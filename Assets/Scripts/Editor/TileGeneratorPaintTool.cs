@@ -9,10 +9,15 @@ public class TileGeneratorPaintTool : EditorTool
     void BeforeSceneGUI(SceneView sceneView)
     {
         if (!ToolManager.IsActiveTool(this)) return;
-        if (Event.current.type == EventType.MouseDrag && Event.current.button == 0)
+
+        if (Event.current.type == EventType.MouseDrag)
         {
             Event.current.Use();
-            Debug.Log("Mouse drag");
+        }
+
+        if (Event.current.type == EventType.MouseUp)
+        {
+            Event.current.Use();
         }
     }
 
