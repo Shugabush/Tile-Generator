@@ -1,6 +1,4 @@
 #if UNITY_EDITOR
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
@@ -8,6 +6,10 @@ using UnityEditor;
 public class TileGeneratorEditor : Editor
 {
     TileGenerator tileGenerator;
+
+    bool drawSelected;
+    bool eraseSelected;
+
     public override void OnInspectorGUI()
     {
         if (tileGenerator == null)
@@ -34,6 +36,20 @@ public class TileGeneratorEditor : Editor
                     tileGenerator.selectedPalette = palette;
                 }
             }
+        }
+
+        GUI.backgroundColor = drawSelected ? Color.red : oldColor;
+        if (GUILayout.Button("Draw"))
+        {
+            drawSelected = !drawSelected;
+            eraseSelected = false;
+        }
+
+        GUI.backgroundColor = eraseSelected ? Color.red : oldColor;
+        if (GUILayout.Button("Erase"))
+        {
+            eraseSelected = !eraseSelected;
+            drawSelected = false;
         }
 
         GUI.backgroundColor = oldColor;
