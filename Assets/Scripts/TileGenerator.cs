@@ -20,6 +20,8 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
     public GameObject selectedTilePrefab;
     public Vector3Int selectedTileIndex = -Vector3Int.one;
 
+    public bool shouldPaint = true;
+
     Tile SelectedTile
     {
         get
@@ -184,7 +186,21 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
         selectedTileIndex = -Vector3Int.one;
     }
 
-    public void PaintTile()
+    public void ChangeTile()
+    {
+        if (shouldPaint)
+        {
+            // Paint tile
+            PaintTile();
+        }
+        else
+        {
+            // Erase tile
+            EraseTile();
+        }
+    }
+
+    void PaintTile()
     {
         // Cache selected tile
         Tile selectedTile = SelectedTile;
@@ -197,6 +213,19 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
 
             selectedTile.obj = newObj;
             selectedTile.prefab = selectedTilePrefab;
+        }
+    }
+
+    void EraseTile()
+    {
+        // Cache selected tile
+        Tile selectedTile = SelectedTile;
+        if (selectedTile != null && selectedTile.obj != null)
+        {
+            // Destroy the existing object
+            DestroyImmediate(selectedTile.obj);
+            selectedTile.obj = null;
+            selectedTile.prefab = null;
         }
     }
 

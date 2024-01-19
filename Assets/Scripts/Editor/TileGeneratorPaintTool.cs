@@ -46,7 +46,7 @@ public class TileGeneratorPaintTool : EditorTool
 
         if (isClicking)
         {
-            tileGenerator.PaintTile();
+            tileGenerator.ChangeTile();
         }
 
         base.OnToolGUI(window);

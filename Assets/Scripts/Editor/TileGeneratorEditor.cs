@@ -87,6 +87,8 @@ public class TileGeneratorEditor : Editor
             window.tileGenerator = tileGenerator;
         }
 
+        tileGenerator.shouldPaint = drawSelected;
+
         if (EditorGUI.EndChangeCheck())
         {
             EditorUtility.SetDirty(tileGenerator);
