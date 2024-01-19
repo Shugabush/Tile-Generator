@@ -61,6 +61,16 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
 
         foreach (var key in keysToRemove)
         {
+            // Before removing the tile at the key location,
+            // Destroy any game object that exists there
+            Tile tile = tiles[key];
+            if (tile.obj != null)
+            {
+#if UNITY_EDITOR
+                UnityEditor.EditorApplication.delayCall += () => DestroyImmediate(tile.obj);
+#endif
+            }
+
             tiles.Remove(key);
         }
 
@@ -71,7 +81,22 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
                 for (int z = 0; z < gridCount.z; z++)
                 {
                     Vector3Int vectorIndex = new Vector3Int(x, y, z);
-                    tiles.TryAdd(vectorIndex, new Tile(this, vectorIndex));
+
+                    if (tiles.TryGetValue(vectorIndex, out Tile tile))
+                    {
+                        
+                    }
+                    else
+                    {
+                        tile = new Tile(this, vectorIndex);
+                        tiles.Add(vectorIndex, tile);
+                    }
+
+                    if (tile.obj != null)
+                    {
+                        tile.obj.transform.position = GetGridScalePoint(vectorIndex);
+                        tile.obj.transform.localScale = GetGridScaleRatio();
+                    }
                 }
             }
         }
