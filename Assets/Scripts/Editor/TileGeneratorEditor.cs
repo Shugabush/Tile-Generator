@@ -50,12 +50,13 @@ public class TileGeneratorEditor : Editor
             // Display selected palette's prefabs
             foreach (var obj in tileGenerator.selectedPalette.objectSets)
             {
-                if (obj != null && obj.prefab != null)
+                GameObject targetObj = obj.GetTargetObject();
+                if (obj != null && targetObj != null)
                 {
-                    GUI.backgroundColor = tileGenerator.selectedTilePrefab == obj.prefab ? Color.green : oldColor;
-                    if (GUILayout.Button(obj.prefab.name))
+                    GUI.backgroundColor = tileGenerator.selectedTilePrefab == targetObj ? Color.green : oldColor;
+                    if (GUILayout.Button(targetObj.name))
                     {
-                        tileGenerator.selectedTilePrefab = tileGenerator.selectedTilePrefab == obj.prefab ? null : obj.prefab;
+                        tileGenerator.selectedTilePrefab = tileGenerator.selectedTilePrefab == targetObj ? null : targetObj;
                     }
                 }
             }
