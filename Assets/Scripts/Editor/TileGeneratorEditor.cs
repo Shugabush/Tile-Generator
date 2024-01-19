@@ -21,8 +21,12 @@ public class TileGeneratorEditor : Editor
 
         EditorGUI.BeginChangeCheck();
 
-        SerializedProperty property = serializedObject.FindProperty("gridSize");
-        EditorGUILayout.PropertyField(property);
+        SerializedProperty gridSize = serializedObject.FindProperty("gridSize");
+        EditorGUILayout.PropertyField(gridSize);
+
+        SerializedProperty gridCount = serializedObject.FindProperty("gridCount");
+        EditorGUILayout.PropertyField(gridCount);
+
         serializedObject.ApplyModifiedProperties();
 
         foreach (TilePalette palette in tileGenerator.palettes)

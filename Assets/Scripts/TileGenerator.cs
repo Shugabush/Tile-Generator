@@ -13,6 +13,8 @@ public class TileGenerator : MonoBehaviour
 
     public TilePalette selectedPalette;
 
+    public Vector3Int selectedTile = -Vector3Int.one;
+
     void OnValidate()
     {
         // Grid count can never go below 1
@@ -56,16 +58,23 @@ public class TileGenerator : MonoBehaviour
             {
                 for (int z = 0; z < tiles.GetLength(2); z++)
                 {
-                    Gizmos.matrix = Matrix4x4.Translate(GetGridScalePoint(x, y, z) - ((gridSize - Vector3.one) * 0.5f));
+                    Gizmos.matrix = Matrix4x4.Translate(transform.TransformPoint(GetGridScalePoint(x, y, z))) * 
+                        Matrix4x4.Rotate(transform.rotation) *
+                        Matrix4x4.Scale(Vector3.Scale(GetGridScaleRatio(), transform.localScale));
 
-                    Gizmos.DrawWireCube(transform.position, GetGridScaleRatio());
+                    if (selectedTile.x == x && selectedTile.y == y && selectedTile.z == z)
+                    {
+                        Gizmos.DrawCube(Vector3.zero, Vector3.one);
+                    }
+                    else
+                    {
+                        Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
+                    }
                 }
             }
         }
 
         Gizmos.matrix = Matrix4x4.identity;
-
-        Gizmos.DrawWireCube(transform.position, gridSize);
     }
 
     Vector3 GetGridScaleRatio()
@@ -91,6 +100,42 @@ public class TileGenerator : MonoBehaviour
         yPoint -= (1 - gridScaleRatio.y) * 0.5f;
         zPoint -= (1 - gridScaleRatio.z) * 0.5f;
 
-        return new Vector3(xPoint, yPoint, zPoint);
+        return new Vector3(xPoint, yPoint, zPoint) - ((gridSize - Vector3.one) * 0.5f);
+    }
+
+    public void GetSelectedPoint(Ray ray)
+    {
+        Plane hPlane = new Plane(transform.up, Vector3.zero);
+        hPlane.distance -= transform.position.y;
+
+        if (hPlane.Raycast(ray, out float distance))
+        {
+            // Cache grid scale ratio
+            Vector3 gridScaleRatio = GetGridScaleRatio();
+
+            Vector3 selectedPoint = transform.InverseTransformPoint(ray.GetPoint(distance));
+
+            // Trying to convert xPoint, yPoint, and zPoint into what the indexes will be (excluding decimals)
+            float xPoint = selectedPoint.x + gridSize.x * 0.5f;
+            float yPoint = selectedPoint.y + gridSize.y * 0.5f;
+            float zPoint = selectedPoint.z + gridSize.z * 0.5f;
+
+            xPoint /= gridScaleRatio.x;
+            yPoint /= gridScaleRatio.y;
+            zPoint /= gridScaleRatio.z;
+
+            int xIndex = (int)xPoint;
+            int yIndex = (int)yPoint;
+            int zIndex = (int)zPoint;
+
+            if (xIndex < tiles.GetLength(0) && xIndex >= 0
+                && yIndex < tiles.GetLength(1) && yIndex >= 0
+                && zIndex < tiles.GetLength(2) && zIndex >= 0)
+            {
+                selectedTile = new Vector3Int(xIndex, yIndex, zIndex);
+                return;
+            }
+        }
+        selectedTile = -Vector3Int.one;
     }
 }
