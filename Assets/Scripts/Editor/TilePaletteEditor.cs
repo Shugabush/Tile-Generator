@@ -37,8 +37,7 @@ public class TilePaletteEditor : Editor
                 {
                     Rect rectSize = new Rect(x * inspectorWidthRatio, 250 + z * inspectorWidthRatio, inspectorWidthRatio, inspectorWidthRatio);
 
-                    set.SetObject(x, targetYIndex, z,
-                        (GameObject)EditorGUI.ObjectField(rectSize, set.GetObject(x, targetYIndex, z), typeof(GameObject), false));
+                    set.defaultGameObject = (GameObject)EditorGUI.ObjectField(rectSize, set.defaultGameObject, typeof(GameObject), false);
 
                 }
             }

@@ -7,6 +7,11 @@ public class RuleTile : ScriptableObject
 {
     public GameObject defaultGameObject = null;
 
+    public GameObject GetObject()
+    {
+        return defaultGameObject;
+    }
+
     public Rule[] rules = new Rule[0];
 
     [System.Serializable]

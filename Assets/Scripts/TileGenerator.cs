@@ -239,6 +239,9 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
             selectedTile.obj = newObj;
             selectedTile.prefab = selectedTilePrefab;
         }
+#if UNITY_EDITOR
+        UnityEditor.EditorUtility.SetDirty(this);
+#endif
     }
 
     void EraseTile()
@@ -252,13 +255,9 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
             selectedTile.obj = null;
             selectedTile.prefab = null;
         }
-    }
-
-    bool SelectedTileIsValid()
-    {
-        return selectedTileIndex.x >= 0 && selectedTileIndex.x < tileCount.x &&
-               selectedTileIndex.y >= 0 && selectedTileIndex.y < tileCount.y &&
-               selectedTileIndex.z >= 0 && selectedTileIndex.z < tileCount.z;
+#if UNITY_EDITOR
+        UnityEditor.EditorUtility.SetDirty(this);
+#endif
     }
 
     public void OnBeforeSerialize()

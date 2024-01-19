@@ -29,5 +29,5 @@ public class TilePalette : ScriptableObject
         }
     }
 
-    public List<ObjectSet> objectSets = new List<ObjectSet>();
+    public List<RuleTile> objectSets = new List<RuleTile>();
 }
