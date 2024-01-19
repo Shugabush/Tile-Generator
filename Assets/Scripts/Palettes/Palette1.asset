@@ -14,3 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectSets:
   - prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    serializedObjects:
+    - {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    objectsLength: {x: 2, y: 1, z: 2}

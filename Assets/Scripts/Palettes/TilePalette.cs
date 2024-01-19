@@ -10,6 +10,12 @@ public class TilePalette : ScriptableObject
     {
         public GameObject prefab;
 
+        [SerializeField, HideInInspector]
+        GameObject[] serializedObjects = new GameObject[1];
+
+        [SerializeField, HideInInspector]
+        Vector3Int objectsLength = Vector3Int.one;
+
         public GameObject[,,] objects = new GameObject[1, 1, 1];
 
         public bool ChangeObjectDimensions(Vector3Int indexCount)
@@ -56,6 +62,41 @@ public class TilePalette : ScriptableObject
 
             objects = newObjects;
             return true;
+        }
+
+        public void Save()
+        {
+            objectsLength = new Vector3Int(objects.GetLength(0), objects.GetLength(1), objects.GetLength(2));
+            serializedObjects = new GameObject[objectsLength.x * objectsLength.y * objectsLength.z];
+
+            for (int x = 0; x < objectsLength.x; x++)
+            {
+                for (int y = 0; y < objectsLength.y; y++)
+                {
+                    for (int z = 0; z < objectsLength.z; z++)
+                    {
+                        int targetIndex = x + (z * objectsLength.x) + (y * objectsLength.x * objectsLength.z);
+                        serializedObjects[targetIndex] = objects[x, y, z];
+                    }
+                }
+            }
+        }
+
+        public void Load()
+        {
+            objects = new GameObject[objectsLength.x, objectsLength.y, objectsLength.z];
+
+            for (int x = 0; x < objectsLength.x; x++)
+            {
+                for (int y = 0; y < objectsLength.y; y++)
+                {
+                    for (int z = 0; z < objectsLength.z; z++)
+                    {
+                        int targetIndex = x + (z * objectsLength.x) + (y * objectsLength.x * objectsLength.z);
+                        objects[x, y, z] = serializedObjects[targetIndex];
+                    }
+                }
+            }
         }
     }
 

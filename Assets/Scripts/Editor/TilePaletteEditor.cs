@@ -32,7 +32,10 @@ public class TilePaletteEditor : Editor
             if (set.ChangeObjectDimensions(objectsXLength, objectsYLength, objectsZLength))
             {
                 EditorUtility.SetDirty(palette);
+                set.Save();
             }
+
+            set.Load();
 
             for (int x = 0; x < set.objects.GetLength(0); x++)
             {
@@ -47,6 +50,10 @@ public class TilePaletteEditor : Editor
 
         if (EditorGUI.EndChangeCheck())
         {
+            foreach (var set in palette.objectSets)
+            {
+                set.Save();
+            }
             EditorUtility.SetDirty(palette);
         }
     }

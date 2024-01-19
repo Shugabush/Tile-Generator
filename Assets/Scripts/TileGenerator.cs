@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TileGenerator : MonoBehaviour
+public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
 {
     [SerializeField] Vector3Int gridCount = Vector3Int.one;
     [SerializeField] Vector3 gridSize = Vector3.one * 25;
@@ -174,5 +174,15 @@ public class TileGenerator : MonoBehaviour
         return selectedTileIndex.x >= 0 && selectedTileIndex.x < tiles.GetLength(0) &&
                selectedTileIndex.y >= 0 && selectedTileIndex.y < tiles.GetLength(1) &&
                selectedTileIndex.z >= 0 && selectedTileIndex.z < tiles.GetLength(2);
+    }
+
+    public void OnBeforeSerialize()
+    {
+
+    }
+
+    public void OnAfterDeserialize()
+    {
+
     }
 }
