@@ -12,8 +12,8 @@ public class TileGenerator : MonoBehaviour
     public List<TilePalette> palettes = new List<TilePalette>();
 
     public TilePalette selectedPalette;
-
-    public Vector3Int selectedTile = -Vector3Int.one;
+    public GameObject selectedTilePrefab;
+    public Vector3Int selectedTileIndex = -Vector3Int.one;
 
     void OnValidate()
     {
@@ -33,13 +33,21 @@ public class TileGenerator : MonoBehaviour
             // Then set the original tile array to the new one
 
             Tile[,,] newTiles = new Tile[gridCount.x, gridCount.y, gridCount.z];
-            for (int x = 0; x < Mathf.Min(tiles.GetLength(0), newTiles.GetLength(0)); x++)
+            for (int x = 0; x < newTiles.GetLength(0); x++)
             {
-                for (int y = 0; y < Mathf.Min(tiles.GetLength(1), newTiles.GetLength(1)); y++)
+                for (int y = 0; y < newTiles.GetLength(1); y++)
                 {
-                    for (int z = 0; z < Mathf.Min(tiles.GetLength(2), newTiles.GetLength(2)); z++)
+                    for (int z = 0; z < newTiles.GetLength(2); z++)
                     {
-                        newTiles[x, y, z] = tiles[x, y, z];
+                        if (IndexIsValid(x, y, z))
+                        {
+                            newTiles[x, y, z] = tiles[x, y, z];
+                            newTiles[x, y, z].indexPosition = new Vector3Int(x, y, z);
+                        }
+                        else
+                        {
+                            newTiles[x, y, z] = new Tile(this, new Vector3Int(x, y, z));
+                        }
                     }
                 }
             }
@@ -62,7 +70,7 @@ public class TileGenerator : MonoBehaviour
                         Matrix4x4.Rotate(transform.rotation) *
                         Matrix4x4.Scale(Vector3.Scale(GetGridScaleRatio(), transform.localScale));
 
-                    if (selectedTile.x == x && selectedTile.y == y && selectedTile.z == z)
+                    if (selectedTileIndex.x == x && selectedTileIndex.y == y && selectedTileIndex.z == z)
                     {
                         Gizmos.DrawCube(Vector3.zero, Vector3.one);
                     }
@@ -132,10 +140,39 @@ public class TileGenerator : MonoBehaviour
                 && yIndex < tiles.GetLength(1) && yIndex >= 0
                 && zIndex < tiles.GetLength(2) && zIndex >= 0)
             {
-                selectedTile = new Vector3Int(xIndex, yIndex, zIndex);
+                selectedTileIndex = new Vector3Int(xIndex, yIndex, zIndex);
                 return;
             }
         }
-        selectedTile = -Vector3Int.one;
+        selectedTileIndex = -Vector3Int.one;
+    }
+
+    public void PaintTile()
+    {
+        if (SelectedTileIsValid() && selectedPalette != null && selectedTilePrefab != null)
+        {
+            // Create the game object
+        }
+    }
+
+    bool IndexIsValid(Vector3Int index)
+    {
+        return index.x >= 0 && index.x < tiles.GetLength(0) &&
+               index.y >= 0 && index.y < tiles.GetLength(1) &&
+               index.z >= 0 && index.z < tiles.GetLength(2);
+    }
+
+    bool IndexIsValid(int x, int y, int z)
+    {
+        return x >= 0 && x < tiles.GetLength(0) &&
+               y >= 0 && y < tiles.GetLength(1) &&
+               z >= 0 && z < tiles.GetLength(2);
+    }
+
+    bool SelectedTileIsValid()
+    {
+        return selectedTileIndex.x >= 0 && selectedTileIndex.x < tiles.GetLength(0) &&
+               selectedTileIndex.y >= 0 && selectedTileIndex.y < tiles.GetLength(1) &&
+               selectedTileIndex.z >= 0 && selectedTileIndex.z < tiles.GetLength(2);
     }
 }

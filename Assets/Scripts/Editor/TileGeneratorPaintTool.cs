@@ -46,7 +46,7 @@ public class TileGeneratorPaintTool : EditorTool
 
         if (isClicking)
         {
-            
+            tileGenerator.PaintTile();
         }
 
         base.OnToolGUI(window);
@@ -70,7 +70,7 @@ public class TileGeneratorPaintTool : EditorTool
         base.OnWillBeDeactivated();
 
         SceneView.beforeSceneGui -= BeforeSceneGUI;
-        tileGenerator.selectedTile = -Vector3Int.one;
+        tileGenerator.selectedTileIndex = -Vector3Int.one;
     }
 
     Vector3 GetCurrentMousePositionInScene()

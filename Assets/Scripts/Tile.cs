@@ -2,21 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class Tile
 {
-    bool initialized = false;
+    public TileGenerator parent;
 
-    TileGenerator parent;
+    public Vector3Int indexPosition;
 
-    Vector3Int indexPosition;
+    // Game Object that is occupying this tile slot (if any)
+    public GameObject obj;
 
-    public void Initialize(TileGenerator parent, Vector3Int indexPosition)
+    public Tile(TileGenerator parent, Vector3Int indexPosition)
     {
-        if (!initialized || this.parent == null)
-        {
-            this.parent = parent;
-            this.indexPosition = indexPosition;
-            initialized = true;
-        }
+        this.parent = parent;
+        this.indexPosition = indexPosition;
     }
 }

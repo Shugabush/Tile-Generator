@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 032e181d79173d044ad3fcd7e4865537, type: 3}
   m_Name: Palette1
   m_EditorClassIdentifier: 
-  prefabs: []
+  objectSets:
+  - prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}

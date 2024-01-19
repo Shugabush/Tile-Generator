@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.UIElements;
 
 [CustomEditor(typeof(TileGenerator))]
 public class TileGeneratorEditor : Editor
@@ -37,10 +38,31 @@ public class TileGeneratorEditor : Editor
                 
                 if (GUILayout.Button(palette.name))
                 {
-                    tileGenerator.selectedPalette = palette;
+                    tileGenerator.selectedPalette = tileGenerator.selectedPalette == palette ? null : palette;
                 }
             }
         }
+
+        GUILayout.Space(25);
+
+        if (tileGenerator.selectedPalette != null)
+        {
+            // Display selected palette's prefabs
+            foreach (var obj in tileGenerator.selectedPalette.objectSets)
+            {
+                if (obj != null && obj.prefab != null)
+                {
+                    GUI.backgroundColor = tileGenerator.selectedTilePrefab == obj.prefab ? Color.green : oldColor;
+                    if (GUILayout.Button(obj.prefab.name))
+                    {
+                        tileGenerator.selectedTilePrefab = tileGenerator.selectedTilePrefab == obj.prefab ? null : obj.prefab;
+                    }
+                }
+            }
+        }
+
+
+        GUILayout.Space(25);
 
         GUI.backgroundColor = drawSelected ? Color.red : oldColor;
         if (GUILayout.Button("Draw"))

@@ -350,4 +350,5 @@ MonoBehaviour:
   palettes:
   - {fileID: 11400000, guid: fb940e17ea9a91d40b84ea2f6ac5b19a, type: 2}
   selectedPalette: {fileID: 11400000, guid: fb940e17ea9a91d40b84ea2f6ac5b19a, type: 2}
-  selectedTile: {x: -1, y: -1, z: -1}
+  selectedTilePrefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+  selectedTileIndex: {x: -1, y: -1, z: -1}
