@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8bee137f346016043b54821c0df249e5, type: 3}
-  m_Name: New Rule Tile
+  m_Name: Cube
   m_EditorClassIdentifier: 
   defaultGameObject: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
   rules:

@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
 {
     [SerializeField] Vector3Int gridCount = Vector3Int.one;
@@ -211,6 +215,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
         selectedTileIndex = -Vector3Int.one;
     }
 
+#if UNITY_EDITOR
     public void ChangeTile()
     {
         if (shouldPaint)
@@ -232,16 +237,20 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
         if (selectedTile != null && selectedTile.GetPrefab() != selectedTilePrefab &&
             selectedPalette != null && selectedTilePrefab != null)
         {
+            if (selectedTile.obj != null)
+            {
+                // Destroy existing obj
+                DestroyImmediate(selectedTile.obj);
+            }
+
             // Create the game object
-            GameObject newObj = Instantiate(selectedTilePrefab, transform);
+            GameObject newObj = (GameObject)PrefabUtility.InstantiatePrefab(selectedTilePrefab, transform);
             newObj.transform.position = GetGridScalePoint(selectedTile.indexPosition);
 
             selectedTile.obj = newObj;
             selectedTile.prefab = selectedTilePrefab;
         }
-#if UNITY_EDITOR
-        UnityEditor.EditorUtility.SetDirty(this);
-#endif
+        EditorUtility.SetDirty(this);
     }
 
     void EraseTile()
@@ -255,10 +264,9 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
             selectedTile.obj = null;
             selectedTile.prefab = null;
         }
-#if UNITY_EDITOR
-        UnityEditor.EditorUtility.SetDirty(this);
-#endif
+        EditorUtility.SetDirty(this);
     }
+#endif
 
     public void OnBeforeSerialize()
     {

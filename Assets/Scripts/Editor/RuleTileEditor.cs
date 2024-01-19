@@ -5,29 +5,7 @@ using UnityEngine;
 [CustomEditor(typeof(RuleTile)), CanEditMultipleObjects]
 public class RuleTileEditor : Editor
 {
-    RuleTile ruleTile;
 
-    public override void OnInspectorGUI()
-    {
-        if (ruleTile == null)
-        {
-            ruleTile = (RuleTile)target;
-        }
-
-        EditorGUI.BeginChangeCheck();
-
-        serializedObject.Update();
-
-        SerializedProperty ruleArray = serializedObject.FindProperty("rules");
-        EditorGUILayout.PropertyField(ruleArray);
-
-        serializedObject.ApplyModifiedProperties();
-
-        if (EditorGUI.EndChangeCheck())
-        {
-            EditorUtility.SetDirty(ruleTile);
-        }
-    }
 }
 
 /*[CustomPropertyDrawer(typeof(RuleTile.Rule.Slot))]
