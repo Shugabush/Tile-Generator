@@ -246,6 +246,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
             // Create the game object
             GameObject newObj = (GameObject)PrefabUtility.InstantiatePrefab(selectedTilePrefab, transform);
             newObj.transform.position = GetGridScalePoint(selectedTile.indexPosition);
+            newObj.transform.localScale = GetGridScaleRatio();
 
             selectedTile.obj = newObj;
             selectedTile.prefab = selectedTilePrefab;
