@@ -54,19 +54,6 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
             }
         }
     }
-    void OnDisable()
-    {
-        if (Application.isPlaying)
-        {
-            foreach (var tile in tiles.Values)
-            {
-                if (tile.obj != null)
-                {
-                    tile.obj.SetActive(false);
-                }
-            }
-        }
-    }
 
     void OnValidate()
     {
@@ -124,7 +111,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
 
                     if (tile.obj != null)
                     {
-                        tile.obj.transform.position = GetGridScalePoint(vectorIndex);
+                        tile.obj.transform.position = transform.TransformPoint(GetGridScalePoint(vectorIndex));
                         tile.obj.transform.localScale = GetGridScaleRatio();
 
                         if (showAllYLevels)
@@ -190,11 +177,6 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
         return new Vector3(gridSize.x / gridCount.x, gridSize.y / gridCount.y, gridSize.z / gridCount.z);
     }
 
-    Vector3 GetGridScaleRatioInverse()
-    {
-        return new Vector3(gridCount.x / gridSize.x, gridCount.y / gridSize.y, gridCount.z / gridSize.z);
-    }
-
     Vector3 GetGridScalePoint(Vector3Int index)
     {
         // Cache grid scale ratio
@@ -227,9 +209,9 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
         return new Vector3(xPoint, yPoint, zPoint) - ((gridSize - Vector3.one) * 0.5f);
     }
 
-    public void GetSelectedPoint(Ray ray)
+    public bool GetSelectedPoint(Ray ray)
     {
-        Plane hPlane = new Plane(transform.up, GetGridScalePoint(0, selectedTileIndex.y, 0));
+        Plane hPlane = new Plane(transform.up, transform.TransformPoint(GetGridScalePoint(0, selectedTileIndex.y, 0)));
         hPlane.distance -= transform.position.y;
 
         if (hPlane.Raycast(ray, out float distance))
@@ -258,11 +240,12 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
             {
                 selectedTileIndex.x = xIndex;
                 selectedTileIndex.z = zIndex;
-                return;
+                return true;
             }
         }
         selectedTileIndex.x = -1;
         selectedTileIndex.z = -1;
+        return false;
     }
 
 #if UNITY_EDITOR
@@ -295,7 +278,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
 
             // Create the game object
             GameObject newObj = (GameObject)PrefabUtility.InstantiatePrefab(selectedTilePrefab, transform);
-            newObj.transform.position = GetGridScalePoint(selectedTile.indexPosition);
+            newObj.transform.position = transform.TransformPoint(GetGridScalePoint(selectedTile.indexPosition));
             newObj.transform.localScale = GetGridScaleRatio();
 
             selectedTile.obj = newObj;
@@ -337,14 +320,6 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
         for (int i = 0; i < Mathf.Min(tileKeys.Count, tileValues.Count); i++)
         {
             tiles.Add(tileKeys[i], tileValues[i]);
-        }
-    }
-
-    void OnGUI()
-    {
-        foreach (var kvp in tiles)
-        {
-            GUILayout.Label("Key: " + kvp.Key + " value: " + kvp.Value);
         }
     }
 }

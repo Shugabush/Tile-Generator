@@ -2,7 +2,6 @@
 using UnityEngine;
 using UnityEditor.EditorTools;
 using UnityEditor;
-using Unity.VisualScripting;
 
 [EditorTool("Paint Tool", typeof(TileGenerator))]
 public class TileGeneratorPaintTool : EditorTool
@@ -40,9 +39,15 @@ public class TileGeneratorPaintTool : EditorTool
 
         if (Selection.activeGameObject == null || !Selection.activeGameObject.TryGetComponent<TileGenerator>(out _)) return;
 
-        Handles.DrawWireDisc(GetCurrentMousePositionInScene(), Vector3.up, 0.5f);
 
-        tileGenerator.GetSelectedPoint(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition));
+        if (tileGenerator.GetSelectedPoint(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition)))
+        {
+            Handles.DrawWireDisc(GetCurrentMousePositionInScene(), Selection.activeTransform.up, 0.5f);
+        }
+        else
+        {
+            Handles.DrawWireDisc(GetCurrentMousePositionInScene(), Vector3.up, 0.5f);
+        }
 
         if (isClicking)
         {
