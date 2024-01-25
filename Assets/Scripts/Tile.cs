@@ -26,8 +26,20 @@ public class Tile
         int targetIndex = (x + 1) * 9;
         targetIndex += (y + 1) * 3;
         targetIndex += z + 1;
-        Debug.Log(targetIndex + " from " + $"{x}, {y}, {z}");
-        //adjacentObjects[targetIndex] = newObj;
+        adjacentObjects[targetIndex] = newObj;
+    }
+
+    public GameObject GetAdjacentObject(Vector3Int directionIndex)
+    {
+        return GetAdjacentObject(directionIndex.x, directionIndex.y, directionIndex.z);
+    }
+
+    public GameObject GetAdjacentObject(int x, int y, int z)
+    {
+        int targetIndex = (x + 1) * 9;
+        targetIndex += (y + 1) * 3;
+        targetIndex += z + 1;
+        return adjacentObjects[targetIndex];
     }
 
     public GameObject GetPrefab()

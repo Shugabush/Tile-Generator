@@ -11,6 +11,8 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
     [SerializeField] Vector3Int gridCount = Vector3Int.one;
     [SerializeField] Vector3 gridSize = Vector3.one * 25;
 
+    public Vector3Int GridCount => gridCount;
+
     Vector3Int tileCount = Vector3Int.one;
 
     [SerializeField] List<Vector3Int> tileKeys = new List<Vector3Int>();
@@ -25,6 +27,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
     public Vector3Int selectedTileIndex = -Vector3Int.one;
 
     public bool shouldPaint = true;
+    public bool showAllYLevels = true;
 
     Tile SelectedTile
     {
@@ -35,6 +38,33 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
                 return tile;
             }
             return null;
+        }
+    }
+
+    void OnEnable()
+    {
+        if (Application.isPlaying)
+        {
+            foreach (var tile in tiles.Values)
+            {
+                if (tile.obj != null)
+                {
+                    tile.obj.SetActive(true);
+                }
+            }
+        }
+    }
+    void OnDisable()
+    {
+        if (Application.isPlaying)
+        {
+            foreach (var tile in tiles.Values)
+            {
+                if (tile.obj != null)
+                {
+                    tile.obj.SetActive(false);
+                }
+            }
         }
     }
 
@@ -71,7 +101,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
             if (tile.obj != null)
             {
 #if UNITY_EDITOR
-                UnityEditor.EditorApplication.delayCall += () => DestroyImmediate(tile.obj);
+                EditorApplication.delayCall += () => DestroyImmediate(tile.obj);
 #endif
             }
 
@@ -86,11 +116,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
                 {
                     Vector3Int vectorIndex = new Vector3Int(x, y, z);
 
-                    if (tiles.TryGetValue(vectorIndex, out Tile tile))
-                    {
-                        
-                    }
-                    else
+                    if (!tiles.TryGetValue(vectorIndex, out Tile tile))
                     {
                         tile = new Tile(this, vectorIndex);
                         tiles.Add(vectorIndex, tile);
@@ -100,6 +126,16 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
                     {
                         tile.obj.transform.position = GetGridScalePoint(vectorIndex);
                         tile.obj.transform.localScale = GetGridScaleRatio();
+
+                        if (showAllYLevels)
+                        {
+                            tile.obj.SetActive(true);
+                            tile.obj.hideFlags = hideFlags;
+                        }
+                        else
+                        {
+                            tile.obj.SetActive(y == selectedTileIndex.y);
+                        }
                     }
                 }
             }
@@ -114,27 +150,39 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
 
         for (int x = 0; x < tileCount.x; x++)
         {
-            for (int y = 0; y < tileCount.y; y++)
+            for (int z = 0; z < tileCount.z; z++)
             {
-                for (int z = 0; z < tileCount.z; z++)
+                if (showAllYLevels)
                 {
-                    Gizmos.matrix = Matrix4x4.Translate(transform.TransformPoint(GetGridScalePoint(x, y, z))) * 
-                        Matrix4x4.Rotate(transform.rotation) *
-                        Matrix4x4.Scale(Vector3.Scale(GetGridScaleRatio(), transform.localScale));
-
-                    if (selectedTileIndex.x == x && selectedTileIndex.y == y && selectedTileIndex.z == z)
+                    for (int y = 0; y < tileCount.y; y++)
                     {
-                        Gizmos.DrawCube(Vector3.zero, Vector3.one);
+                        DrawTile(x, y, z);
                     }
-                    else
-                    {
-                        Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
-                    }
+                }
+                else
+                {
+                    DrawTile(x, selectedTileIndex.y, z);
                 }
             }
         }
 
         Gizmos.matrix = Matrix4x4.identity;
+    }
+
+    void DrawTile(int x, int y, int z)
+    {
+        Gizmos.matrix = Matrix4x4.Translate(transform.TransformPoint(GetGridScalePoint(x, y, z))) *
+                    Matrix4x4.Rotate(transform.rotation) *
+                    Matrix4x4.Scale(Vector3.Scale(GetGridScaleRatio(), transform.localScale));
+
+        if (selectedTileIndex.x == x && selectedTileIndex.y == y && selectedTileIndex.z == z)
+        {
+            Gizmos.DrawCube(Vector3.zero, Vector3.one);
+        }
+        else
+        {
+            Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
+        }
     }
 
     Vector3 GetGridScaleRatio()
@@ -181,7 +229,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
 
     public void GetSelectedPoint(Ray ray)
     {
-        Plane hPlane = new Plane(transform.up, Vector3.zero);
+        Plane hPlane = new Plane(transform.up, GetGridScalePoint(0, selectedTileIndex.y, 0));
         hPlane.distance -= transform.position.y;
 
         if (hPlane.Raycast(ray, out float distance))
@@ -208,11 +256,13 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
                 && yIndex < tileCount.y && yIndex >= 0
                 && zIndex < tileCount.z && zIndex >= 0)
             {
-                selectedTileIndex = new Vector3Int(xIndex, yIndex, zIndex);
+                selectedTileIndex.x = xIndex;
+                selectedTileIndex.z = zIndex;
                 return;
             }
         }
-        selectedTileIndex = -Vector3Int.one;
+        selectedTileIndex.x = -1;
+        selectedTileIndex.z = -1;
     }
 
 #if UNITY_EDITOR

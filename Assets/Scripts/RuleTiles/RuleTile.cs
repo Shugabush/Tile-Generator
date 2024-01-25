@@ -51,12 +51,16 @@ public class RuleTile : ScriptableObject
         public Slot[] slots = new Slot[26];
         public GameObject newObj;
 
-        public void Evaluate(Tile currentTile, Tile[] parentArray)
+        public bool Evaluate(Tile tile)
         {
             foreach (var slot in slots)
             {
-
+                if (!slot.Evaluate(tile))
+                {
+                    return false;
+                }
             }
+            return true;
         }
 
         public Slot GetSlot(Vector3Int direction)
@@ -105,19 +109,17 @@ public class RuleTile : ScriptableObject
                 GUI.DrawTexture(position, xMarkTexture);
             }
 
-            public bool Evaluate(Tile currentTile, Tile[] parentArray)
+            public bool Evaluate(Tile tile)
             {
                 switch (condition)
                 {
                     case Condition.ExistingTile:
-                        break;
+                        return tile.GetAdjacentObject(direction) != null;
                     case Condition.NoTile:
-                        break;
+                        return tile.GetAdjacentObject(direction) == null;
                     default:
                         return false;
                 }
-
-                return false;
             }
         }
     }
