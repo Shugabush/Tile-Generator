@@ -14,6 +14,22 @@ public class Tile
     // Game Object that is occupying this tile slot (if any)
     public GameObject obj;
 
+    GameObject[] adjacentObjects = new GameObject[26];
+
+    public void SetAdjacentObject(Vector3Int directionIndex, GameObject newObj)
+    {
+        SetAdjacentObject(directionIndex.x, directionIndex.y, directionIndex.z, newObj);
+    }
+
+    public void SetAdjacentObject(int x, int y, int z, GameObject newObj)
+    {
+        int targetIndex = (x + 1) * 9;
+        targetIndex += (y + 1) * 3;
+        targetIndex += z + 1;
+        Debug.Log(targetIndex + " from " + $"{x}, {y}, {z}");
+        //adjacentObjects[targetIndex] = newObj;
+    }
+
     public GameObject GetPrefab()
     {
         if (obj == null)
