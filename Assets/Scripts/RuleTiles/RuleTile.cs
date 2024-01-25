@@ -7,8 +7,17 @@ public class RuleTile : ScriptableObject
 {
     public GameObject defaultGameObject = null;
 
-    public GameObject GetObject()
+    public GameObject GetObject(Tile tile)
     {
+        foreach (var rule in rules)
+        {
+            GameObject evaluatedObj = rule.Evaluate(tile);
+            if (evaluatedObj != null)
+            {
+                Debug.Log("here");
+                return evaluatedObj;
+            }
+        }
         return defaultGameObject;
     }
 
@@ -51,16 +60,16 @@ public class RuleTile : ScriptableObject
         public Slot[] slots = new Slot[26];
         public GameObject newObj;
 
-        public bool Evaluate(Tile tile)
+        public GameObject Evaluate(Tile tile)
         {
             foreach (var slot in slots)
             {
                 if (!slot.Evaluate(tile))
                 {
-                    return false;
+                    return null;
                 }
             }
-            return true;
+            return newObj;
         }
 
         public Slot GetSlot(Vector3Int direction)
@@ -111,12 +120,13 @@ public class RuleTile : ScriptableObject
 
             public bool Evaluate(Tile tile)
             {
+                if (tile == null) return false;
                 switch (condition)
                 {
                     case Condition.ExistingTile:
-                        return tile.GetAdjacentObject(direction) != null;
+                        return tile.GetAdjacentTile(direction) != null;
                     case Condition.NoTile:
-                        return tile.GetAdjacentObject(direction) == null;
+                        return tile.GetAdjacentTile(direction) == null;
                     default:
                         return false;
                 }

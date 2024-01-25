@@ -13,8 +13,6 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
 
     public Vector3Int GridCount => gridCount;
 
-    Vector3Int tileCount = Vector3Int.one;
-
     [SerializeField] List<Vector3Int> tileKeys = new List<Vector3Int>();
     [SerializeField] List<Tile> tileValues = new List<Tile>();
 
@@ -29,7 +27,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
     public bool shouldPaint = true;
     public bool showAllYLevels = true;
 
-    Tile SelectedTile
+    public Tile SelectedTile
     {
         get
         {
@@ -101,47 +99,104 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
             {
                 for (int z = 0; z < gridCount.z; z++)
                 {
-                    Vector3Int vectorIndex = new Vector3Int(x, y, z);
-
-                    if (!tiles.TryGetValue(vectorIndex, out Tile tile))
-                    {
-                        tile = new Tile(this, vectorIndex);
-                        tiles.Add(vectorIndex, tile);
-                    }
-
-                    if (tile.obj != null)
-                    {
-                        tile.obj.transform.position = transform.TransformPoint(GetGridScalePoint(vectorIndex));
-                        tile.obj.transform.localScale = GetGridScaleRatio();
-
-                        if (showAllYLevels)
-                        {
-                            tile.obj.SetActive(true);
-                            tile.obj.hideFlags = hideFlags;
-                        }
-                        else
-                        {
-                            tile.obj.SetActive(y == selectedTileIndex.y);
-                        }
-                    }
+                    ValidateTile(x, y, z);
                 }
             }
         }
+    }
 
-        tileCount = gridCount;
+    void ValidateTile(int x, int y, int z)
+    {
+        Vector3Int vectorIndex = new Vector3Int(x, y, z);
+
+        if (!tiles.TryGetValue(vectorIndex, out Tile tile))
+        {
+            tile = new Tile(this, vectorIndex);
+            tiles.Add(vectorIndex, tile);
+        }
+
+        if (tile.obj != null)
+        {
+            tile.obj.transform.position = transform.TransformPoint(GetGridScalePoint(vectorIndex));
+            tile.obj.transform.localScale = GetGridScaleRatio();
+
+            if (showAllYLevels)
+            {
+                tile.obj.SetActive(true);
+                tile.obj.hideFlags = hideFlags;
+            }
+            else
+            {
+                tile.obj.SetActive(y == selectedTileIndex.y);
+            }
+            ManageAdjacentTiles(tile);
+        }
+    }
+
+    void ManageAdjacentTiles(Tile targetTile)
+    {
+        int x = targetTile.indexPosition.x;
+        int y = targetTile.indexPosition.y;
+        int z = targetTile.indexPosition.z;
+
+        bool adjLeft = x > 0;
+        bool adjRight = x < gridCount.x;
+
+        bool adjDown = y > 0;
+        bool adjUp = y < gridCount.y;
+
+        bool adjBackward = z > 0;
+        bool adjForward = z < gridCount.y;
+
+        if (adjLeft)
+        {
+            targetTile.SetAdjacentTile(Vector3Int.left, tiles[new Vector3Int(x - 1, y, z)]);
+        }
+        if (adjRight)
+        {
+            targetTile.SetAdjacentTile(Vector3Int.right, tiles[new Vector3Int(x + 1, y, z)]);
+        }
+
+        if (adjDown)
+        {
+            targetTile.SetAdjacentTile(Vector3Int.down, tiles[new Vector3Int(x, y - 1, z)]);
+        }
+        if (adjUp)
+        {
+            targetTile.SetAdjacentTile(Vector3Int.up, tiles[new Vector3Int(x, y + 1, z)]);
+        }
+
+        if (adjBackward)
+        {
+            targetTile.SetAdjacentTile(Vector3Int.back, tiles[new Vector3Int(x, y, z - 1)]);
+        }
+        if (adjForward)
+        {
+            targetTile.SetAdjacentTile(Vector3Int.forward, tiles[new Vector3Int(x, y, z + 1)]);
+        }
+
+        if (adjLeft && adjDown)
+        {
+            targetTile.SetAdjacentTile(Vector3Int.left + Vector3Int.down, tiles[new Vector3Int(x, y, z + 1)]);
+        }
+    }
+
+    void ManageSingleAdjacentTile(Tile targetTile, Vector3Int direction)
+    {
+
     }
 
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
 
-        for (int x = 0; x < tileCount.x; x++)
+        for (int x = 0; x < gridCount.x; x++)
         {
-            for (int z = 0; z < tileCount.z; z++)
+            for (int z = 0; z < gridCount.z; z++)
             {
                 if (showAllYLevels)
                 {
-                    for (int y = 0; y < tileCount.y; y++)
+                    for (int y = 0; y < gridCount.y; y++)
                     {
                         DrawTile(x, y, z);
                     }
@@ -234,9 +289,9 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
             int yIndex = (int)yPoint;
             int zIndex = (int)zPoint;
 
-            if (xIndex < tileCount.x && xIndex >= 0
-                && yIndex < tileCount.y && yIndex >= 0
-                && zIndex < tileCount.z && zIndex >= 0)
+            if (xIndex < gridCount.x && xIndex >= 0
+                && yIndex < gridCount.y && yIndex >= 0
+                && zIndex < gridCount.z && zIndex >= 0)
             {
                 selectedTileIndex.x = xIndex;
                 selectedTileIndex.z = zIndex;

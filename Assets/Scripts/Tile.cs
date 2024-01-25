@@ -14,32 +14,51 @@ public class Tile
     // Game Object that is occupying this tile slot (if any)
     public GameObject obj;
 
-    GameObject[] adjacentObjects = new GameObject[26];
+    Tile[] adjacentTiles = new Tile[26];
 
-    public void SetAdjacentObject(Vector3Int directionIndex, GameObject newObj)
+    public void SetAdjacentTile(Vector3Int directionIndex, Tile newTile)
     {
-        SetAdjacentObject(directionIndex.x, directionIndex.y, directionIndex.z, newObj);
+        SetAdjacentTile(directionIndex.x, directionIndex.y, directionIndex.z, newTile);
     }
 
-    public void SetAdjacentObject(int x, int y, int z, GameObject newObj)
+    public void SetAdjacentTile(int x, int y, int z, Tile newTile)
     {
+        if (adjacentTiles == null || adjacentTiles.Length == 0)
+        {
+            adjacentTiles = new Tile[26];
+        }
+
         int targetIndex = (x + 1) * 9;
         targetIndex += (y + 1) * 3;
         targetIndex += z + 1;
-        adjacentObjects[targetIndex] = newObj;
+        if (adjacentTiles[targetIndex] != newTile)
+        {
+            adjacentTiles[targetIndex] = newTile;
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+            {
+                UnityEditor.EditorUtility.SetDirty(parent);
+            }
+#endif
+        }
     }
 
-    public GameObject GetAdjacentObject(Vector3Int directionIndex)
+    public Tile GetAdjacentTile(Vector3Int directionIndex)
     {
-        return GetAdjacentObject(directionIndex.x, directionIndex.y, directionIndex.z);
+        return GetAdjacentTile(directionIndex.x, directionIndex.y, directionIndex.z);
     }
 
-    public GameObject GetAdjacentObject(int x, int y, int z)
+    public Tile GetAdjacentTile(int x, int y, int z)
     {
+        if (adjacentTiles == null || adjacentTiles.Length == 0)
+        {
+            adjacentTiles = new Tile[26];
+        }
+
         int targetIndex = (x + 1) * 9;
         targetIndex += (y + 1) * 3;
         targetIndex += z + 1;
-        return adjacentObjects[targetIndex];
+        return adjacentTiles[targetIndex];
     }
 
     public GameObject GetPrefab()

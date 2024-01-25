@@ -348,7 +348,6 @@ MonoBehaviour:
   gridCount: {x: 4, y: 4, z: 4}
   gridSize: {x: 4, y: 1, z: 4}
   tileKeys:
-  - {x: 3, y: 0, z: 0}
   - {x: 2, y: 0, z: 0}
   - {x: 1, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
@@ -361,9 +360,6 @@ MonoBehaviour:
   - {x: 2, y: 0, z: 1}
   - {x: 2, y: 0, z: 2}
   - {x: 2, y: 0, z: 3}
-  - {x: 3, y: 0, z: 1}
-  - {x: 3, y: 0, z: 2}
-  - {x: 3, y: 0, z: 3}
   - {x: 0, y: 1, z: 0}
   - {x: 0, y: 1, z: 1}
   - {x: 0, y: 1, z: 2}
@@ -376,10 +372,6 @@ MonoBehaviour:
   - {x: 2, y: 1, z: 1}
   - {x: 2, y: 1, z: 2}
   - {x: 2, y: 1, z: 3}
-  - {x: 3, y: 1, z: 0}
-  - {x: 3, y: 1, z: 1}
-  - {x: 3, y: 1, z: 2}
-  - {x: 3, y: 1, z: 3}
   - {x: 0, y: 2, z: 0}
   - {x: 0, y: 2, z: 1}
   - {x: 0, y: 2, z: 2}
@@ -404,6 +396,14 @@ MonoBehaviour:
   - {x: 2, y: 3, z: 1}
   - {x: 2, y: 3, z: 2}
   - {x: 2, y: 3, z: 3}
+  - {x: 3, y: 0, z: 0}
+  - {x: 3, y: 0, z: 1}
+  - {x: 3, y: 0, z: 2}
+  - {x: 3, y: 0, z: 3}
+  - {x: 3, y: 1, z: 0}
+  - {x: 3, y: 1, z: 1}
+  - {x: 3, y: 1, z: 2}
+  - {x: 3, y: 1, z: 3}
   - {x: 3, y: 2, z: 0}
   - {x: 3, y: 2, z: 1}
   - {x: 3, y: 2, z: 2}
@@ -414,148 +414,116 @@ MonoBehaviour:
   - {x: 3, y: 3, z: 3}
   tileValues:
   - parent: {fileID: 1939783120}
-    indexPosition: {x: 3, y: 0, z: 0}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
-    obj: {fileID: 0}
-  - parent: {fileID: 1939783120}
     indexPosition: {x: 2, y: 0, z: 0}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 1, y: 0, z: 0}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 0, y: 0, z: 0}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 0, y: 0, z: 1}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 0, y: 0, z: 2}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 0, y: 0, z: 3}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 1, y: 0, z: 1}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 1, y: 0, z: 2}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 1, y: 0, z: 3}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 2, y: 0, z: 1}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 2, y: 0, z: 2}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 2, y: 0, z: 3}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
-    obj: {fileID: 0}
-  - parent: {fileID: 1939783120}
-    indexPosition: {x: 3, y: 0, z: 1}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
-    obj: {fileID: 0}
-  - parent: {fileID: 1939783120}
-    indexPosition: {x: 3, y: 0, z: 2}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
-    obj: {fileID: 0}
-  - parent: {fileID: 1939783120}
-    indexPosition: {x: 3, y: 0, z: 3}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 0, y: 1, z: 0}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 0, y: 1, z: 1}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 0, y: 1, z: 2}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 0, y: 1, z: 3}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 1, y: 1, z: 0}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 1, y: 1, z: 1}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 1, y: 1, z: 2}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 1, y: 1, z: 3}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 2, y: 1, z: 0}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 2, y: 1, z: 1}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 2, y: 1, z: 2}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 2, y: 1, z: 3}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
-    obj: {fileID: 0}
-  - parent: {fileID: 1939783120}
-    indexPosition: {x: 3, y: 1, z: 0}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
-    obj: {fileID: 0}
-  - parent: {fileID: 1939783120}
-    indexPosition: {x: 3, y: 1, z: 1}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
-    obj: {fileID: 0}
-  - parent: {fileID: 1939783120}
-    indexPosition: {x: 3, y: 1, z: 2}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
-    obj: {fileID: 0}
-  - parent: {fileID: 1939783120}
-    indexPosition: {x: 3, y: 1, z: 3}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 0, y: 2, z: 0}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 0, y: 2, z: 1}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 0, y: 2, z: 2}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 0, y: 2, z: 3}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 0, y: 3, z: 0}
@@ -575,19 +543,19 @@ MonoBehaviour:
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 1, y: 2, z: 0}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 1, y: 2, z: 1}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 1, y: 2, z: 2}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 1, y: 2, z: 3}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 1, y: 3, z: 0}
@@ -607,19 +575,19 @@ MonoBehaviour:
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 2, y: 2, z: 0}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 2, y: 2, z: 1}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 2, y: 2, z: 2}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 2, y: 2, z: 3}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 2, y: 3, z: 0}
@@ -638,41 +606,73 @@ MonoBehaviour:
     prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
+    indexPosition: {x: 3, y: 0, z: 0}
+    prefab: {fileID: 0}
+    obj: {fileID: 0}
+  - parent: {fileID: 1939783120}
+    indexPosition: {x: 3, y: 0, z: 1}
+    prefab: {fileID: 0}
+    obj: {fileID: 0}
+  - parent: {fileID: 1939783120}
+    indexPosition: {x: 3, y: 0, z: 2}
+    prefab: {fileID: 0}
+    obj: {fileID: 0}
+  - parent: {fileID: 1939783120}
+    indexPosition: {x: 3, y: 0, z: 3}
+    prefab: {fileID: 0}
+    obj: {fileID: 0}
+  - parent: {fileID: 1939783120}
+    indexPosition: {x: 3, y: 1, z: 0}
+    prefab: {fileID: 0}
+    obj: {fileID: 0}
+  - parent: {fileID: 1939783120}
+    indexPosition: {x: 3, y: 1, z: 1}
+    prefab: {fileID: 0}
+    obj: {fileID: 0}
+  - parent: {fileID: 1939783120}
+    indexPosition: {x: 3, y: 1, z: 2}
+    prefab: {fileID: 0}
+    obj: {fileID: 0}
+  - parent: {fileID: 1939783120}
+    indexPosition: {x: 3, y: 1, z: 3}
+    prefab: {fileID: 0}
+    obj: {fileID: 0}
+  - parent: {fileID: 1939783120}
     indexPosition: {x: 3, y: 2, z: 0}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 3, y: 2, z: 1}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 3, y: 2, z: 2}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 3, y: 2, z: 3}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 3, y: 3, z: 0}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 3, y: 3, z: 1}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 3, y: 3, z: 2}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   - parent: {fileID: 1939783120}
     indexPosition: {x: 3, y: 3, z: 3}
-    prefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+    prefab: {fileID: 0}
     obj: {fileID: 0}
   palettes:
   - {fileID: 11400000, guid: fb940e17ea9a91d40b84ea2f6ac5b19a, type: 2}
   selectedPalette: {fileID: 11400000, guid: fb940e17ea9a91d40b84ea2f6ac5b19a, type: 2}
-  selectedTilePrefab: {fileID: 0}
-  selectedTileIndex: {x: -1, y: 2, z: -1}
+  selectedTilePrefab: {fileID: 7635457198165937764, guid: cd4ab6a3072531f40969e50f89b8d736, type: 3}
+  selectedTileIndex: {x: -1, y: 0, z: -1}
   shouldPaint: 0
-  showAllYLevels: 1
+  showAllYLevels: 0
