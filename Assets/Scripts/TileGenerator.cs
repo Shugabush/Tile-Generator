@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.VisualScripting;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -20,11 +21,13 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
 
     public List<TilePalette> palettes = new List<TilePalette>();
 
-    public TilePalette selectedPalette;
+    [SerializeReference] public TilePalette selectedPalette;
+    [SerializeReference] public RuleTile selectedRule;
     public GameObject selectedTilePrefab;
     public Vector3Int selectedTileIndex = -Vector3Int.one;
 
     public bool shouldPaint = true;
+    public bool shouldErase = false;
     public bool showAllYLevels = true;
 
     public Tile SelectedTile
@@ -45,12 +48,19 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
         {
             foreach (var tile in tiles.Values)
             {
+                tile.parent = this;
                 if (tile.obj != null)
                 {
                     tile.obj.SetActive(true);
                 }
             }
         }
+    }
+
+    [ContextMenu("Adjacent Tile Test")]
+    void AdjacentTileTest()
+    {
+        tiles[Vector3Int.zero].AdjacentTileIndexDebug(1, 0, 1);
     }
 
     void OnValidate()
@@ -115,81 +125,87 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
             tiles.Add(vectorIndex, tile);
         }
 
+        tile.parent = this;
+        tile.indexPosition = vectorIndex;
+
         if (tile.obj != null)
         {
-            tile.obj.transform.position = transform.TransformPoint(GetGridScalePoint(vectorIndex));
+            tile.obj.transform.parent = transform;
+            tile.obj.transform.position = tile.GetTargetPosition();
             tile.obj.transform.localScale = GetGridScaleRatio();
 
             if (showAllYLevels)
             {
                 tile.obj.SetActive(true);
-                tile.obj.hideFlags = hideFlags;
             }
             else
             {
                 tile.obj.SetActive(y == selectedTileIndex.y);
             }
-            ManageAdjacentTiles(tile);
         }
+        ManageAdjacentTiles(tile);
+
+#if UNITY_EDITOR
+        tile.FixObject();
+#endif
     }
 
     void ManageAdjacentTiles(Tile targetTile)
+    {
+        ManageSingleAdjacentTile(targetTile, Vector3Int.right);
+        ManageSingleAdjacentTile(targetTile, Vector3Int.left);
+        ManageSingleAdjacentTile(targetTile, Vector3Int.up);
+        ManageSingleAdjacentTile(targetTile, Vector3Int.down);
+        ManageSingleAdjacentTile(targetTile, Vector3Int.forward);
+        ManageSingleAdjacentTile(targetTile, Vector3Int.back);
+
+        ManageSingleAdjacentTile(targetTile, new Vector3Int(1, 1, 0));
+        ManageSingleAdjacentTile(targetTile, new Vector3Int(1, -1, 0));
+        ManageSingleAdjacentTile(targetTile, new Vector3Int(1, 0, 1));
+        ManageSingleAdjacentTile(targetTile, new Vector3Int(1, 0, -1));
+        ManageSingleAdjacentTile(targetTile, new Vector3Int(-1, 1, 0));
+        ManageSingleAdjacentTile(targetTile, new Vector3Int(-1, -1, 0));
+        ManageSingleAdjacentTile(targetTile, new Vector3Int(-1, 0, 1));
+        ManageSingleAdjacentTile(targetTile, new Vector3Int(-1, 0, -1));
+
+        ManageSingleAdjacentTile(targetTile, new Vector3Int(0, 1, 1));
+        ManageSingleAdjacentTile(targetTile, new Vector3Int(0, 1, -1));
+        ManageSingleAdjacentTile(targetTile, new Vector3Int(0, -1, 1));
+        ManageSingleAdjacentTile(targetTile, new Vector3Int(0, -1, -1));
+    }
+
+    void ManageSingleAdjacentTile(Tile targetTile, Vector3Int direction)
     {
         int x = targetTile.indexPosition.x;
         int y = targetTile.indexPosition.y;
         int z = targetTile.indexPosition.z;
 
-        bool adjLeft = x > 0;
-        bool adjRight = x < gridCount.x;
-
-        bool adjDown = y > 0;
-        bool adjUp = y < gridCount.y;
-
-        bool adjBackward = z > 0;
-        bool adjForward = z < gridCount.y;
-
-        if (adjLeft)
+        Vector3Int adjacentVectorIndex = new Vector3Int(x + direction.x, y + direction.y, z + direction.z);
+        if (tiles.ContainsKey(adjacentVectorIndex))
         {
-            targetTile.SetAdjacentTile(Vector3Int.left, tiles[new Vector3Int(x - 1, y, z)]);
+            targetTile.SetAdjacentTile(direction, tiles[adjacentVectorIndex]);
         }
-        if (adjRight)
-        {
-            targetTile.SetAdjacentTile(Vector3Int.right, tiles[new Vector3Int(x + 1, y, z)]);
-        }
-
-        if (adjDown)
-        {
-            targetTile.SetAdjacentTile(Vector3Int.down, tiles[new Vector3Int(x, y - 1, z)]);
-        }
-        if (adjUp)
-        {
-            targetTile.SetAdjacentTile(Vector3Int.up, tiles[new Vector3Int(x, y + 1, z)]);
-        }
-
-        if (adjBackward)
-        {
-            targetTile.SetAdjacentTile(Vector3Int.back, tiles[new Vector3Int(x, y, z - 1)]);
-        }
-        if (adjForward)
-        {
-            targetTile.SetAdjacentTile(Vector3Int.forward, tiles[new Vector3Int(x, y, z + 1)]);
-        }
-
-        if (adjLeft && adjDown)
-        {
-            targetTile.SetAdjacentTile(Vector3Int.left + Vector3Int.down, tiles[new Vector3Int(x, y, z + 1)]);
-        }
-    }
-
-    void ManageSingleAdjacentTile(Tile targetTile, Vector3Int direction)
-    {
 
     }
 
     void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.red;
+#if UNITY_EDITOR
+        Gizmos.color = Color.blue;
+        Tile selectedTile = SelectedTile;
+        if (selectedTile != null && selectedTile.obj != null)
+        {
+            for (int i = 0; i < selectedTile.adjacentTiles.Length; i++)
+            {
+                var adjTile = selectedTile.adjacentTiles[i];
+                if (adjTile != null)
+                {
+                    Gizmos.DrawLine(selectedTile.GetTargetPosition(), adjTile.GetTargetPosition());
+                }
+            }
+        }
 
+        Gizmos.color = Color.red;
         for (int x = 0; x < gridCount.x; x++)
         {
             for (int z = 0; z < gridCount.z; z++)
@@ -226,13 +242,14 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
             Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
         }
     }
+#endif
 
-    Vector3 GetGridScaleRatio()
+    public Vector3 GetGridScaleRatio()
     {
         return new Vector3(gridSize.x / gridCount.x, gridSize.y / gridCount.y, gridSize.z / gridCount.z);
     }
 
-    Vector3 GetGridScalePoint(Vector3Int index)
+    public Vector3 GetGridScalePoint(Vector3Int index)
     {
         // Cache grid scale ratio
         Vector3 gridScaleRatio = GetGridScaleRatio();
@@ -248,7 +265,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
         return new Vector3(xPoint, yPoint, zPoint) - ((gridSize - Vector3.one) * 0.5f);
     }
 
-    Vector3 GetGridScalePoint(float x, float y, float z)
+    public Vector3 GetGridScalePoint(float x, float y, float z)
     {
         // Cache grid scale ratio
         Vector3 gridScaleRatio = GetGridScaleRatio();
@@ -311,7 +328,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
             // Paint tile
             PaintTile();
         }
-        else
+        else if (shouldErase)
         {
             // Erase tile
             EraseTile();
@@ -322,8 +339,9 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
     {
         // Cache selected tile
         Tile selectedTile = SelectedTile;
-        if (selectedTile != null && selectedTile.GetPrefab() != selectedTilePrefab &&
-            selectedPalette != null && selectedTilePrefab != null)
+
+        if (selectedTile != null &&
+            selectedRule != null && selectedTilePrefab != null)
         {
             if (selectedTile.obj != null)
             {
@@ -333,11 +351,13 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
 
             // Create the game object
             GameObject newObj = (GameObject)PrefabUtility.InstantiatePrefab(selectedTilePrefab, transform);
-            newObj.transform.position = transform.TransformPoint(GetGridScalePoint(selectedTile.indexPosition));
-            newObj.transform.localScale = GetGridScaleRatio();
 
             selectedTile.obj = newObj;
-            selectedTile.prefab = selectedTilePrefab;
+            selectedTile.rule = selectedRule;
+
+            selectedTile.obj.transform.parent = transform;
+            selectedTile.obj.transform.position = selectedTile.GetTargetPosition();
+            selectedTile.obj.transform.localScale = GetGridScaleRatio();
         }
         EditorUtility.SetDirty(this);
     }
@@ -352,6 +372,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
             DestroyImmediate(selectedTile.obj);
             selectedTile.obj = null;
             selectedTile.prefab = null;
+            selectedTile.rule = null;
         }
         EditorUtility.SetDirty(this);
     }

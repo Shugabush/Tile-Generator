@@ -5,5 +5,5 @@ using UnityEngine;
 [CreateAssetMenu()]
 public class TilePalette : ScriptableObject
 {
-    public List<RuleTile> objectSets = new List<RuleTile>();
+    public List<RuleTile> ruleTiles = new List<RuleTile>();
 }

@@ -14,7 +14,6 @@ public class RuleTile : ScriptableObject
             GameObject evaluatedObj = rule.Evaluate(tile);
             if (evaluatedObj != null)
             {
-                Debug.Log("here");
                 return evaluatedObj;
             }
         }
@@ -128,7 +127,7 @@ public class RuleTile : ScriptableObject
                     case Condition.NoTile:
                         return tile.GetAdjacentTile(direction) == null;
                     default:
-                        return false;
+                        return true;
                 }
             }
         }

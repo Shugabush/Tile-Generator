@@ -57,15 +57,18 @@ public class TileGeneratorEditor : Editor
         if (tileGenerator.selectedPalette != null)
         {
             // Display selected palette's prefabs
-            foreach (var obj in tileGenerator.selectedPalette.objectSets)
+            foreach (var ruleTile in tileGenerator.selectedPalette.ruleTiles)
             {
-                GameObject targetObj = obj.GetObject(tileGenerator.SelectedTile);
-                if (obj != null && targetObj != null)
+                if (ruleTile == null) continue;
+
+                GameObject targetObj = ruleTile.GetObject(tileGenerator.SelectedTile);
+                if (targetObj != null)
                 {
-                    GUI.backgroundColor = tileGenerator.selectedTilePrefab == targetObj ? Color.green : oldColor;
-                    if (GUILayout.Button(targetObj.name))
+                    GUI.backgroundColor = tileGenerator.selectedRule == ruleTile ? Color.green : oldColor;
+                    if (GUILayout.Button(ruleTile.defaultGameObject.name))
                     {
-                        tileGenerator.selectedTilePrefab = tileGenerator.selectedTilePrefab == targetObj ? null : targetObj;
+                        tileGenerator.selectedRule = ruleTile;
+                        tileGenerator.selectedTilePrefab = targetObj;
                     }
                 }
             }
@@ -95,8 +98,9 @@ public class TileGeneratorEditor : Editor
             AddTilePaletteWindow window = (AddTilePaletteWindow)EditorWindow.GetWindow(typeof(AddTilePaletteWindow), false, "Add Palette");
             window.tileGenerator = tileGenerator;
         }
-
+        
         tileGenerator.shouldPaint = drawSelected;
+        tileGenerator.shouldErase = eraseSelected;
 
         if (EditorGUI.EndChangeCheck())
         {

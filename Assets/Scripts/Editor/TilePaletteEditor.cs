@@ -29,20 +29,6 @@ public class TilePaletteEditor : Editor
         float inspectorWidth = EditorGUIUtility.currentViewWidth;
         float inspectorWidthRatio = inspectorWidth / 3f;
 
-        foreach (var set in palette.objectSets)
-        {
-            for (int x = 0; x < 3; x++)
-            {
-                for (int z = 0; z < 3; z++)
-                {
-                    Rect rectSize = new Rect(x * inspectorWidthRatio, 250 + z * inspectorWidthRatio, inspectorWidthRatio, inspectorWidthRatio);
-
-                    set.defaultGameObject = (GameObject)EditorGUI.ObjectField(rectSize, set.defaultGameObject, typeof(GameObject), false);
-
-                }
-            }
-        }
-
         if (EditorGUI.EndChangeCheck())
         {
             EditorUtility.SetDirty(palette);
