@@ -2,10 +2,12 @@
 using UnityEditor;
 using UnityEngine;
 
-/*[CustomEditor(typeof(RuleTile)), CanEditMultipleObjects]
+[CustomEditor(typeof(RuleTile)), CanEditMultipleObjects]
 public class RuleTileEditor : Editor
 {
     RuleTile ruleTile;
+
+    int selectedYLevel = 0;
 
     public override void OnInspectorGUI()
     {
@@ -15,61 +17,74 @@ public class RuleTileEditor : Editor
         }
 
         // This is necessary for GetLastRect() to work apparently
-        GUILayout.Space(0);
+        GUILayout.Space(25);
 
         //base.OnInspectorGUI();
 
         EditorGUI.BeginChangeCheck();
 
-        SerializedProperty currentProperty = serializedObject.GetIterator().Copy();
-
-        // Go through all properties (no children properties, they will be drawn automatically)
-        for (int i = 0; currentProperty.NextVisible(i == 0); i++)
-        {
-            EditorGUILayout.PropertyField(currentProperty, currentProperty.name != "rules");
-            if (currentProperty.name == "rules")
-            {
-                currentProperty.isExpanded = EditorGUILayout.Foldout(currentProperty.isExpanded, "slots");
-                for (int j = 0; j < currentProperty.arraySize; j++)
-                {
-                    SerializedProperty ruleElement = currentProperty.GetArrayElementAtIndex(j);
-
-                    SerializedProperty slotsArray = ruleElement.FindPropertyRelative("slots");
-                    for (int k = 0; k < slotsArray.arraySize; k++)
-                    {
-                        SerializedProperty slotProperty = slotsArray.GetArrayElementAtIndex(k);
-                        GUIContent slotLabel = new GUIContent(k.ToString());
-                        EditorGUILayout.PropertyField(slotProperty, slotLabel);
-                    }
-                }
-            }
-            if (currentProperty.type == "Slot")
-            {
-                RuleTile.Rule.Slot slot = currentProperty.GetValue<RuleTile.Rule.Slot>();
-                Debug.Log(slot.condition);
-            }
-        }
-
-        currentProperty = serializedObject.GetIterator().Copy();
+        SerializedProperty defaultObjProperty = serializedObject.FindProperty("defaultGameObject");
+        EditorGUILayout.PropertyField(defaultObjProperty);
 
         Rect lastRect = GUILayoutUtility.GetLastRect();
-
-        *//*for (int i = 0; i < ruleTile.rules.Length; i++)
+        for (int i = 0; i < ruleTile.rules.Count; i++)
         {
             var rule = ruleTile.rules[i];
+
+            if (rule.slots == null || rule.slots.Length != 26)
+            {
+                rule.slots = new RuleTile.Rule.Slot[26];
+            }
+
+            rule.newObj = (GameObject)EditorGUILayout.ObjectField("New Game Object", rule.newObj, typeof(GameObject));
+
+            switch (selectedYLevel)
+            {
+                case -1:
+                    GUILayout.Label("Lower Level");
+                    break;
+                case 0:
+                    GUILayout.Label("Main Level");
+                    break;
+                case 1:
+                    GUILayout.Label("Upper Level");
+                    break;
+            }
+
+            Rect removeRuleRect = GUILayoutUtility.GetLastRect();
+
+            if (GUI.Button(removeRuleRect, "Remove Rule"))
+            {
+                ruleTile.rules.Remove(rule);
+                i--;
+                continue;
+            }
+
             for (int j = 0; j < rule.slots.Length; j++)
             {
                 var slot = rule.slots[j];
-                slot.Draw(new Rect(lastRect.x + i, lastRect.y + i, 50, 50));
+
+                if (slot.direction.y == selectedYLevel)
+                {
+                    slot.Draw(new Rect(lastRect.x + 50 + (slot.direction.x * 50), lastRect.y + (125 + 175 * i) - (slot.direction.z * 50), 50, 50));
+                }
             }
-        }*//*
+        }
+        Rect addRuleRect = GUILayoutUtility.GetLastRect();
+
+        if (GUI.Button(addRuleRect, "Add New Rule"))
+        {
+            // Add a new rule
+            var newRule = new RuleTile.Rule();
+            ruleTile.rules.Add(newRule);
+        }
 
         if (EditorGUI.EndChangeCheck())
         {
             EditorUtility.SetDirty(ruleTile);
         }
     }
-}*/
+}
 
 /*[CustomPropertyDrawer(typeof(RuleTile.Rule.Slot))]
 public class RuleTileSlotEditor : PropertyDrawer

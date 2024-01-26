@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [CreateAssetMenu()]
 public class RuleTile : ScriptableObject
@@ -21,7 +24,7 @@ public class RuleTile : ScriptableObject
     }
 
 
-    public Rule[] rules = new Rule[0];
+    public List<Rule> rules = new List<Rule>();
 
     void OnValidate()
     {
@@ -54,6 +57,15 @@ public class RuleTile : ScriptableObject
             None,
             ExistingTile,
             NoTile,
+        }
+
+        public Rule()
+        {
+            slots = new Slot[26];
+            for (int i = 0; i < slots.Length; i++)
+            {
+                slots[i] = new Slot();
+            }
         }
 
         public Slot[] slots = new Slot[26];
@@ -114,7 +126,96 @@ public class RuleTile : ScriptableObject
                     xMarkTexture.LoadImage(System.Convert.FromBase64String(xMarkTextureString));
                 }
 
-                GUI.DrawTexture(position, xMarkTexture);
+                // Cache proper texture
+                Texture properTexture = GetProperTexture();
+
+                // Cache rotation angle
+                float rotationAngle = properTexture == arrowTexture ? GetAngleFromDirection() : 0f;
+
+                GUILayout.BeginVertical();
+
+                if (GUI.Button(position, string.Empty))
+                {
+                    condition++;
+                    if (condition > (Condition)2)
+                    {
+                        condition = 0;
+                    }
+                }
+
+                Rect textureRect = position;
+
+                textureRect.size *= 0.75f;
+                textureRect.center = position.center;
+
+                GUIUtility.RotateAroundPivot(rotationAngle, textureRect.center);
+
+                if (properTexture != null)
+                {
+                    GUI.DrawTexture(textureRect, properTexture);
+                }
+
+                // Rotate back to 0 degrees
+                GUIUtility.RotateAroundPivot(-rotationAngle, new Vector2(position.x + (position.width / 2f), position.y + (position.height / 2f)));
+
+                GUILayout.EndVertical();
+            }
+
+            Texture GetProperTexture()
+            {
+                switch (condition)
+                {
+                    case Condition.ExistingTile:
+                        return arrowTexture;
+                    case Condition.NoTile:
+                        return xMarkTexture;
+                    default:
+                        return null;
+                }
+            }
+
+            public float GetAngleFromDirection()
+            {
+                bool right = direction.x > 0;
+                bool left = direction.x < 0;
+                bool forward = direction.z > 0;
+                bool backward = direction.z < 0;
+
+                if (right && forward)
+                {
+                    return 45f;
+                }
+                if (right && backward)
+                {
+                    return 135f;
+                }
+                if (left && forward)
+                {
+                    return -45f;
+                }
+                if (left && backward)
+                {
+                    return -135f;
+                }
+
+                if (right)
+                {
+                    return 90f;
+                }
+                if (left)
+                {
+                    return -90f;
+                }
+                if (forward)
+                {
+                    return 0f;
+                }
+                if (backward)
+                {
+                    return 180f;
+                }
+
+                return 0f;
             }
 
             public bool Evaluate(Tile tile)

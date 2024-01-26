@@ -58,15 +58,12 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
         }
     }
 
-    [ContextMenu("Adjacent Tile Test")]
-    void AdjacentTileTest()
-    {
-        tiles[Vector3Int.zero].AdjacentTileIndexDebug(1, 0, 1);
-    }
-
     void Update()
     {
-        OnValidate();
+        if (!Application.isPlaying)
+        {
+            OnValidate();
+        }
     }
 
     void OnValidate()
@@ -201,9 +198,8 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
         Tile selectedTile = SelectedTile;
         if (selectedTile != null && selectedTile.obj != null)
         {
-            for (int i = 0; i < selectedTile.adjacentTiles2.Length; i++)
+            foreach (var adjTile in selectedTile.adjacentTiles.Values)
             {
-                var adjTile = selectedTile.adjacentTiles2[i];
                 if (adjTile != null)
                 {
                     Gizmos.DrawLine(selectedTile.GetTargetPosition(), adjTile.GetTargetPosition());
