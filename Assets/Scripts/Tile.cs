@@ -20,34 +20,45 @@ public class Tile
     public GameObject obj;
 
     [SerializeReference]
-    public Tile[] adjacentTiles = new Tile[26];
+    public Tile[] adjacentTiles2 = new Tile[26];
+
+    Dictionary<Vector3Int, Tile> adjacentTiles = new Dictionary<Vector3Int, Tile>();
 
     public void SetAdjacentTile(Vector3Int directionIndex, Tile newTile)
     {
-        Vector3 positionOffset = newTile.GetTargetLocalPosition() - GetTargetLocalPosition();
-        directionIndex.x = System.Math.Sign(positionOffset.x);
-        directionIndex.y = System.Math.Sign(positionOffset.y);
-        directionIndex.z = System.Math.Sign(positionOffset.z);
+        if (adjacentTiles == null)
+        {
+            adjacentTiles = new Dictionary<Vector3Int, Tile>();
+        }
 
-        SetAdjacentTile(directionIndex.x, directionIndex.y, directionIndex.z, newTile);
+        if (adjacentTiles.ContainsKey(directionIndex))
+        {
+            adjacentTiles[directionIndex] = newTile;
+        }
+        else
+        {
+            adjacentTiles.Add(directionIndex, newTile);
+        }
+
+        //SetAdjacentTile(directionIndex.x, directionIndex.y, directionIndex.z, newTile);
     }
 
     public void SetAdjacentTile(int x, int y, int z, Tile newTile)
     {
-        if (adjacentTiles == null || adjacentTiles.Length == 0)
+        if (adjacentTiles2 == null || adjacentTiles2.Length == 0)
         {
-            adjacentTiles = new Tile[26];
+            adjacentTiles2 = new Tile[26];
         }
 
         int targetIndex = (x + 1) * 9;
         targetIndex += (y + 1) * 3;
         targetIndex += z + 1;
 
-        if (targetIndex >= 0 && targetIndex < adjacentTiles.Length)
+        if (targetIndex >= 0 && targetIndex < adjacentTiles2.Length)
         {
-            if (adjacentTiles[targetIndex] != newTile)
+            if (adjacentTiles2[targetIndex] != newTile)
             {
-                adjacentTiles[targetIndex] = newTile;
+                adjacentTiles2[targetIndex] = newTile;
 #if UNITY_EDITOR
                 if (!Application.isPlaying)
                 {
@@ -58,14 +69,37 @@ public class Tile
         }
     }
 
+    public Tile GetAdjacentTile(Vector3Int directionIndex)
+    {
+        if (adjacentTiles.ContainsKey(directionIndex))
+        {
+            return adjacentTiles[directionIndex];
+        }
+        return null;
+
+        //return GetAdjacentTile(directionIndex.x, directionIndex.y, directionIndex.z);
+    }
+
+    public Tile GetAdjacentTile(int x, int y, int z)
+    {
+        if (adjacentTiles2 == null || adjacentTiles2.Length == 0)
+        {
+            adjacentTiles2 = new Tile[26];
+        }
+
+        int targetIndex = (x + 1) * 9;
+        targetIndex += (y + 1) * 3;
+        targetIndex += z + 1;
+        return adjacentTiles2[targetIndex];
+    }
+
 #if UNITY_EDITOR
     public void FixObject()
     {
         if (rule == null) return;
 
         GameObject rulePrefab = rule.GetObject(this);
-        Debug.Log(rulePrefab == rule.defaultGameObject);
-        if (rulePrefab != prefab)
+        if (rulePrefab != PrefabUtility.GetCorrespondingObjectFromOriginalSource(obj))
         {
             // Destroy obj and re-instantiate the new prefab
             GameObject objToDestroy = obj;
@@ -83,24 +117,6 @@ public class Tile
     }
 #endif
 
-    public Tile GetAdjacentTile(Vector3Int directionIndex)
-    {
-        return GetAdjacentTile(directionIndex.x, directionIndex.y, directionIndex.z);
-    }
-
-    public Tile GetAdjacentTile(int x, int y, int z)
-    {
-        if (adjacentTiles == null || adjacentTiles.Length == 0)
-        {
-            adjacentTiles = new Tile[26];
-        }
-
-        int targetIndex = (x + 1) * 9;
-        targetIndex += (y + 1) * 3;
-        targetIndex += z + 1;
-        return adjacentTiles[targetIndex];
-    }
-
     public void AdjacentTileIndexDebug(int x, int y, int z)
     {
         int targetIndex = (x + 1) * 9;
@@ -108,7 +124,7 @@ public class Tile
         targetIndex += z + 1;
         Debug.Log(new Vector3Int(x, y, z).ToString() + " " + targetIndex.ToString());
         Debug.DrawRay(GetTargetPosition(), Vector3.up, Color.black, 100);
-        Debug.DrawRay(adjacentTiles[targetIndex].GetTargetPosition(), Vector3.up, Color.gray, 100);
+        Debug.DrawRay(adjacentTiles2[targetIndex].GetTargetPosition(), Vector3.up, Color.gray, 100);
     }
 
     public Vector3 GetTargetLocalPosition()

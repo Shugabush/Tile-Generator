@@ -120,12 +120,15 @@ public class RuleTile : ScriptableObject
             public bool Evaluate(Tile tile)
             {
                 if (tile == null) return false;
+
+                Tile adjacentTile = tile.GetAdjacentTile(direction);
+
                 switch (condition)
                 {
                     case Condition.ExistingTile:
-                        return tile.GetAdjacentTile(direction) != null;
+                        return adjacentTile != null && adjacentTile.obj != null;
                     case Condition.NoTile:
-                        return tile.GetAdjacentTile(direction) == null;
+                        return adjacentTile == null || adjacentTile.obj == null;
                     default:
                         return true;
                 }
