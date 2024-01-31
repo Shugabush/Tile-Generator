@@ -30,7 +30,7 @@ public class TileGeneratorEditor : Editor
         SerializedProperty selectedTileIndexProperty = serializedObject.FindProperty("selectedTileIndex");
         Vector3Int selectedTileIndex = selectedTileIndexProperty.vector3IntValue;
         selectedTileIndex.y = EditorGUILayout.IntField("Y Level", selectedTileIndex.y);
-        selectedTileIndex.y = Mathf.Clamp(selectedTileIndex.y, 0, tileGenerator.GridCount.y);
+        selectedTileIndex.y = Mathf.Clamp(selectedTileIndex.y, 0, tileGenerator.GridCount.y - 1);
 
         selectedTileIndexProperty.vector3IntValue = selectedTileIndex;
 
