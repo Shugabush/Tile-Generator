@@ -16,9 +16,6 @@ public class RuleTileEditor : Editor
             ruleTile = (RuleTile)target;
         }
 
-        // This is necessary for GetLastRect() to work apparently
-        GUILayout.Space(25);
-
         //base.OnInspectorGUI();
 
         EditorGUI.BeginChangeCheck();
@@ -26,9 +23,13 @@ public class RuleTileEditor : Editor
         SerializedProperty defaultObjProperty = serializedObject.FindProperty("defaultGameObject");
         EditorGUILayout.PropertyField(defaultObjProperty);
 
-        Rect lastRect = GUILayoutUtility.GetLastRect();
         for (int i = 0; i < ruleTile.rules.Count; i++)
         {
+            if (ruleTile.rules.Count == 0)
+            {
+                break;
+            }
+
             var rule = ruleTile.rules[i];
 
             if (rule.slots == null || rule.slots.Length != 26)
@@ -51,14 +52,20 @@ public class RuleTileEditor : Editor
                     break;
             }
 
-            Rect removeRuleRect = GUILayoutUtility.GetLastRect();
-
-            if (GUI.Button(removeRuleRect, "Remove Rule"))
+            if (GUILayout.Button("Remove Rule"))
             {
                 ruleTile.rules.Remove(rule);
                 i--;
                 continue;
             }
+
+            Vector3Int lastSlotDirection = -Vector3Int.one;
+            lastSlotDirection.y = selectedYLevel;
+
+            EditorGUILayout.BeginHorizontal();
+
+            int row = 0;
+            bool activeVertical = false;
 
             for (int j = 0; j < rule.slots.Length; j++)
             {
@@ -66,13 +73,44 @@ public class RuleTileEditor : Editor
 
                 if (slot.direction.y == selectedYLevel)
                 {
-                    slot.Draw(new Rect(lastRect.x + 50 + (slot.direction.x * 50), lastRect.y + (125 + 175 * i) - (slot.direction.z * 50), 50, 50));
+                    row++;
+                    GUILayoutOption widthOption = GUILayout.Width(50);
+                    GUILayoutOption heightOption = GUILayout.Height(50);
+
+                    if (row >= 3)
+                    {
+                        EditorGUILayout.BeginVertical();
+                        EditorGUILayout.EndHorizontal();
+
+                        row = 0;
+                        activeVertical = true;
+                    }
+
+                    if (GUILayout.Button(string.Empty, widthOption, heightOption))
+                    {
+                        slot.NextCondition();
+                    }
+
+                    Rect lastRect = GUILayoutUtility.GetLastRect();
+
+                    slot.DrawTexture(lastRect);
+
+                    if (activeVertical)
+                    {
+                        EditorGUILayout.EndVertical();
+                        EditorGUILayout.BeginHorizontal();
+
+                        GUI.Label(lastRect, "AV");
+
+                        activeVertical = false;
+                    }
                 }
             }
-        }
-        Rect addRuleRect = GUILayoutUtility.GetLastRect();
 
-        if (GUI.Button(addRuleRect, "Add New Rule"))
+            EditorGUILayout.EndHorizontal();
+        }
+
+        if (GUILayout.Button("Add New Rule"))
         {
             // Add a new rule
             var newRule = new RuleTile.Rule();

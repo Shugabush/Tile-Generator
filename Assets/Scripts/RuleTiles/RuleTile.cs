@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -62,9 +63,22 @@ public class RuleTile : ScriptableObject
         public Rule()
         {
             slots = new Slot[26];
+
             for (int i = 0; i < slots.Length; i++)
             {
                 slots[i] = new Slot();
+                int copyI = i;
+
+                if (i >= 13)
+                {
+                    copyI++;
+                }
+
+                int x = copyI / 9;
+                int y = copyI % 9 / 3;
+                int z = copyI % 9 % 3;
+
+                slots[i].direction = new Vector3Int(x - 1, y - 1, z - 1);
             }
         }
 
@@ -136,11 +150,7 @@ public class RuleTile : ScriptableObject
 
                 if (GUI.Button(position, string.Empty))
                 {
-                    condition++;
-                    if (condition > (Condition)2)
-                    {
-                        condition = 0;
-                    }
+                    NextCondition();
                 }
 
                 Rect textureRect = position;
@@ -159,6 +169,51 @@ public class RuleTile : ScriptableObject
                 GUIUtility.RotateAroundPivot(-rotationAngle, new Vector2(position.x + (position.width / 2f), position.y + (position.height / 2f)));
 
                 GUILayout.EndVertical();
+            }
+
+            public void NextCondition()
+            {
+                condition++;
+                if (condition > (Condition)2)
+                {
+                    condition = 0;
+                }
+            }
+            
+            public void DrawTexture(Rect position)
+            {
+                if (arrowTexture == null)
+                {
+                    arrowTexture = new Texture2D(2, 2);
+                    arrowTexture.LoadImage(System.Convert.FromBase64String(arrowTextureString));
+                }
+
+                if (xMarkTexture == null)
+                {
+                    xMarkTexture = new Texture2D(2, 2);
+                    xMarkTexture.LoadImage(System.Convert.FromBase64String(xMarkTextureString));
+                }
+
+                // Cache proper texture
+                Texture properTexture = GetProperTexture();
+
+                // Cache rotation angle
+                float rotationAngle = properTexture == arrowTexture ? GetAngleFromDirection() : 0f;
+
+                Rect textureRect = position;
+
+                textureRect.size *= 0.75f;
+                textureRect.center = position.center;
+
+                GUIUtility.RotateAroundPivot(rotationAngle, textureRect.center);
+
+                if (properTexture != null)
+                {
+                    GUI.DrawTexture(textureRect, properTexture);
+                }
+
+                // Rotate back to 0 degrees
+                GUIUtility.RotateAroundPivot(-rotationAngle, new Vector2(position.x + (position.width / 2f), position.y + (position.height / 2f)));
             }
 
             Texture GetProperTexture()
