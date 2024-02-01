@@ -28,11 +28,6 @@ public class RuleTileEditor : Editor
 
         for (int i = 0; i < ruleTile.rules.Count; i++)
         {
-            if (ruleTile.rules.Count == 0)
-            {
-                break;
-            }
-
             var rule = ruleTile.rules[i];
 
             if (rule.slots == null || rule.slots.Length != 26)
@@ -45,24 +40,27 @@ public class RuleTileEditor : Editor
             rule.newObj = (GameObject)EditorGUI.ObjectField(currentRect, "New Game Object", rule.newObj, typeof(GameObject));
 
             currentRect.y += 50;
+            currentRect.x += 200;
 
+            GUIStyle yLevelStyle = new GUIStyle();
+            yLevelStyle.fontSize = 24;
             switch (selectedYLevel)
             {
                 case -1:
-                    GUI.Label(currentRect, "Lower Level");
+                    GUI.Label(currentRect, "Lower Level", yLevelStyle);
                     break;
                 case 0:
-                    GUI.Label(currentRect, "Main Level");
+                    GUI.Label(currentRect, "Main Level", yLevelStyle);
                     break;
                 case 1:
-                    GUI.Label(currentRect, "Upper Level");
+                    GUI.Label(currentRect, "Upper Level", yLevelStyle);
                     break;
                 default:
                     throw new System.Exception("Selected Y Level of " + selectedYLevel.ToString() + "is unexpected!");
             }
 
-            Rect lastRect = GUILayoutUtility.GetLastRect();
-            
+            currentRect.x -= 200;
+            currentRect.y += 50;
 
             Vector3Int lastSlotDirection = -Vector3Int.one;
             lastSlotDirection.y = selectedYLevel;
@@ -73,17 +71,12 @@ public class RuleTileEditor : Editor
 
                 if (slot.direction.y == selectedYLevel)
                 {
-                    Rect slotRect = new Rect(lastRect.x + 50 + (slot.direction.x * 50), lastRect.y + (125 + 175 * i) - (slot.direction.z * 50), 50, 50);
+                    Rect slotRect = new Rect(currentRect.x + 50 + (slot.direction.x * 50), currentRect.y - (slot.direction.z * 50), 50, 50);
                     slot.Draw(slotRect);
-
-                    if (slotRect.y > currentRect.y)
-                    {
-                        currentRect.y = slotRect.y;
-                    }
                 }
             }
 
-            currentRect.y += 50;
+            currentRect.y += 125;
 
             if (GUI.Button(currentRect, "Remove Rule"))
             {
@@ -91,7 +84,7 @@ public class RuleTileEditor : Editor
                 i--;
                 continue;
             }
-            currentRect.y += 50;
+            //currentRect.y += 50;
         }
 
         currentRect.y += 25;
