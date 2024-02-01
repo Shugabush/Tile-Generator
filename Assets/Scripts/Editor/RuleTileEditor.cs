@@ -21,7 +21,10 @@ public class RuleTileEditor : Editor
         EditorGUI.BeginChangeCheck();
 
         SerializedProperty defaultObjProperty = serializedObject.FindProperty("defaultGameObject");
+        
         EditorGUILayout.PropertyField(defaultObjProperty);
+
+        Rect currentRect = GUILayoutUtility.GetLastRect();
 
         for (int i = 0; i < ruleTile.rules.Count; i++)
         {
@@ -37,35 +40,32 @@ public class RuleTileEditor : Editor
                 rule.slots = new RuleTile.Rule.Slot[26];
             }
 
-            rule.newObj = (GameObject)EditorGUILayout.ObjectField("New Game Object", rule.newObj, typeof(GameObject));
+            currentRect.y += 50;
+
+            rule.newObj = (GameObject)EditorGUI.ObjectField(currentRect, "New Game Object", rule.newObj, typeof(GameObject));
+
+            currentRect.y += 50;
 
             switch (selectedYLevel)
             {
                 case -1:
-                    GUILayout.Label("Lower Level");
+                    GUI.Label(currentRect, "Lower Level");
                     break;
                 case 0:
-                    GUILayout.Label("Main Level");
+                    GUI.Label(currentRect, "Main Level");
                     break;
                 case 1:
-                    GUILayout.Label("Upper Level");
+                    GUI.Label(currentRect, "Upper Level");
                     break;
+                default:
+                    throw new System.Exception("Selected Y Level of " + selectedYLevel.ToString() + "is unexpected!");
             }
 
-            if (GUILayout.Button("Remove Rule"))
-            {
-                ruleTile.rules.Remove(rule);
-                i--;
-                continue;
-            }
+            Rect lastRect = GUILayoutUtility.GetLastRect();
+            
 
             Vector3Int lastSlotDirection = -Vector3Int.one;
             lastSlotDirection.y = selectedYLevel;
-
-            EditorGUILayout.BeginHorizontal();
-
-            int row = 0;
-            bool activeVertical = false;
 
             for (int j = 0; j < rule.slots.Length; j++)
             {
@@ -73,49 +73,36 @@ public class RuleTileEditor : Editor
 
                 if (slot.direction.y == selectedYLevel)
                 {
-                    row++;
-                    GUILayoutOption widthOption = GUILayout.Width(50);
-                    GUILayoutOption heightOption = GUILayout.Height(50);
+                    Rect slotRect = new Rect(lastRect.x + 50 + (slot.direction.x * 50), lastRect.y + (125 + 175 * i) - (slot.direction.z * 50), 50, 50);
+                    slot.Draw(slotRect);
 
-                    if (row >= 3)
+                    if (slotRect.y > currentRect.y)
                     {
-                        EditorGUILayout.BeginVertical();
-                        EditorGUILayout.EndHorizontal();
-
-                        row = 0;
-                        activeVertical = true;
-                    }
-
-                    if (GUILayout.Button(string.Empty, widthOption, heightOption))
-                    {
-                        slot.NextCondition();
-                    }
-
-                    Rect lastRect = GUILayoutUtility.GetLastRect();
-
-                    slot.DrawTexture(lastRect);
-
-                    if (activeVertical)
-                    {
-                        EditorGUILayout.EndVertical();
-                        EditorGUILayout.BeginHorizontal();
-
-                        GUI.Label(lastRect, "AV");
-
-                        activeVertical = false;
+                        currentRect.y = slotRect.y;
                     }
                 }
             }
 
-            EditorGUILayout.EndHorizontal();
+            currentRect.y += 50;
+
+            if (GUI.Button(currentRect, "Remove Rule"))
+            {
+                ruleTile.rules.Remove(rule);
+                i--;
+                continue;
+            }
+            currentRect.y += 50;
         }
 
-        if (GUILayout.Button("Add New Rule"))
+        currentRect.y += 25;
+        if (GUI.Button(currentRect, "Add New Rule"))
         {
             // Add a new rule
             var newRule = new RuleTile.Rule();
             ruleTile.rules.Add(newRule);
         }
+
+        GUILayout.Space(1000);
 
         if (EditorGUI.EndChangeCheck())
         {
