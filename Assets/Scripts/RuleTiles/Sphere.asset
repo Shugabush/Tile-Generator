@@ -13,4 +13,112 @@ MonoBehaviour:
   m_Name: Sphere
   m_EditorClassIdentifier: 
   defaultGameObject: {fileID: 7635457198165937764, guid: 36ee23c3b02d79543b2a8e7c71e9fe5b, type: 3}
-  rules: []
+  rules:
+  - slots:
+    - direction: {x: -1, y: -1, z: -1}
+      condition: 0
+    - direction: {x: -1, y: -1, z: 0}
+      condition: 0
+    - direction: {x: -1, y: -1, z: 1}
+      condition: 0
+    - direction: {x: -1, y: 0, z: -1}
+      condition: 0
+    - direction: {x: -1, y: 0, z: 0}
+      condition: 0
+    - direction: {x: -1, y: 0, z: 1}
+      condition: 0
+    - direction: {x: -1, y: 1, z: -1}
+      condition: 0
+    - direction: {x: -1, y: 1, z: 0}
+      condition: 0
+    - direction: {x: -1, y: 1, z: 1}
+      condition: 0
+    - direction: {x: 0, y: -1, z: -1}
+      condition: 0
+    - direction: {x: 0, y: -1, z: 0}
+      condition: 0
+    - direction: {x: 0, y: -1, z: 1}
+      condition: 0
+    - direction: {x: 0, y: 0, z: -1}
+      condition: 0
+    - direction: {x: 0, y: 0, z: 1}
+      condition: 0
+    - direction: {x: 0, y: 1, z: -1}
+      condition: 0
+    - direction: {x: 0, y: 1, z: 0}
+      condition: 0
+    - direction: {x: 0, y: 1, z: 1}
+      condition: 0
+    - direction: {x: 1, y: -1, z: -1}
+      condition: 0
+    - direction: {x: 1, y: -1, z: 0}
+      condition: 0
+    - direction: {x: 1, y: -1, z: 1}
+      condition: 0
+    - direction: {x: 1, y: 0, z: -1}
+      condition: 0
+    - direction: {x: 1, y: 0, z: 0}
+      condition: 0
+    - direction: {x: 1, y: 0, z: 1}
+      condition: 0
+    - direction: {x: 1, y: 1, z: -1}
+      condition: 0
+    - direction: {x: 1, y: 1, z: 0}
+      condition: 0
+    - direction: {x: 1, y: 1, z: 1}
+      condition: 0
+    newObj: {fileID: 0}
+  - slots:
+    - direction: {x: -1, y: -1, z: -1}
+      condition: 0
+    - direction: {x: -1, y: -1, z: 0}
+      condition: 0
+    - direction: {x: -1, y: -1, z: 1}
+      condition: 0
+    - direction: {x: -1, y: 0, z: -1}
+      condition: 0
+    - direction: {x: -1, y: 0, z: 0}
+      condition: 0
+    - direction: {x: -1, y: 0, z: 1}
+      condition: 0
+    - direction: {x: -1, y: 1, z: -1}
+      condition: 0
+    - direction: {x: -1, y: 1, z: 0}
+      condition: 0
+    - direction: {x: -1, y: 1, z: 1}
+      condition: 0
+    - direction: {x: 0, y: -1, z: -1}
+      condition: 0
+    - direction: {x: 0, y: -1, z: 0}
+      condition: 0
+    - direction: {x: 0, y: -1, z: 1}
+      condition: 0
+    - direction: {x: 0, y: 0, z: -1}
+      condition: 0
+    - direction: {x: 0, y: 0, z: 1}
+      condition: 0
+    - direction: {x: 0, y: 1, z: -1}
+      condition: 0
+    - direction: {x: 0, y: 1, z: 0}
+      condition: 0
+    - direction: {x: 0, y: 1, z: 1}
+      condition: 0
+    - direction: {x: 1, y: -1, z: -1}
+      condition: 0
+    - direction: {x: 1, y: -1, z: 0}
+      condition: 0
+    - direction: {x: 1, y: -1, z: 1}
+      condition: 0
+    - direction: {x: 1, y: 0, z: -1}
+      condition: 0
+    - direction: {x: 1, y: 0, z: 0}
+      condition: 0
+    - direction: {x: 1, y: 0, z: 1}
+      condition: 0
+    - direction: {x: 1, y: 1, z: -1}
+      condition: 0
+    - direction: {x: 1, y: 1, z: 0}
+      condition: 0
+    - direction: {x: 1, y: 1, z: 1}
+      condition: 0
+    newObj: {fileID: 0}

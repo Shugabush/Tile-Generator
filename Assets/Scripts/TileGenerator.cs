@@ -29,7 +29,8 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
 
     public bool shouldPaint = true;
     public bool shouldErase = false;
-    public bool showAllYLevels = true;
+    [SerializeField] bool showAllYLevels = true;
+    [SerializeField] bool showGrid = true;
 
     public Tile SelectedTile
     {
@@ -194,25 +195,14 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
     void OnDrawGizmosSelected()
     {
 #if UNITY_EDITOR
-        Gizmos.color = Color.blue;
-        Tile selectedTile = SelectedTile;
-        if (selectedTile != null && selectedTile.obj != null)
-        {
-            foreach (var adjTile in selectedTile.adjacentTiles.Values)
-            {
-                if (adjTile != null)
-                {
-                    Gizmos.DrawLine(selectedTile.GetTargetPosition(), adjTile.GetTargetPosition());
-                }
-            }
-        }
+        if (!showGrid && !shouldPaint && !shouldErase) return;
 
         Gizmos.color = Color.red;
         for (int x = 0; x < gridCount.x; x++)
         {
             for (int z = 0; z < gridCount.z; z++)
             {
-                if (showAllYLevels)
+                if (showAllYLevels && showGrid)
                 {
                     for (int y = 0; y < gridCount.y; y++)
                     {

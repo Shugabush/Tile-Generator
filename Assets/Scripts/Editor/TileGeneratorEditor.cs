@@ -7,8 +7,8 @@ public class TileGeneratorEditor : Editor
 {
     TileGenerator tileGenerator;
 
-    bool drawSelected;
-    bool eraseSelected;
+    bool drawSelected = false;
+    bool eraseSelected = false;
 
     public override void OnInspectorGUI()
     {
@@ -36,6 +36,9 @@ public class TileGeneratorEditor : Editor
 
         SerializedProperty showAllYLevels = serializedObject.FindProperty("showAllYLevels");
         EditorGUILayout.PropertyField(showAllYLevels);
+
+        SerializedProperty showGrid = serializedObject.FindProperty("showGrid");
+        EditorGUILayout.PropertyField(showGrid);
 
         serializedObject.ApplyModifiedProperties();
 

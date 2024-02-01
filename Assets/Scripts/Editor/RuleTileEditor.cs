@@ -16,8 +16,6 @@ public class RuleTileEditor : Editor
             ruleTile = (RuleTile)target;
         }
 
-        //base.OnInspectorGUI();
-
         EditorGUI.BeginChangeCheck();
 
         SerializedProperty defaultObjProperty = serializedObject.FindProperty("defaultGameObject");
@@ -25,10 +23,16 @@ public class RuleTileEditor : Editor
         EditorGUILayout.PropertyField(defaultObjProperty);
 
         Rect currentRect = GUILayoutUtility.GetLastRect();
+        GUILayout.Space(Screen.height * 0.5f);
+
+        Rect lastRect = currentRect;
 
         for (int i = 0; i < ruleTile.rules.Count; i++)
         {
             var rule = ruleTile.rules[i];
+            GUILayout.Space(currentRect.y - lastRect.y);
+
+            lastRect = currentRect;
 
             currentRect.y += 50;
 
@@ -112,8 +116,6 @@ public class RuleTileEditor : Editor
             var newRule = new RuleTile.Rule();
             ruleTile.rules.Add(newRule);
         }
-
-        GUILayout.Space(1000);
 
         if (EditorGUI.EndChangeCheck())
         {
