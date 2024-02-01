@@ -30,11 +30,6 @@ public class RuleTileEditor : Editor
         {
             var rule = ruleTile.rules[i];
 
-            if (rule.slots == null || rule.slots.Length != 26)
-            {
-                rule.slots = new RuleTile.Rule.Slot[26];
-            }
-
             currentRect.y += 50;
 
             rule.newObj = (GameObject)EditorGUI.ObjectField(currentRect, "New Game Object", rule.newObj, typeof(GameObject));
@@ -44,20 +39,44 @@ public class RuleTileEditor : Editor
 
             GUIStyle yLevelStyle = new GUIStyle();
             yLevelStyle.fontSize = 24;
-            switch (selectedYLevel)
+
+            var oldColor = GUI.backgroundColor;
+
+            // Make buttons for y levels
+            Rect selectedYLevelRect = currentRect;
+            selectedYLevelRect.size = new Vector2(100, 25);
+
+            if (selectedYLevel == -1) GUI.backgroundColor = Color.gray;
+
+            selectedYLevelRect.y += 50;
+
+            if (GUI.Button(selectedYLevelRect, "Lower Level"))
             {
-                case -1:
-                    GUI.Label(currentRect, "Lower Level", yLevelStyle);
-                    break;
-                case 0:
-                    GUI.Label(currentRect, "Main Level", yLevelStyle);
-                    break;
-                case 1:
-                    GUI.Label(currentRect, "Upper Level", yLevelStyle);
-                    break;
-                default:
-                    throw new System.Exception("Selected Y Level of " + selectedYLevel.ToString() + "is unexpected!");
+                selectedYLevel = -1;
             }
+
+            GUI.backgroundColor = oldColor;
+            if (selectedYLevel == 0) GUI.backgroundColor = Color.gray;
+
+            selectedYLevelRect.y += 50;
+
+            if (GUI.Button(selectedYLevelRect, "Main Level"))
+            {
+                selectedYLevel = 0;
+            }
+
+            GUI.backgroundColor = oldColor;
+            if (selectedYLevel == 1) GUI.backgroundColor = Color.gray;
+
+            selectedYLevelRect.y += 50;
+
+            if (GUI.Button(selectedYLevelRect, "Upper Level"))
+            {
+                selectedYLevel = 1;
+            }
+
+            GUI.backgroundColor = oldColor;
+            currentRect.y = selectedYLevelRect.y;
 
             currentRect.x -= 200;
             currentRect.y += 50;
@@ -84,7 +103,6 @@ public class RuleTileEditor : Editor
                 i--;
                 continue;
             }
-            //currentRect.y += 50;
         }
 
         currentRect.y += 25;
@@ -103,36 +121,4 @@ public class RuleTileEditor : Editor
         }
     }
 }
-
-/*[CustomPropertyDrawer(typeof(RuleTile.Rule.Slot))]
-public class RuleTileSlotEditor : PropertyDrawer
-{
-    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-    {
-        EditorGUI.BeginChangeCheck();
-
-        Rect conditionRect = new Rect(position.x, position.y + 25, position.width, position.height);
-
-        SerializedProperty childProperty = property.Copy();
-        for (int i = 0; childProperty.Next(true); i++)
-        {
-            Rect childRect = new Rect(position.x, position.y, position.width, position.height);
-        }
-        
-        SerializedProperty conditionProperty = property.FindPropertyRelative("condition");
-
-        EditorGUI.PropertyField(position, property);
-        property.isExpanded = EditorGUI.Foldout(position, property.isExpanded, GUIContent.none);
-
-        if (property.isExpanded)
-        {
-            EditorGUI.PropertyField(conditionRect, conditionProperty);
-        }
-
-        if (EditorGUI.EndChangeCheck())
-        {
-            
-        }
-    }
-}*/
 #endif
