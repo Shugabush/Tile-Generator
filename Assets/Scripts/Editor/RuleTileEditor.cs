@@ -21,6 +21,7 @@ public class RuleTileEditor : Editor
         SerializedProperty defaultObjProperty = serializedObject.FindProperty("defaultGameObject");
         
         EditorGUILayout.PropertyField(defaultObjProperty);
+        serializedObject.ApplyModifiedProperties();
 
         Rect currentRect = GUILayoutUtility.GetLastRect();
         GUILayout.Space(Screen.height * 0.5f);
