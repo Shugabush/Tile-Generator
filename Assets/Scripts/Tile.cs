@@ -35,8 +35,6 @@ public class Tile
         {
             adjacentTiles.Add(directionIndex, newTile);
         }
-
-        //SetAdjacentTile(directionIndex.x, directionIndex.y, directionIndex.z, newTile);
     }
 
     public Tile GetAdjacentTile(Vector3Int directionIndex)
@@ -54,7 +52,7 @@ public class Tile
         if (rule == null) return;
 
         GameObject rulePrefab = rule.GetObject(this);
-        if (rulePrefab != PrefabUtility.GetCorrespondingObjectFromOriginalSource(obj))
+        if (rulePrefab != PrefabUtility.GetCorrespondingObjectFromSource(obj))
         {
             // Destroy obj and re-instantiate the new prefab
             GameObject objToDestroy = obj;
