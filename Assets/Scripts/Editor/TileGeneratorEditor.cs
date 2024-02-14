@@ -77,7 +77,6 @@ public class TileGeneratorEditor : Editor
             }
         }
 
-
         GUILayout.Space(25);
 
         GUI.backgroundColor = drawSelected ? Color.red : oldColor;
@@ -96,12 +95,19 @@ public class TileGeneratorEditor : Editor
 
         GUI.backgroundColor = oldColor;
 
+        GUILayout.Space(25);
+
         if (GUILayout.Button("Add/Remove Palettes"))
         {
             AddTilePaletteWindow window = (AddTilePaletteWindow)EditorWindow.GetWindow(typeof(AddTilePaletteWindow), false, "Add Palette");
             window.tileGenerator = tileGenerator;
         }
-        
+
+        if (GUILayout.Button("Clear Unused Tiles"))
+        {
+            tileGenerator.ClearUnusedTiles();
+        }
+
         tileGenerator.shouldPaint = drawSelected;
         tileGenerator.shouldErase = eraseSelected;
 

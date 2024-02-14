@@ -77,35 +77,6 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
         gridSize.y = Mathf.Max(gridSize.y, 0.01f);
         gridSize.z = Mathf.Max(gridSize.z, 0.01f);
 
-        // Remove unnecessary tiles
-        List<Vector3Int> keysToRemove = new List<Vector3Int>();
-
-        foreach (var tileKey in tiles.Keys)
-        {
-            if (tileKey.x >= gridCount.x || 
-                tileKey.y >= gridCount.y ||
-                tileKey.z >= gridCount.z)
-            {
-                keysToRemove.Add(tileKey);
-            }
-            
-        }
-
-        foreach (var key in keysToRemove)
-        {
-            // Before removing the tile at the key location,
-            // Destroy any game object that exists there
-            Tile tile = tiles[key];
-            if (tile.obj != null)
-            {
-#if UNITY_EDITOR
-                EditorApplication.delayCall += () => DestroyImmediate(tile.obj);
-#endif
-            }
-
-            tiles.Remove(key);
-        }
-
         for (int x = 0; x < gridCount.x; x++)
         {
             for (int y = 0; y < gridCount.y; y++)
@@ -115,6 +86,53 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
                     ValidateTile(x, y, z);
                 }
             }
+        }
+
+        // Destroy objects in unused tiles
+
+        foreach (var tileKey in tiles.Keys)
+        {
+            if (tileKey.x >= gridCount.x ||
+                tileKey.y >= gridCount.y ||
+                tileKey.z >= gridCount.z)
+            {
+                Tile tile = tiles[tileKey];
+                if (tile.obj != null)
+                {
+#if UNITY_EDITOR
+                    EditorApplication.delayCall += () => DestroyImmediate(tile.obj);
+#endif
+                }
+            }
+        }
+    }
+
+    public void ClearUnusedTiles()
+    {
+        // Remove unused tiles
+        List<Vector3Int> keysToRemove = new List<Vector3Int>();
+
+        foreach (var tileKey in tiles.Keys)
+        {
+            if (tileKey.x >= gridCount.x ||
+                tileKey.y >= gridCount.y ||
+                tileKey.z >= gridCount.z)
+            {
+                keysToRemove.Add(tileKey);
+            }
+        }
+
+        foreach (var key in keysToRemove)
+        {
+            Tile tile = tiles[key];
+            if (tile.obj != null)
+            {
+#if UNITY_EDITOR
+                EditorApplication.delayCall += () => DestroyImmediate(tile.obj);
+#endif
+            }
+
+            tiles.Remove(key);
         }
     }
 
@@ -146,6 +164,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
                 tile.obj.SetActive(y == selectedTileIndex.y);
             }
         }
+        tile.EnsurePrefabIsInstantiated();
         ManageAdjacentTiles(tile);
 
 #if UNITY_EDITOR
@@ -345,6 +364,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
 
             selectedTile.obj = newObj;
             selectedTile.rule = selectedRule;
+            selectedTile.prefab = selectedTilePrefab;
 
             selectedTile.obj.transform.parent = transform;
             selectedTile.obj.transform.position = selectedTile.GetTargetPosition();

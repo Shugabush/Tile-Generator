@@ -47,12 +47,22 @@ public class Tile
     }
 
 #if UNITY_EDITOR
+    public void EnsurePrefabIsInstantiated()
+    {
+        if (rule == null || prefab == null || obj != null) return;
+
+        obj = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+        obj.transform.parent = parent.transform;
+        obj.transform.position = GetTargetPosition();
+        SetScale(parent.GetGridScaleRatio());
+    }
+
     public void FixObject()
     {
-        if (rule == null) return;
+        if (rule == null || obj == null) return;
 
         GameObject rulePrefab = rule.GetObject(this);
-        if (rulePrefab != PrefabUtility.GetCorrespondingObjectFromSource(obj))
+        if (rulePrefab != null && rulePrefab != PrefabUtility.GetCorrespondingObjectFromSource(obj))
         {
             // Destroy obj and re-instantiate the new prefab
             GameObject objToDestroy = obj;
