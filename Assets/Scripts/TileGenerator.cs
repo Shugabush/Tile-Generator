@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.VisualScripting;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -136,7 +135,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
         {
             tile.obj.transform.parent = transform;
             tile.obj.transform.position = tile.GetTargetPosition();
-            tile.obj.transform.localScale = GetGridScaleRatio();
+            tile.SetScale(GetGridScaleRatio());
 
             if (showAllYLevels)
             {
@@ -349,7 +348,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
 
             selectedTile.obj.transform.parent = transform;
             selectedTile.obj.transform.position = selectedTile.GetTargetPosition();
-            selectedTile.obj.transform.localScale = GetGridScaleRatio();
+            SelectedTile.SetScale(GetGridScaleRatio());
         }
         EditorUtility.SetDirty(this);
     }

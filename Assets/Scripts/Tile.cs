@@ -64,7 +64,7 @@ public class Tile
             obj = (GameObject)PrefabUtility.InstantiatePrefab(rulePrefab);
             obj.transform.parent = parent.transform;
             obj.transform.position = GetTargetPosition();
-            obj.transform.localScale = parent.GetGridScaleRatio();
+            SetScale(parent.GetGridScaleRatio());
             prefab = rulePrefab;
         }
     }
@@ -78,6 +78,29 @@ public class Tile
     public Vector3 GetTargetPosition()
     {
         return parent.transform.TransformPoint(GetTargetLocalPosition());
+    }
+
+    public void SetScale(Vector3 baseScale)
+    {
+        if (obj == null) return;
+
+        Renderer rend = obj.GetComponentInChildren<Renderer>();
+
+        obj.transform.localScale = baseScale;
+
+        Vector3 size = rend.localBounds.size;
+
+        size.x = Mathf.Max(0.025f, size.x);
+        size.y = Mathf.Max(0.025f, size.y);
+        size.z = Mathf.Max(0.025f, size.z);
+
+        Vector3 scaledSize = new Vector3(baseScale.x / size.x, baseScale.y / size.y, baseScale.z / size.z);
+
+        scaledSize.x = Mathf.Max(0.025f, scaledSize.x);
+        scaledSize.y = Mathf.Max(0.025f, scaledSize.y);
+        scaledSize.z = Mathf.Max(0.025f, scaledSize.z);
+
+        obj.transform.localScale = scaledSize;
     }
 
     public Tile(TileGenerator parent, Vector3Int indexPosition)

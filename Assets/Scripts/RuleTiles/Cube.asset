@@ -67,4 +67,4 @@ MonoBehaviour:
       condition: 0
     - direction: {x: 1, y: 1, z: 1}
       condition: 0
-    newObj: {fileID: 7635457198165937764, guid: bcf50a31c098f6c41a6a775097f528f2, type: 3}
+    newObj: {fileID: 8141497731362815425, guid: 6e2fb962dee6c7e45aff832dadb10d87, type: 3}
