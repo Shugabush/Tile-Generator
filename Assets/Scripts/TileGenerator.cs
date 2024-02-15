@@ -205,12 +205,11 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
         {
             targetTile.SetAdjacentTile(direction, tiles[adjacentVectorIndex]);
         }
-
     }
 
+#if UNITY_EDITOR
     void OnDrawGizmosSelected()
     {
-#if UNITY_EDITOR
 
         Gizmos.color = Color.red;
         for (int x = 0; x < gridCount.x; x++)
