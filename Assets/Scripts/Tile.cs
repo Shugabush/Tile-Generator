@@ -21,18 +21,7 @@ namespace TileGeneration
         public GameObject prefab;
 
         // Game Object that is occupying this tile slot (if any)
-        GameObject obj;
-        public GameObject Obj
-        {
-            get
-            {
-                return obj;
-            }
-            set
-            {
-                obj = value;
-            }
-        }
+        public GameObject obj;
         public Dictionary<Vector3Int, Tile> adjacentTiles = new Dictionary<Vector3Int, Tile>();
 
         public void SetAdjacentTile(Vector3Int directionIndex, Tile newTile)
@@ -64,48 +53,50 @@ namespace TileGeneration
 #if UNITY_EDITOR
         public void EnsurePrefabIsInstantiated()
         {
-            if (Obj == null)
+            if (obj == null)
             {
                 rule = null;
                 prefab = null;
                 return;
             }
 
-            if (rule == null || prefab == null || Obj != null) return;
+            if (rule == null || prefab == null || obj != null) return;
 
-            Obj = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-            Obj.transform.SetParent(parent.transform);
-            Obj.transform.position = GetTargetPosition();
+            obj = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            obj.transform.SetParent(parent.transform);
+            obj.transform.position = GetTargetPosition();
+            obj.transform.localRotation = prefab.transform.localRotation;
             SetScale(parent.GetGridScaleRatio());
         }
 
         public void FixObject()
         {
-            if (rule == null || prefab == null || Obj == null)
+            if (rule == null || prefab == null || obj == null)
             {
                 prefab = null;
-                if (Obj != null)
+                if (obj != null)
                 {
-                    EditorApplication.delayCall += () => Object.DestroyImmediate(Obj);
-                    Obj = null;
+                    EditorApplication.delayCall += () => Object.DestroyImmediate(obj);
+                    obj = null;
                 }
 
                 return;
             }
 
             GameObject rulePrefab = rule.GetObject(this);
-            if (rulePrefab != null && rulePrefab != PrefabUtility.GetCorrespondingObjectFromSource(Obj))
+            if (rulePrefab != null && rulePrefab != PrefabUtility.GetCorrespondingObjectFromSource(obj))
             {
                 // Destroy obj and re-instantiate the new prefab
-                GameObject objToDestroy = Obj;
+                GameObject objToDestroy = obj;
                 if (objToDestroy != null)
                 {
                     EditorApplication.delayCall += () => Object.DestroyImmediate(objToDestroy);
                 }
 
-                Obj = (GameObject)PrefabUtility.InstantiatePrefab(rulePrefab);
-                Obj.transform.parent = parent.transform;
-                Obj.transform.position = GetTargetPosition();
+                obj = (GameObject)PrefabUtility.InstantiatePrefab(rulePrefab);
+                obj.transform.parent = parent.transform;
+                obj.transform.position = GetTargetPosition();
+                obj.transform.localRotation = rulePrefab.transform.localRotation;
                 SetScale(parent.GetGridScaleRatio());
                 prefab = rulePrefab;
             }
@@ -124,11 +115,11 @@ namespace TileGeneration
 
         public void SetScale(Vector3 baseScale)
         {
-            if (Obj == null) return;
+            if (obj == null) return;
 
-            Renderer rend = Obj.GetComponentInChildren<Renderer>();
+            Renderer rend = obj.GetComponentInChildren<Renderer>();
 
-            Obj.transform.localScale = baseScale;
+            obj.transform.localScale = baseScale;
 
             Vector3 size = rend.localBounds.size;
 
@@ -142,7 +133,7 @@ namespace TileGeneration
             scaledSize.y = Mathf.Max(0.025f, scaledSize.y);
             scaledSize.z = Mathf.Max(0.025f, scaledSize.z);
 
-            Obj.transform.localScale = scaledSize;
+            obj.transform.localScale = scaledSize;
         }
 
         public Tile(TileGenerator parent, Vector3Int indexPosition)

@@ -12,7 +12,7 @@ namespace TileGeneration
 
         void Update()
         {
-            if (tile != null && tile.Obj != gameObject)
+            if (tile != null && tile.obj != gameObject)
             {
 #if UNITY_EDITOR
                 EditorApplication.delayCall += () => DestroyImmediate(gameObject);
@@ -22,7 +22,7 @@ namespace TileGeneration
 
         void OnValidate()
         {
-            if (tile != null && tile.Obj != gameObject)
+            if (tile != null && tile.obj != gameObject)
             {
 #if UNITY_EDITOR
                 EditorApplication.delayCall += () => DestroyImmediate(gameObject);

@@ -108,6 +108,11 @@ namespace TileGeneration
                 tileGenerator.ClearUnusedTiles();
             }
 
+            if (GUILayout.Button("Clear Unused Objects"))
+            {
+                tileGenerator.ClearUnusedObjects();
+            }
+
             if (GUILayout.Button("Reset Tiles"))
             {
                 tileGenerator.ResetTiles();

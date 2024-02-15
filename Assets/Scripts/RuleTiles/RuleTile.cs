@@ -212,9 +212,9 @@ namespace TileGeneration
                     switch (condition)
                     {
                         case Condition.ExistingTile:
-                            return adjacentTile != null && adjacentTile.Obj != null;
+                            return adjacentTile != null && adjacentTile.obj != null;
                         case Condition.NoTile:
-                            return adjacentTile == null || adjacentTile.Obj == null;
+                            return adjacentTile == null || adjacentTile.obj == null;
                         default:
                             return true;
                     }

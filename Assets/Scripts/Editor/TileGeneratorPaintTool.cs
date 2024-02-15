@@ -41,7 +41,6 @@ namespace TileGeneration
 
             if (Selection.activeGameObject == null || !Selection.activeGameObject.TryGetComponent<TileGenerator>(out _)) return;
 
-
             if (tileGenerator.GetSelectedPoint(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition)))
             {
                 Handles.DrawWireDisc(GetCurrentMousePositionInScene(), Selection.activeTransform.up, 0.5f);

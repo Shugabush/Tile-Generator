@@ -50,9 +50,9 @@ namespace TileGeneration
                 foreach (var tile in tiles.Values)
                 {
                     tile.parent = this;
-                    if (tile.Obj != null)
+                    if (tile.obj != null)
                     {
-                        tile.Obj.SetActive(true);
+                        tile.obj.SetActive(true);
                     }
                 }
             }
@@ -68,6 +68,8 @@ namespace TileGeneration
 
         void OnValidate()
         {
+            Undo.undoRedoPerformed = new Undo.UndoRedoCallback(ClearUnusedObjects);
+
             // Grid count can never go below 1
             gridCount.x = System.Math.Max(gridCount.x, 1);
             gridCount.y = System.Math.Max(gridCount.y, 1);
@@ -96,10 +98,10 @@ namespace TileGeneration
                     tileKey.z >= gridCount.z)
                 {
                     Tile tile = tiles[tileKey];
-                    if (tile.Obj != null)
+                    if (tile.obj != null)
                     {
 #if UNITY_EDITOR
-                        EditorApplication.delayCall += () => DestroyImmediate(tile.Obj);
+                        EditorApplication.delayCall += () => DestroyImmediate(tile.obj);
 #endif
                     }
                 }
@@ -124,14 +126,36 @@ namespace TileGeneration
             foreach (var key in keysToRemove)
             {
                 Tile tile = tiles[key];
-                if (tile.Obj != null)
+                if (tile.obj != null)
                 {
 #if UNITY_EDITOR
-                    EditorApplication.delayCall += () => DestroyImmediate(tile.Obj);
+                    EditorApplication.delayCall += () => DestroyImmediate(tile.obj);
 #endif
                 }
 
                 tiles.Remove(key);
+            }
+        }
+
+        public void ClearUnusedObjects()
+        {
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                GameObject child = transform.GetChild(i).gameObject;
+                bool trackedByTile = false;
+                foreach (var tile in tiles.Values)
+                {
+                    if (tile.obj == child.gameObject)
+                    {
+                        trackedByTile = true;
+                        break;
+                    }
+                }
+                
+                if (!trackedByTile)
+                {
+                    DestroyImmediate(child);
+                }
             }
         }
 
@@ -148,19 +172,19 @@ namespace TileGeneration
             tile.parent = this;
             tile.indexPosition = vectorIndex;
 
-            if (tile.Obj != null)
+            if (tile.obj != null)
             {
-                tile.Obj.transform.parent = transform;
-                tile.Obj.transform.position = tile.GetTargetPosition();
+                tile.obj.transform.parent = transform;
+                tile.obj.transform.position = tile.GetTargetPosition();
                 tile.SetScale(GetGridScaleRatio());
 
                 if (showAllYLevels)
                 {
-                    tile.Obj.SetActive(true);
+                    tile.obj.SetActive(true);
                 }
                 else
                 {
-                    tile.Obj.SetActive(y == selectedTileIndex.y);
+                    tile.obj.SetActive(y == selectedTileIndex.y);
                 }
             }
             tile.EnsurePrefabIsInstantiated();
@@ -365,10 +389,10 @@ namespace TileGeneration
             if (selectedTile != null &&
                 selectedRule != null && selectedTilePrefab != null)
             {
-                if (selectedTile.Obj != null)
+                if (selectedTile.obj != null)
                 {
                     // Destroy existing obj
-                    DestroyImmediate(selectedTile.Obj);
+                    DestroyImmediate(selectedTile.obj);
                 }
 
                 // Create the game object
@@ -376,14 +400,15 @@ namespace TileGeneration
 
                 Undo.RegisterCreatedObjectUndo(newObj, "New Object Created");
 
-                selectedTile.Obj = newObj;
+                selectedTile.obj = newObj;
                 selectedTile.rule = selectedRule;
                 selectedTile.prefab = selectedTilePrefab;
 
-                selectedTile.Obj.transform.parent = transform;
+                selectedTile.obj.transform.parent = transform;
 
-                selectedTile.Obj.transform.position = selectedTile.GetTargetPosition();
-                SelectedTile.SetScale(GetGridScaleRatio());
+                selectedTile.obj.transform.position = selectedTile.GetTargetPosition();
+                selectedTile.obj.transform.localRotation = selectedTilePrefab.transform.localRotation;
+                selectedTile.SetScale(GetGridScaleRatio());
             }
             EditorUtility.SetDirty(this);
         }
@@ -394,28 +419,13 @@ namespace TileGeneration
 
             // Cache selected tile
             Tile selectedTile = SelectedTile;
-            if (selectedTile != null && selectedTile.Obj != null)
+            if (selectedTile != null && selectedTile.obj != null)
             {
                 // Destroy the existing object
-                DestroyImmediate(selectedTile.Obj);
-                selectedTile.Obj = null;
+                DestroyImmediate(selectedTile.obj);
+                selectedTile.obj = null;
                 selectedTile.prefab = null;
                 selectedTile.rule = null;
-            }
-            EditorUtility.SetDirty(this);
-        }
-
-        void EraseTile(Tile tile)
-        {
-            Undo.RecordObject(this, "Tile Generator Change");
-
-            if (tile != null && tile.Obj != null)
-            {
-                // Destroy the existing object
-                DestroyImmediate(tile.Obj);
-                tile.Obj = null;
-                tile.prefab = null;
-                tile.rule = null;
             }
             EditorUtility.SetDirty(this);
         }
