@@ -85,14 +85,21 @@ namespace TileGeneration
 
             public GameObject Evaluate(Tile tile)
             {
+                bool evaluated = true;
+                bool anythingRequired = false;
+
                 foreach (var slot in slots)
                 {
                     if (!slot.Evaluate(tile))
                     {
-                        return null;
+                        evaluated = false;
+                    }
+                    if (slot.condition != Condition.None)
+                    {
+                        anythingRequired = true;
                     }
                 }
-                return newObj;
+                return evaluated && anythingRequired ? newObj : null;
             }
 
             public Slot GetSlot(Vector3Int direction)
@@ -119,7 +126,7 @@ namespace TileGeneration
                 private const string checkMarkTextureString = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAQlBMVEVHcEwAfwAAfwAAfwAAfwAAfwAAfwAAfwAAfwAAfwAAfwAAfwAAfwAAfwAAfwAAfwAAfwAAfwAAfwAAfwAAfwAAfwCj5MZKAAAAFXRSTlMAFvrYOCoE5vIMbbB7S4lfzJO+oB5wJja8AAABhElEQVRYw6VX2baDIAysgLKI4jb//6uXIr1t7Tm1ZnwfSWYJ4Xajvral4D4lTx2/RgbfJT12BL6Z3cicbxbMDD5ZrATeR4e+IdpfFZaNUK8HJsJAZgK0keMHDdiBwFvAJcJ9Ga+i/PzgAMJAXcHLDbDjdcvhCQEKXgUOj1k8AVLBLw3jn0yA4fBK7ECjQRHQTgU/SQloFlAE+LXgxRHqxoJHL41QUHsD0ggMbm8gcAKKG6gCiBuoAsgbiIproBIotlBbCYTQQk1f8dIMVAfCnUzB1n8nAOtJiM1ovhJwboGk42eT/kHADwzmuC3DscyICwzm09z6XqixFf/bGNzuK0PwnxH42YP3A9UyHGfIuYRv14Zy83ZQ8FTC49zSZXfeJuByiqtsqs+mmB94jNdnP2wM/w1cWwWeygGiFHbpiawFXFxGn+LVL4gHgKyAFyKFBfyvATVFonU8KKqAVyL1Rk5S8T5cidTyB8lOJLGQFyIt8yTuchpn6knd9NZQP8hXxYWF8A93mShQW0ri4AAAAABJRU5ErkJggg==";
                 private const string xMarkTextureString = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAS1BMVEX/////8PD/7u7/7+//7e3//Pz/+/v//f3/9PT/9vb/8/P/+fn/+Pj/OTn/MDD/HBz/AAD/GRn/Ojr/Nzf/CQn/CAj/Li7/GBj////nzx5BAAAADXRSTlMAAAAAAAAAAAAAAAAA7Uh4SAAAAAFiS0dEAIgFHUgAAAAHdElNRQfoARQADQqBo01kAAAAAW9yTlQBz6J3mgAAAMJJREFUOMuFk9sSgyAMRCOo2NrqUtvy/39atTrkNmNeIDlLwuhCtMWzIRNhqvsZMIoGyOc+Y40oedxqmXEgGH4oDg60hu+KF2AUsdYW6mpyTmEc/ZprBedpPyEVlgvFcHO4ULjcV3DuKSS3Cs21wnKid8UfB9PAG9wtb+SIoHnUlwwX3PeHjPaC+/7A2NspnD+IRq0Q57eC6sF592+ZxD0m7/vX2pfZ3vNHYQ/D80dhT8vzRzmT7Puj1GTp7e9Ny778AA5AIjOXvvPoAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDI0LTAxLTIwVDAwOjEzOjEwKzAwOjAwtfCBMAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyNC0wMS0yMFQwMDoxMzoxMCswMDowMMStOYwAAAAASUVORK5CYII=";
                 
-                Condition condition = Condition.None;
+                public Condition condition = Condition.None;
 
                 /// <summary>
                 /// Draws a texture based on the condition type
@@ -205,9 +212,9 @@ namespace TileGeneration
                     switch (condition)
                     {
                         case Condition.ExistingTile:
-                            return adjacentTile != null && adjacentTile.obj != null;
+                            return adjacentTile != null && adjacentTile.Obj != null;
                         case Condition.NoTile:
-                            return adjacentTile == null || adjacentTile.obj == null;
+                            return adjacentTile == null || adjacentTile.Obj == null;
                         default:
                             return true;
                     }

@@ -50,9 +50,9 @@ namespace TileGeneration
                 foreach (var tile in tiles.Values)
                 {
                     tile.parent = this;
-                    if (tile.obj != null)
+                    if (tile.Obj != null)
                     {
-                        tile.obj.SetActive(true);
+                        tile.Obj.SetActive(true);
                     }
                 }
             }
@@ -89,7 +89,6 @@ namespace TileGeneration
             }
 
             // Destroy objects in unused tiles
-
             foreach (var tileKey in tiles.Keys)
             {
                 if (tileKey.x >= gridCount.x ||
@@ -97,10 +96,10 @@ namespace TileGeneration
                     tileKey.z >= gridCount.z)
                 {
                     Tile tile = tiles[tileKey];
-                    if (tile.obj != null)
+                    if (tile.Obj != null)
                     {
 #if UNITY_EDITOR
-                        EditorApplication.delayCall += () => DestroyImmediate(tile.obj);
+                        EditorApplication.delayCall += () => DestroyImmediate(tile.Obj);
 #endif
                     }
                 }
@@ -125,10 +124,10 @@ namespace TileGeneration
             foreach (var key in keysToRemove)
             {
                 Tile tile = tiles[key];
-                if (tile.obj != null)
+                if (tile.Obj != null)
                 {
 #if UNITY_EDITOR
-                    EditorApplication.delayCall += () => DestroyImmediate(tile.obj);
+                    EditorApplication.delayCall += () => DestroyImmediate(tile.Obj);
 #endif
                 }
 
@@ -149,19 +148,19 @@ namespace TileGeneration
             tile.parent = this;
             tile.indexPosition = vectorIndex;
 
-            if (tile.obj != null)
+            if (tile.Obj != null)
             {
-                tile.obj.transform.parent = transform;
-                tile.obj.transform.position = tile.GetTargetPosition();
+                tile.Obj.transform.parent = transform;
+                tile.Obj.transform.position = tile.GetTargetPosition();
                 tile.SetScale(GetGridScaleRatio());
 
                 if (showAllYLevels)
                 {
-                    tile.obj.SetActive(true);
+                    tile.Obj.SetActive(true);
                 }
                 else
                 {
-                    tile.obj.SetActive(y == selectedTileIndex.y);
+                    tile.Obj.SetActive(y == selectedTileIndex.y);
                 }
             }
             tile.EnsurePrefabIsInstantiated();
@@ -252,6 +251,8 @@ namespace TileGeneration
             Gizmos.matrix = Matrix4x4.Translate(transform.TransformPoint(GetGridScalePoint(x, y, z))) *
                         Matrix4x4.Rotate(transform.rotation) *
                         Matrix4x4.Scale(Vector3.Scale(GetGridScaleRatio(), transform.localScale));
+
+            Gizmos.color = tiles[new Vector3Int(x, y, z)].prefab != null ? Color.red : Color.blue;
 
             if (selectedTileIndex.x == x && selectedTileIndex.y == y && selectedTileIndex.z == z)
             {
@@ -358,28 +359,30 @@ namespace TileGeneration
         void PaintTile()
         {
             Undo.RecordObject(this, "Tile Generator Change");
-
             // Cache selected tile
             Tile selectedTile = SelectedTile;
 
             if (selectedTile != null &&
                 selectedRule != null && selectedTilePrefab != null)
             {
-                if (selectedTile.obj != null)
+                if (selectedTile.Obj != null)
                 {
                     // Destroy existing obj
-                    DestroyImmediate(selectedTile.obj);
+                    DestroyImmediate(selectedTile.Obj);
                 }
 
                 // Create the game object
                 GameObject newObj = (GameObject)PrefabUtility.InstantiatePrefab(selectedTilePrefab, transform);
 
-                selectedTile.obj = newObj;
+                Undo.RegisterCreatedObjectUndo(newObj, "New Object Created");
+
+                selectedTile.Obj = newObj;
                 selectedTile.rule = selectedRule;
                 selectedTile.prefab = selectedTilePrefab;
 
-                selectedTile.obj.transform.parent = transform;
-                selectedTile.obj.transform.position = selectedTile.GetTargetPosition();
+                selectedTile.Obj.transform.parent = transform;
+
+                selectedTile.Obj.transform.position = selectedTile.GetTargetPosition();
                 SelectedTile.SetScale(GetGridScaleRatio());
             }
             EditorUtility.SetDirty(this);
@@ -391,11 +394,11 @@ namespace TileGeneration
 
             // Cache selected tile
             Tile selectedTile = SelectedTile;
-            if (selectedTile != null && selectedTile.obj != null)
+            if (selectedTile != null && selectedTile.Obj != null)
             {
                 // Destroy the existing object
-                DestroyImmediate(selectedTile.obj);
-                selectedTile.obj = null;
+                DestroyImmediate(selectedTile.Obj);
+                selectedTile.Obj = null;
                 selectedTile.prefab = null;
                 selectedTile.rule = null;
             }
@@ -406,11 +409,11 @@ namespace TileGeneration
         {
             Undo.RecordObject(this, "Tile Generator Change");
 
-            if (tile != null && tile.obj != null)
+            if (tile != null && tile.Obj != null)
             {
                 // Destroy the existing object
-                DestroyImmediate(tile.obj);
-                tile.obj = null;
+                DestroyImmediate(tile.Obj);
+                tile.Obj = null;
                 tile.prefab = null;
                 tile.rule = null;
             }

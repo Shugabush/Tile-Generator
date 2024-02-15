@@ -19,8 +19,20 @@ namespace TileGeneration
 
         // Prefab for this tile (we will be comparing this when deciding if we need to draw a new one or not)
         public GameObject prefab;
+
         // Game Object that is occupying this tile slot (if any)
-        public GameObject obj;
+        GameObject obj;
+        public GameObject Obj
+        {
+            get
+            {
+                return obj;
+            }
+            set
+            {
+                obj = value;
+            }
+        }
         public Dictionary<Vector3Int, Tile> adjacentTiles = new Dictionary<Vector3Int, Tile>();
 
         public void SetAdjacentTile(Vector3Int directionIndex, Tile newTile)
@@ -52,31 +64,48 @@ namespace TileGeneration
 #if UNITY_EDITOR
         public void EnsurePrefabIsInstantiated()
         {
-            if (rule == null || prefab == null || obj != null) return;
+            if (Obj == null)
+            {
+                rule = null;
+                prefab = null;
+                return;
+            }
 
-            obj = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-            obj.transform.parent = parent.transform;
-            obj.transform.position = GetTargetPosition();
+            if (rule == null || prefab == null || Obj != null) return;
+
+            Obj = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            Obj.transform.SetParent(parent.transform);
+            Obj.transform.position = GetTargetPosition();
             SetScale(parent.GetGridScaleRatio());
         }
 
         public void FixObject()
         {
-            if (rule == null || obj == null) return;
+            if (rule == null || prefab == null || Obj == null)
+            {
+                prefab = null;
+                if (Obj != null)
+                {
+                    EditorApplication.delayCall += () => Object.DestroyImmediate(Obj);
+                    Obj = null;
+                }
+
+                return;
+            }
 
             GameObject rulePrefab = rule.GetObject(this);
-            if (rulePrefab != null && rulePrefab != PrefabUtility.GetCorrespondingObjectFromSource(obj))
+            if (rulePrefab != null && rulePrefab != PrefabUtility.GetCorrespondingObjectFromSource(Obj))
             {
                 // Destroy obj and re-instantiate the new prefab
-                GameObject objToDestroy = obj;
+                GameObject objToDestroy = Obj;
                 if (objToDestroy != null)
                 {
                     EditorApplication.delayCall += () => Object.DestroyImmediate(objToDestroy);
                 }
 
-                obj = (GameObject)PrefabUtility.InstantiatePrefab(rulePrefab);
-                obj.transform.parent = parent.transform;
-                obj.transform.position = GetTargetPosition();
+                Obj = (GameObject)PrefabUtility.InstantiatePrefab(rulePrefab);
+                Obj.transform.parent = parent.transform;
+                Obj.transform.position = GetTargetPosition();
                 SetScale(parent.GetGridScaleRatio());
                 prefab = rulePrefab;
             }
@@ -95,11 +124,11 @@ namespace TileGeneration
 
         public void SetScale(Vector3 baseScale)
         {
-            if (obj == null) return;
+            if (Obj == null) return;
 
-            Renderer rend = obj.GetComponentInChildren<Renderer>();
+            Renderer rend = Obj.GetComponentInChildren<Renderer>();
 
-            obj.transform.localScale = baseScale;
+            Obj.transform.localScale = baseScale;
 
             Vector3 size = rend.localBounds.size;
 
@@ -113,7 +142,7 @@ namespace TileGeneration
             scaledSize.y = Mathf.Max(0.025f, scaledSize.y);
             scaledSize.z = Mathf.Max(0.025f, scaledSize.z);
 
-            obj.transform.localScale = scaledSize;
+            Obj.transform.localScale = scaledSize;
         }
 
         public Tile(TileGenerator parent, Vector3Int indexPosition)

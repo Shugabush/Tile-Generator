@@ -24,7 +24,7 @@ MonoBehaviour:
     - direction: {x: -1, y: 0, z: -1}
       condition: 0
     - direction: {x: -1, y: 0, z: 0}
-      condition: 0
+      condition: 1
     - direction: {x: -1, y: 0, z: 1}
       condition: 0
     - direction: {x: -1, y: 1, z: -1}
@@ -40,9 +40,9 @@ MonoBehaviour:
     - direction: {x: 0, y: -1, z: 1}
       condition: 0
     - direction: {x: 0, y: 0, z: -1}
-      condition: 0
+      condition: 1
     - direction: {x: 0, y: 0, z: 1}
-      condition: 0
+      condition: 1
     - direction: {x: 0, y: 1, z: -1}
       condition: 0
     - direction: {x: 0, y: 1, z: 0}
@@ -58,61 +58,7 @@ MonoBehaviour:
     - direction: {x: 1, y: 0, z: -1}
       condition: 0
     - direction: {x: 1, y: 0, z: 0}
-      condition: 0
-    - direction: {x: 1, y: 0, z: 1}
-      condition: 0
-    - direction: {x: 1, y: 1, z: -1}
-      condition: 0
-    - direction: {x: 1, y: 1, z: 0}
-      condition: 0
-    - direction: {x: 1, y: 1, z: 1}
-      condition: 0
-    newObj: {fileID: 7635457198165937764, guid: 53fea5378289b2948886aa3e0ba7fb17, type: 3}
-  - slots:
-    - direction: {x: -1, y: -1, z: -1}
-      condition: 0
-    - direction: {x: -1, y: -1, z: 0}
-      condition: 0
-    - direction: {x: -1, y: -1, z: 1}
-      condition: 0
-    - direction: {x: -1, y: 0, z: -1}
-      condition: 0
-    - direction: {x: -1, y: 0, z: 0}
-      condition: 0
-    - direction: {x: -1, y: 0, z: 1}
-      condition: 0
-    - direction: {x: -1, y: 1, z: -1}
-      condition: 0
-    - direction: {x: -1, y: 1, z: 0}
-      condition: 0
-    - direction: {x: -1, y: 1, z: 1}
-      condition: 0
-    - direction: {x: 0, y: -1, z: -1}
-      condition: 0
-    - direction: {x: 0, y: -1, z: 0}
-      condition: 0
-    - direction: {x: 0, y: -1, z: 1}
-      condition: 0
-    - direction: {x: 0, y: 0, z: -1}
-      condition: 0
-    - direction: {x: 0, y: 0, z: 1}
-      condition: 0
-    - direction: {x: 0, y: 1, z: -1}
-      condition: 0
-    - direction: {x: 0, y: 1, z: 0}
-      condition: 0
-    - direction: {x: 0, y: 1, z: 1}
-      condition: 0
-    - direction: {x: 1, y: -1, z: -1}
-      condition: 0
-    - direction: {x: 1, y: -1, z: 0}
-      condition: 0
-    - direction: {x: 1, y: -1, z: 1}
-      condition: 0
-    - direction: {x: 1, y: 0, z: -1}
-      condition: 0
-    - direction: {x: 1, y: 0, z: 0}
-      condition: 0
+      condition: 1
     - direction: {x: 1, y: 0, z: 1}
       condition: 0
     - direction: {x: 1, y: 1, z: -1}

@@ -14,4 +14,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ruleTiles:
   - {fileID: 11400000, guid: d1d38b672297e8e4eba4aa445fe2dade, type: 2}
-  - {fileID: 11400000, guid: 4171e89d85a295549b9ac869fc6af75e, type: 2}
