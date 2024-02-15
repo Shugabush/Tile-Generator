@@ -68,7 +68,7 @@ public class TileGeneratorEditor : Editor
                 if (targetObj != null)
                 {
                     GUI.backgroundColor = tileGenerator.selectedRule == ruleTile ? Color.green : oldColor;
-                    if (GUILayout.Button(ruleTile.defaultGameObject.name))
+                    if (GUILayout.Button(AssetPreview.GetAssetPreview(ruleTile.defaultGameObject)))
                     {
                         tileGenerator.selectedRule = ruleTile;
                         tileGenerator.selectedTilePrefab = targetObj;
