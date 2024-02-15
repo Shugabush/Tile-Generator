@@ -3,88 +3,91 @@ using UnityEngine;
 using UnityEditor.EditorTools;
 using UnityEditor;
 
-[EditorTool("Paint Tool", typeof(TileGenerator))]
-public class TileGeneratorPaintTool : EditorTool
+namespace TileGeneration
 {
-    bool isClicking = false;
-
-    TileGenerator tileGenerator;
-
-    void BeforeSceneGUI(SceneView sceneView)
+    [EditorTool("Paint Tool", typeof(TileGenerator))]
+    public class TileGeneratorPaintTool : EditorTool
     {
-        if (!ToolManager.IsActiveTool(this)) return;
-        if (Selection.activeGameObject == null || !Selection.activeGameObject.TryGetComponent<TileGenerator>(out _)) return;
+        bool isClicking = false;
 
-        if ((Event.current.type == EventType.MouseDrag || Event.current.type == EventType.MouseDown) && Event.current.button == 0)
+        TileGenerator tileGenerator;
+
+        void BeforeSceneGUI(SceneView sceneView)
         {
-            isClicking = true;
-            Event.current.Use();
-        }
-        else
-        {
-            isClicking = false;
-        }
+            if (!ToolManager.IsActiveTool(this)) return;
+            if (Selection.activeGameObject == null || !Selection.activeGameObject.TryGetComponent<TileGenerator>(out _)) return;
 
-        if (Event.current.type == EventType.MouseUp && Event.current.button == 0)
-        {
-            Event.current.Use();
-        }
-    }
+            if ((Event.current.type == EventType.MouseDrag || Event.current.type == EventType.MouseDown) && Event.current.button == 0)
+            {
+                isClicking = true;
+                Event.current.Use();
+            }
+            else
+            {
+                isClicking = false;
+            }
 
-    public override void OnToolGUI(EditorWindow window)
-    {
-        if (!(window is SceneView)) return;
-
-        if (!ToolManager.IsActiveTool(this)) return;
-
-        if (Selection.activeGameObject == null || !Selection.activeGameObject.TryGetComponent<TileGenerator>(out _)) return;
-
-
-        if (tileGenerator.GetSelectedPoint(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition)))
-        {
-            Handles.DrawWireDisc(GetCurrentMousePositionInScene(), Selection.activeTransform.up, 0.5f);
-        }
-        else
-        {
-            Handles.DrawWireDisc(GetCurrentMousePositionInScene(), Vector3.up, 0.5f);
+            if (Event.current.type == EventType.MouseUp && Event.current.button == 0)
+            {
+                Event.current.Use();
+            }
         }
 
-        if (isClicking)
+        public override void OnToolGUI(EditorWindow window)
         {
-            tileGenerator.ChangeTile();
+            if (!(window is SceneView)) return;
+
+            if (!ToolManager.IsActiveTool(this)) return;
+
+            if (Selection.activeGameObject == null || !Selection.activeGameObject.TryGetComponent<TileGenerator>(out _)) return;
+
+
+            if (tileGenerator.GetSelectedPoint(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition)))
+            {
+                Handles.DrawWireDisc(GetCurrentMousePositionInScene(), Selection.activeTransform.up, 0.5f);
+            }
+            else
+            {
+                Handles.DrawWireDisc(GetCurrentMousePositionInScene(), Vector3.up, 0.5f);
+            }
+
+            if (isClicking)
+            {
+                tileGenerator.ChangeTile();
+            }
+
+            base.OnToolGUI(window);
+
+            window.Repaint();
         }
 
-        base.OnToolGUI(window);
-
-        window.Repaint();
-    }
-
-    public override void OnActivated()
-    {
-        base.OnActivated();
-        if (tileGenerator == null)
+        public override void OnActivated()
         {
-            tileGenerator = (TileGenerator)target;
+            base.OnActivated();
+            if (tileGenerator == null)
+            {
+                tileGenerator = (TileGenerator)target;
+            }
+
+            SceneView.beforeSceneGui += BeforeSceneGUI;
         }
 
-        SceneView.beforeSceneGui += BeforeSceneGUI;
-    }
+        public override void OnWillBeDeactivated()
+        {
+            base.OnWillBeDeactivated();
 
-    public override void OnWillBeDeactivated()
-    {
-        base.OnWillBeDeactivated();
+            SceneView.beforeSceneGui -= BeforeSceneGUI;
+            tileGenerator.selectedTileIndex.x = -1;
+            tileGenerator.selectedTileIndex.z = -1;
+        }
 
-        SceneView.beforeSceneGui -= BeforeSceneGUI;
-        tileGenerator.selectedTileIndex.x = -1;
-        tileGenerator.selectedTileIndex.z = -1;
-    }
+        Vector3 GetCurrentMousePositionInScene()
+        {
+            Vector3 mousePosition = Event.current.mousePosition;
+            var placeObject = HandleUtility.PlaceObject(mousePosition, out var newPosition, out var normal);
 
-    Vector3 GetCurrentMousePositionInScene()
-    {
-        Vector3 mousePosition = Event.current.mousePosition;
-        var placeObject = HandleUtility.PlaceObject(mousePosition, out var newPosition, out var normal);
-
-        return placeObject ? newPosition : HandleUtility.GUIPointToWorldRay(mousePosition).GetPoint(10);
+            return placeObject ? newPosition : HandleUtility.GUIPointToWorldRay(mousePosition).GetPoint(10);
+        }
     }
 }
 #endif

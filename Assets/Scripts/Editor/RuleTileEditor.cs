@@ -2,127 +2,130 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(RuleTile)), CanEditMultipleObjects]
-public class RuleTileEditor : Editor
+namespace TileGeneration
 {
-    RuleTile ruleTile;
-
-    int selectedYLevel = 0;
-
-    public override void OnInspectorGUI()
+    [CustomEditor(typeof(RuleTile)), CanEditMultipleObjects]
+    public class RuleTileEditor : Editor
     {
-        if (ruleTile == null)
+        RuleTile ruleTile;
+
+        int selectedYLevel = 0;
+
+        public override void OnInspectorGUI()
         {
-            ruleTile = (RuleTile)target;
-        }
-
-        EditorGUI.BeginChangeCheck();
-
-        Undo.RecordObject(ruleTile, "Rule Tile Change");
-
-        SerializedProperty defaultObjProperty = serializedObject.FindProperty("defaultGameObject");
-        
-        EditorGUILayout.PropertyField(defaultObjProperty);
-        serializedObject.ApplyModifiedProperties();
-
-        Rect currentRect = GUILayoutUtility.GetLastRect();
-        GUILayout.Space(Screen.height * 0.5f);
-
-        Rect lastRect = currentRect;
-
-        for (int i = 0; i < ruleTile.rules.Count; i++)
-        {
-            var rule = ruleTile.rules[i];
-            GUILayout.Space(currentRect.y - lastRect.y);
-
-            lastRect = currentRect;
-
-            currentRect.y += 50;
-
-            rule.newObj = (GameObject)EditorGUI.ObjectField(currentRect, "New Game Object", rule.newObj, typeof(GameObject));
-
-            currentRect.y += 50;
-            currentRect.x += 200;
-
-            GUIStyle yLevelStyle = new GUIStyle();
-            yLevelStyle.fontSize = 24;
-
-            var oldColor = GUI.backgroundColor;
-
-            // Make buttons for y levels
-            Rect selectedYLevelRect = currentRect;
-            selectedYLevelRect.size = new Vector2(100, 25);
-
-            if (selectedYLevel == -1) GUI.backgroundColor = Color.gray;
-
-            selectedYLevelRect.y += 50;
-
-            if (GUI.Button(selectedYLevelRect, "Lower Level"))
+            if (ruleTile == null)
             {
-                selectedYLevel = -1;
+                ruleTile = (RuleTile)target;
             }
 
-            GUI.backgroundColor = oldColor;
-            if (selectedYLevel == 0) GUI.backgroundColor = Color.gray;
+            EditorGUI.BeginChangeCheck();
 
-            selectedYLevelRect.y += 50;
+            Undo.RecordObject(ruleTile, "Rule Tile Change");
 
-            if (GUI.Button(selectedYLevelRect, "Main Level"))
+            SerializedProperty defaultObjProperty = serializedObject.FindProperty("defaultGameObject");
+
+            EditorGUILayout.PropertyField(defaultObjProperty);
+            serializedObject.ApplyModifiedProperties();
+
+            Rect currentRect = GUILayoutUtility.GetLastRect();
+            GUILayout.Space(Screen.height * 0.5f);
+
+            Rect lastRect = currentRect;
+
+            for (int i = 0; i < ruleTile.rules.Count; i++)
             {
-                selectedYLevel = 0;
-            }
+                var rule = ruleTile.rules[i];
+                GUILayout.Space(currentRect.y - lastRect.y);
 
-            GUI.backgroundColor = oldColor;
-            if (selectedYLevel == 1) GUI.backgroundColor = Color.gray;
+                lastRect = currentRect;
 
-            selectedYLevelRect.y += 50;
+                currentRect.y += 50;
 
-            if (GUI.Button(selectedYLevelRect, "Upper Level"))
-            {
-                selectedYLevel = 1;
-            }
+                rule.newObj = (GameObject)EditorGUI.ObjectField(currentRect, "New Game Object", rule.newObj, typeof(GameObject));
 
-            GUI.backgroundColor = oldColor;
-            currentRect.y = selectedYLevelRect.y;
+                currentRect.y += 50;
+                currentRect.x += 200;
 
-            currentRect.x -= 200;
-            currentRect.y += 50;
+                GUIStyle yLevelStyle = new GUIStyle();
+                yLevelStyle.fontSize = 24;
 
-            Vector3Int lastSlotDirection = -Vector3Int.one;
-            lastSlotDirection.y = selectedYLevel;
+                var oldColor = GUI.backgroundColor;
 
-            for (int j = 0; j < rule.slots.Length; j++)
-            {
-                var slot = rule.slots[j];
+                // Make buttons for y levels
+                Rect selectedYLevelRect = currentRect;
+                selectedYLevelRect.size = new Vector2(100, 25);
 
-                if (slot.direction.y == selectedYLevel)
+                if (selectedYLevel == -1) GUI.backgroundColor = Color.gray;
+
+                selectedYLevelRect.y += 50;
+
+                if (GUI.Button(selectedYLevelRect, "Lower Level"))
                 {
-                    Rect slotRect = new Rect(currentRect.x + 50 + (slot.direction.x * 50), currentRect.y - (slot.direction.z * 50), 50, 50);
-                    slot.Draw(slotRect);
+                    selectedYLevel = -1;
+                }
+
+                GUI.backgroundColor = oldColor;
+                if (selectedYLevel == 0) GUI.backgroundColor = Color.gray;
+
+                selectedYLevelRect.y += 50;
+
+                if (GUI.Button(selectedYLevelRect, "Main Level"))
+                {
+                    selectedYLevel = 0;
+                }
+
+                GUI.backgroundColor = oldColor;
+                if (selectedYLevel == 1) GUI.backgroundColor = Color.gray;
+
+                selectedYLevelRect.y += 50;
+
+                if (GUI.Button(selectedYLevelRect, "Upper Level"))
+                {
+                    selectedYLevel = 1;
+                }
+
+                GUI.backgroundColor = oldColor;
+                currentRect.y = selectedYLevelRect.y;
+
+                currentRect.x -= 200;
+                currentRect.y += 50;
+
+                Vector3Int lastSlotDirection = -Vector3Int.one;
+                lastSlotDirection.y = selectedYLevel;
+
+                for (int j = 0; j < rule.slots.Length; j++)
+                {
+                    var slot = rule.slots[j];
+
+                    if (slot.direction.y == selectedYLevel)
+                    {
+                        Rect slotRect = new Rect(currentRect.x + 50 + (slot.direction.x * 50), currentRect.y - (slot.direction.z * 50), 50, 50);
+                        slot.Draw(slotRect);
+                    }
+                }
+
+                currentRect.y += 125;
+
+                if (GUI.Button(currentRect, "Remove Rule"))
+                {
+                    ruleTile.rules.Remove(rule);
+                    i--;
+                    continue;
                 }
             }
 
-            currentRect.y += 125;
-
-            if (GUI.Button(currentRect, "Remove Rule"))
+            currentRect.y += 25;
+            if (GUI.Button(currentRect, "Add New Rule"))
             {
-                ruleTile.rules.Remove(rule);
-                i--;
-                continue;
+                // Add a new rule
+                var newRule = new RuleTile.Rule();
+                ruleTile.rules.Add(newRule);
             }
-        }
 
-        currentRect.y += 25;
-        if (GUI.Button(currentRect, "Add New Rule"))
-        {
-            // Add a new rule
-            var newRule = new RuleTile.Rule();
-            ruleTile.rules.Add(newRule);
-        }
-
-        if (EditorGUI.EndChangeCheck())
-        {
-            EditorUtility.SetDirty(ruleTile);
+            if (EditorGUI.EndChangeCheck())
+            {
+                EditorUtility.SetDirty(ruleTile);
+            }
         }
     }
 }

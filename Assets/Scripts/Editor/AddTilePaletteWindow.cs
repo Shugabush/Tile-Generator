@@ -2,27 +2,30 @@
 using UnityEngine;
 using UnityEditor;
 
-public class AddTilePaletteWindow : EditorWindow
+namespace TileGeneration
 {
-    public TileGenerator tileGenerator;
-    [SerializeField] TilePalette targetPalette;
-
-    void OnGUI()
+    public class AddTilePaletteWindow : EditorWindow
     {
-        targetPalette = (TilePalette)EditorGUILayout.ObjectField("Target Palette", targetPalette, typeof(TilePalette), false);
+        public TileGenerator tileGenerator;
+        [SerializeField] TilePalette targetPalette;
 
-        if (targetPalette != null)
+        void OnGUI()
         {
-            if (GUILayout.Button("Add Palette") && !tileGenerator.palettes.Contains(targetPalette))
+            targetPalette = (TilePalette)EditorGUILayout.ObjectField("Target Palette", targetPalette, typeof(TilePalette), false);
+
+            if (targetPalette != null)
             {
-                tileGenerator.palettes.Add(targetPalette);
-            }
-            if (GUILayout.Button("Remove Palette") && tileGenerator.palettes.Contains(targetPalette))
-            {
-                tileGenerator.palettes.Remove(targetPalette);
+                if (GUILayout.Button("Add Palette") && !tileGenerator.palettes.Contains(targetPalette))
+                {
+                    tileGenerator.palettes.Add(targetPalette);
+                }
+                if (GUILayout.Button("Remove Palette") && tileGenerator.palettes.Contains(targetPalette))
+                {
+                    tileGenerator.palettes.Remove(targetPalette);
+                }
             }
         }
-    }
 
+    }
 }
 #endif

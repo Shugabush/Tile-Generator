@@ -2,114 +2,117 @@
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(TileGenerator))]
-public class TileGeneratorEditor : Editor
+namespace TileGeneration
 {
-    TileGenerator tileGenerator;
-
-    public override void OnInspectorGUI()
+    [CustomEditor(typeof(TileGenerator))]
+    public class TileGeneratorEditor : Editor
     {
-        if (tileGenerator == null)
+        TileGenerator tileGenerator;
+
+        public override void OnInspectorGUI()
         {
-            tileGenerator = (TileGenerator)target;
-        }
-
-        Undo.RecordObject(tileGenerator, "Tile Generator Change");
-
-        Color oldColor = GUI.backgroundColor;
-
-        EditorGUI.BeginChangeCheck();
-
-        SerializedProperty gridSize = serializedObject.FindProperty("gridSize");
-        EditorGUILayout.PropertyField(gridSize);
-
-        SerializedProperty gridCount = serializedObject.FindProperty("gridCount");
-        EditorGUILayout.PropertyField(gridCount);
-
-        SerializedProperty selectedTileIndexProperty = serializedObject.FindProperty("selectedTileIndex");
-        Vector3Int selectedTileIndex = selectedTileIndexProperty.vector3IntValue;
-        selectedTileIndex.y = EditorGUILayout.IntField("Y Level", selectedTileIndex.y);
-        selectedTileIndex.y = Mathf.Clamp(selectedTileIndex.y, 0, tileGenerator.GridCount.y - 1);
-
-        selectedTileIndexProperty.vector3IntValue = selectedTileIndex;
-
-        SerializedProperty showAllYLevels = serializedObject.FindProperty("showAllYLevels");
-        EditorGUILayout.PropertyField(showAllYLevels);
-
-        serializedObject.ApplyModifiedProperties();
-
-        foreach (TilePalette palette in tileGenerator.palettes)
-        {
-            if (palette != null)
+            if (tileGenerator == null)
             {
-                GUI.backgroundColor = tileGenerator.selectedPalette == palette ? Color.blue : oldColor;
-
-                if (GUILayout.Button(palette.name))
-                {
-                    tileGenerator.selectedPalette = tileGenerator.selectedPalette == palette ? null : palette;
-                }
+                tileGenerator = (TileGenerator)target;
             }
-        }
 
-        GUILayout.Space(25);
+            Undo.RecordObject(tileGenerator, "Tile Generator Change");
 
-        if (tileGenerator.selectedPalette != null)
-        {
-            // Display selected palette's prefabs
-            foreach (var ruleTile in tileGenerator.selectedPalette.ruleTiles)
+            Color oldColor = GUI.backgroundColor;
+
+            EditorGUI.BeginChangeCheck();
+
+            SerializedProperty gridSize = serializedObject.FindProperty("gridSize");
+            EditorGUILayout.PropertyField(gridSize);
+
+            SerializedProperty gridCount = serializedObject.FindProperty("gridCount");
+            EditorGUILayout.PropertyField(gridCount);
+
+            SerializedProperty selectedTileIndexProperty = serializedObject.FindProperty("selectedTileIndex");
+            Vector3Int selectedTileIndex = selectedTileIndexProperty.vector3IntValue;
+            selectedTileIndex.y = EditorGUILayout.IntField("Y Level", selectedTileIndex.y);
+            selectedTileIndex.y = Mathf.Clamp(selectedTileIndex.y, 0, tileGenerator.GridCount.y - 1);
+
+            selectedTileIndexProperty.vector3IntValue = selectedTileIndex;
+
+            SerializedProperty showAllYLevels = serializedObject.FindProperty("showAllYLevels");
+            EditorGUILayout.PropertyField(showAllYLevels);
+
+            serializedObject.ApplyModifiedProperties();
+
+            foreach (TilePalette palette in tileGenerator.palettes)
             {
-                if (ruleTile == null) continue;
-
-                GameObject targetObj = ruleTile.GetObject(tileGenerator.SelectedTile);
-                if (targetObj != null)
+                if (palette != null)
                 {
-                    GUI.backgroundColor = tileGenerator.selectedRule == ruleTile ? Color.green : oldColor;
-                    if (GUILayout.Button(AssetPreview.GetAssetPreview(ruleTile.defaultGameObject)))
+                    GUI.backgroundColor = tileGenerator.selectedPalette == palette ? Color.blue : oldColor;
+
+                    if (GUILayout.Button(palette.name))
                     {
-                        tileGenerator.selectedRule = ruleTile;
-                        tileGenerator.selectedTilePrefab = targetObj;
+                        tileGenerator.selectedPalette = tileGenerator.selectedPalette == palette ? null : palette;
                     }
                 }
             }
-        }
 
-        GUILayout.Space(25);
+            GUILayout.Space(25);
 
-        GUI.backgroundColor = tileGenerator.shouldPaint ? Color.red : oldColor;
-        if (GUILayout.Button("Draw"))
-        {
-            tileGenerator.shouldPaint = true;
-        }
+            if (tileGenerator.selectedPalette != null)
+            {
+                // Display selected palette's prefabs
+                foreach (var ruleTile in tileGenerator.selectedPalette.ruleTiles)
+                {
+                    if (ruleTile == null) continue;
 
-        GUI.backgroundColor = !tileGenerator.shouldPaint ? Color.red : oldColor;
-        if (GUILayout.Button("Erase"))
-        {
-            tileGenerator.shouldPaint = false;
-        }
+                    GameObject targetObj = ruleTile.GetObject(tileGenerator.SelectedTile);
+                    if (targetObj != null)
+                    {
+                        GUI.backgroundColor = tileGenerator.selectedRule == ruleTile ? Color.green : oldColor;
+                        if (GUILayout.Button(AssetPreview.GetAssetPreview(ruleTile.defaultGameObject)))
+                        {
+                            tileGenerator.selectedRule = ruleTile;
+                            tileGenerator.selectedTilePrefab = targetObj;
+                        }
+                    }
+                }
+            }
 
-        GUI.backgroundColor = oldColor;
+            GUILayout.Space(25);
 
-        GUILayout.Space(25);
+            GUI.backgroundColor = tileGenerator.shouldPaint ? Color.red : oldColor;
+            if (GUILayout.Button("Draw"))
+            {
+                tileGenerator.shouldPaint = true;
+            }
 
-        if (GUILayout.Button("Add/Remove Palettes"))
-        {
-            AddTilePaletteWindow window = (AddTilePaletteWindow)EditorWindow.GetWindow(typeof(AddTilePaletteWindow), false, "Add Palette");
-            window.tileGenerator = tileGenerator;
-        }
+            GUI.backgroundColor = !tileGenerator.shouldPaint ? Color.red : oldColor;
+            if (GUILayout.Button("Erase"))
+            {
+                tileGenerator.shouldPaint = false;
+            }
 
-        if (GUILayout.Button("Clear Unused Tiles"))
-        {
-            tileGenerator.ClearUnusedTiles();
-        }
+            GUI.backgroundColor = oldColor;
 
-        if (GUILayout.Button("Reset Tiles"))
-        {
-            tileGenerator.ResetTiles();
-        }
+            GUILayout.Space(25);
 
-        if (EditorGUI.EndChangeCheck())
-        {
-            EditorUtility.SetDirty(tileGenerator);
+            if (GUILayout.Button("Add/Remove Palettes"))
+            {
+                AddTilePaletteWindow window = (AddTilePaletteWindow)EditorWindow.GetWindow(typeof(AddTilePaletteWindow), false, "Add Palette");
+                window.tileGenerator = tileGenerator;
+            }
+
+            if (GUILayout.Button("Clear Unused Tiles"))
+            {
+                tileGenerator.ClearUnusedTiles();
+            }
+
+            if (GUILayout.Button("Reset Tiles"))
+            {
+                tileGenerator.ResetTiles();
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                EditorUtility.SetDirty(tileGenerator);
+            }
         }
     }
 }

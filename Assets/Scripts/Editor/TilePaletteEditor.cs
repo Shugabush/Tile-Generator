@@ -2,30 +2,33 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(TilePalette))]
-public class TilePaletteEditor : Editor
+namespace TileGeneration
 {
-    TilePalette palette;
-
-    public override void OnInspectorGUI()
+    [CustomEditor(typeof(TilePalette))]
+    public class TilePaletteEditor : Editor
     {
-        base.OnInspectorGUI();
+        TilePalette palette;
 
-        if (palette == null)
+        public override void OnInspectorGUI()
         {
-            palette = (TilePalette)target;
-        }
+            base.OnInspectorGUI();
 
-        EditorGUI.BeginChangeCheck();
+            if (palette == null)
+            {
+                palette = (TilePalette)target;
+            }
 
-        // Make sure the objects field below are interactable
-        // Hopefully there is a better way to do this,
-        // but right now this is okay
-        GUILayout.Space(500);
+            EditorGUI.BeginChangeCheck();
 
-        if (EditorGUI.EndChangeCheck())
-        {
-            EditorUtility.SetDirty(palette);
+            // Make sure the objects field below are interactable
+            // Hopefully there is a better way to do this,
+            // but right now this is okay
+            GUILayout.Space(500);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                EditorUtility.SetDirty(palette);
+            }
         }
     }
 }
