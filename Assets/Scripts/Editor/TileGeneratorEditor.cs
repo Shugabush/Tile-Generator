@@ -7,15 +7,14 @@ public class TileGeneratorEditor : Editor
 {
     TileGenerator tileGenerator;
 
-    bool drawSelected = false;
-    bool eraseSelected = false;
-
     public override void OnInspectorGUI()
     {
         if (tileGenerator == null)
         {
             tileGenerator = (TileGenerator)target;
         }
+
+        Undo.RecordObject(tileGenerator, "Tile Generator Change");
 
         Color oldColor = GUI.backgroundColor;
 
@@ -36,9 +35,6 @@ public class TileGeneratorEditor : Editor
 
         SerializedProperty showAllYLevels = serializedObject.FindProperty("showAllYLevels");
         EditorGUILayout.PropertyField(showAllYLevels);
-
-        SerializedProperty showGrid = serializedObject.FindProperty("showGrid");
-        EditorGUILayout.PropertyField(showGrid);
 
         serializedObject.ApplyModifiedProperties();
 
@@ -79,18 +75,16 @@ public class TileGeneratorEditor : Editor
 
         GUILayout.Space(25);
 
-        GUI.backgroundColor = drawSelected ? Color.red : oldColor;
+        GUI.backgroundColor = tileGenerator.shouldPaint ? Color.red : oldColor;
         if (GUILayout.Button("Draw"))
         {
-            drawSelected = !drawSelected;
-            eraseSelected = false;
+            tileGenerator.shouldPaint = true;
         }
 
-        GUI.backgroundColor = eraseSelected ? Color.red : oldColor;
+        GUI.backgroundColor = !tileGenerator.shouldPaint ? Color.red : oldColor;
         if (GUILayout.Button("Erase"))
         {
-            eraseSelected = !eraseSelected;
-            drawSelected = false;
+            tileGenerator.shouldPaint = false;
         }
 
         GUI.backgroundColor = oldColor;
@@ -107,9 +101,6 @@ public class TileGeneratorEditor : Editor
         {
             tileGenerator.ClearUnusedTiles();
         }
-
-        tileGenerator.shouldPaint = drawSelected;
-        tileGenerator.shouldErase = eraseSelected;
 
         if (EditorGUI.EndChangeCheck())
         {

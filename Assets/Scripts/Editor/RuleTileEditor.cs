@@ -18,6 +18,8 @@ public class RuleTileEditor : Editor
 
         EditorGUI.BeginChangeCheck();
 
+        Undo.RecordObject(ruleTile, "Rule Tile Change");
+
         SerializedProperty defaultObjProperty = serializedObject.FindProperty("defaultGameObject");
         
         EditorGUILayout.PropertyField(defaultObjProperty);

@@ -27,9 +27,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
     public Vector3Int selectedTileIndex = -Vector3Int.one;
 
     public bool shouldPaint = true;
-    public bool shouldErase = false;
     [SerializeField] bool showAllYLevels = true;
-    [SerializeField] bool showGrid = true;
 
     public Tile SelectedTile
     {
@@ -213,14 +211,13 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
     void OnDrawGizmosSelected()
     {
 #if UNITY_EDITOR
-        if (!showGrid && !shouldPaint && !shouldErase) return;
 
         Gizmos.color = Color.red;
         for (int x = 0; x < gridCount.x; x++)
         {
             for (int z = 0; z < gridCount.z; z++)
             {
-                if (showAllYLevels && showGrid)
+                if (showAllYLevels)
                 {
                     for (int y = 0; y < gridCount.y; y++)
                     {
@@ -338,7 +335,7 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
             // Paint tile
             PaintTile();
         }
-        else if (shouldErase)
+        else
         {
             // Erase tile
             EraseTile();
@@ -347,6 +344,8 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
 
     void PaintTile()
     {
+        Undo.RecordObject(this, "Tile Generator Change");
+
         // Cache selected tile
         Tile selectedTile = SelectedTile;
 
@@ -375,6 +374,8 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
 
     void EraseTile()
     {
+        Undo.RecordObject(this, "Tile Generator Change");
+
         // Cache selected tile
         Tile selectedTile = SelectedTile;
         if (selectedTile != null && selectedTile.obj != null)
