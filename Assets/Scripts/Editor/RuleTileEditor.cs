@@ -49,7 +49,7 @@ namespace TileGeneration
                 GUIStyle yLevelStyle = new GUIStyle();
                 yLevelStyle.fontSize = 24;
 
-                var oldColor = GUI.backgroundColor;
+                Color oldColor = GUI.backgroundColor;
 
                 // Make buttons for y levels
                 Rect selectedYLevelRect = currentRect;

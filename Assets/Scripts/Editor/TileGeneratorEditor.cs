@@ -66,7 +66,11 @@ namespace TileGeneration
                     if (targetObj != null)
                     {
                         GUI.backgroundColor = tileGenerator.selectedRule == ruleTile ? Color.green : oldColor;
-                        if (GUILayout.Button(AssetPreview.GetAssetPreview(ruleTile.defaultGameObject)))
+
+                        GUIContent asset = new GUIContent(AssetPreview.GetAssetPreview(ruleTile.defaultGameObject),
+                            "This is the " + ruleTile.defaultGameObject.name + " prefab");
+
+                        if (GUILayout.Button(asset))
                         {
                             tileGenerator.selectedRule = ruleTile;
                             tileGenerator.selectedTilePrefab = targetObj;
