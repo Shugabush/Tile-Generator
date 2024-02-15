@@ -102,6 +102,11 @@ public class TileGeneratorEditor : Editor
             tileGenerator.ClearUnusedTiles();
         }
 
+        if (GUILayout.Button("Reset Tiles"))
+        {
+            tileGenerator.ResetTiles();
+        }
+
         if (EditorGUI.EndChangeCheck())
         {
             EditorUtility.SetDirty(tileGenerator);

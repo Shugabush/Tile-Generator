@@ -208,9 +208,21 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
     }
 
 #if UNITY_EDITOR
+    public void ResetTiles()
+    {
+        tiles = new Dictionary<Vector3Int, Tile>();
+        while (transform.childCount > 0)
+        {
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                DestroyImmediate(transform.GetChild(i).gameObject);
+            }
+        }
+        EditorUtility.SetDirty(this);
+    }
+
     void OnDrawGizmosSelected()
     {
-
         Gizmos.color = Color.red;
         for (int x = 0; x < gridCount.x; x++)
         {
@@ -384,6 +396,21 @@ public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
             selectedTile.obj = null;
             selectedTile.prefab = null;
             selectedTile.rule = null;
+        }
+        EditorUtility.SetDirty(this);
+    }
+
+    void EraseTile(Tile tile)
+    {
+        Undo.RecordObject(this, "Tile Generator Change");
+
+        if (tile != null && tile.obj != null)
+        {
+            // Destroy the existing object
+            DestroyImmediate(tile.obj);
+            tile.obj = null;
+            tile.prefab = null;
+            tile.rule = null;
         }
         EditorUtility.SetDirty(this);
     }
