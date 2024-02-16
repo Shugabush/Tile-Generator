@@ -41,9 +41,11 @@ namespace TileGeneration
 
             if (Selection.activeGameObject == null || !Selection.activeGameObject.TryGetComponent<TileGenerator>(out _)) return;
 
-            if (tileGenerator.GetSelectedPoint(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition)))
+            tileGenerator.paintRadius = 0.5f;
+
+            if (tileGenerator.GetSelectedPoint(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition), out Vector3 point))
             {
-                Handles.DrawWireDisc(GetCurrentMousePositionInScene(), Selection.activeTransform.up, 0.5f);
+                Handles.DrawWireDisc(point, Selection.activeTransform.up, tileGenerator.paintRadius);
             }
             else
             {

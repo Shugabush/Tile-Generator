@@ -28,6 +28,9 @@ namespace TileGeneration
             SerializedProperty gridCount = serializedObject.FindProperty("gridCount");
             EditorGUILayout.PropertyField(gridCount);
 
+            SerializedProperty recursions = serializedObject.FindProperty("adjacentRecursions");
+            EditorGUILayout.PropertyField(recursions);
+
             SerializedProperty selectedTileIndexProperty = serializedObject.FindProperty("selectedTileIndex");
             Vector3Int selectedTileIndex = selectedTileIndexProperty.vector3IntValue;
             selectedTileIndex.y = EditorGUILayout.IntField("Y Level", selectedTileIndex.y);

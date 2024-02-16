@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -11,6 +12,30 @@ namespace TileGeneration
     [ExecuteInEditMode]
     public class TileGenerator : MonoBehaviour, ISerializationCallbackReceiver
     {
+        public static readonly Vector3Int[] directions = new Vector3Int[]
+        {
+            Vector3Int.right,
+            Vector3Int.up,
+            Vector3Int.forward,
+            Vector3Int.left,
+            Vector3Int.down,
+            Vector3Int.back,
+            new Vector3Int(1, 1, 0),
+            new Vector3Int(1, -1, 0),
+            new Vector3Int(1, 0, 1),
+            new Vector3Int(1, 0, -1),
+            new Vector3Int(-1, 1, 0),
+            new Vector3Int(-1, -1, 0),
+            new Vector3Int(-1, 0, 1),
+            new Vector3Int(-1, 0, -1),
+            new Vector3Int(0, 1, 1),
+            new Vector3Int(0, 1, -1),
+            new Vector3Int(0, -1, 1),
+            new Vector3Int(0, -1, -1),
+        };
+
+        int debugCount;
+
         [SerializeField] Vector3Int gridCount = Vector3Int.one;
         [SerializeField] Vector3 gridSize = Vector3.one * 25;
 
@@ -21,12 +46,22 @@ namespace TileGeneration
 
         Dictionary<Vector3Int, Tile> tiles = new Dictionary<Vector3Int, Tile>();
 
+        List<Tile> tilesInRadius = new List<Tile>();
+
         public List<TilePalette> palettes = new List<TilePalette>();
 
         [SerializeReference] public TilePalette selectedPalette;
         [SerializeReference] public RuleTile selectedRule;
         public GameObject selectedTilePrefab;
         public Vector3Int selectedTileIndex = -Vector3Int.one;
+
+        public float paintRadius = 1f;
+
+        [Range(0, 10)]
+        public int adjacentRecursions = 5;
+
+        int adjacentSteps = 0;
+        [SerializeField] int maxSteps = 20;
 
         public bool shouldPaint = true;
         [SerializeField] bool showAllYLevels = true;
@@ -37,6 +72,12 @@ namespace TileGeneration
             {
                 if (tiles.TryGetValue(selectedTileIndex, out Tile tile))
                 {
+                    if (selectedTileIndex.x < 0 || selectedTileIndex.y < 0 || selectedTileIndex.z < 0)
+                    {
+                        tiles.Remove(selectedTileIndex);
+                        return null;
+                    }
+
                     return tile;
                 }
                 return null;
@@ -159,10 +200,8 @@ namespace TileGeneration
             }
         }
 
-        void ValidateTile(int x, int y, int z)
+        void ValidateTile(Vector3Int vectorIndex)
         {
-            Vector3Int vectorIndex = new Vector3Int(x, y, z);
-
             if (!tiles.TryGetValue(vectorIndex, out Tile tile))
             {
                 tile = new Tile(this, vectorIndex);
@@ -184,7 +223,7 @@ namespace TileGeneration
                 }
                 else
                 {
-                    tile.obj.SetActive(y == selectedTileIndex.y);
+                    tile.obj.SetActive(vectorIndex.y == selectedTileIndex.y);
                 }
             }
             tile.EnsurePrefabIsInstantiated();
@@ -193,6 +232,11 @@ namespace TileGeneration
 #if UNITY_EDITOR
             tile.FixObject();
 #endif
+        }
+
+        void ValidateTile(int x, int y, int z)
+        {
+            ValidateTile(new Vector3Int(x, y, z));
         }
 
         void ManageAdjacentTiles(Tile targetTile)
@@ -248,6 +292,10 @@ namespace TileGeneration
 
         void OnDrawGizmosSelected()
         {
+            ValidateTile(selectedTileIndex);
+
+            tilesInRadius = GetTilesInRadius(SelectedTile);
+
             Gizmos.color = Color.red;
             for (int x = 0; x < gridCount.x; x++)
             {
@@ -276,9 +324,11 @@ namespace TileGeneration
                         Matrix4x4.Rotate(transform.rotation) *
                         Matrix4x4.Scale(Vector3.Scale(GetGridScaleRatio(), transform.localScale));
 
-            Gizmos.color = tiles[new Vector3Int(x, y, z)].prefab != null ? Color.red : Color.blue;
+            Gizmos.color = Color.red;
 
-            if (selectedTileIndex.x == x && selectedTileIndex.y == y && selectedTileIndex.z == z)
+            Tile tile = tiles[new Vector3Int(x, y, z)];
+
+            if (SelectedTile == tile || tilesInRadius.Contains(tile))
             {
                 Gizmos.DrawCube(Vector3.zero, Vector3.one);
             }
@@ -326,8 +376,10 @@ namespace TileGeneration
             return new Vector3(xPoint, yPoint, zPoint) - ((gridSize - Vector3.one) * 0.5f);
         }
 
-        public bool GetSelectedPoint(Ray ray)
+        public bool GetSelectedPoint(Ray ray, out Vector3 point)
         {
+            point = Vector3.zero;
+
             Plane hPlane = new Plane(transform.up, transform.TransformPoint(GetGridScalePoint(0, selectedTileIndex.y, 0)));
             hPlane.distance -= transform.position.y;
 
@@ -335,6 +387,8 @@ namespace TileGeneration
             {
                 // Cache grid scale ratio
                 Vector3 gridScaleRatio = GetGridScaleRatio();
+
+                point = ray.GetPoint(distance);
 
                 Vector3 selectedPoint = transform.InverseTransformPoint(ray.GetPoint(distance));
 
@@ -368,6 +422,8 @@ namespace TileGeneration
 #if UNITY_EDITOR
         public void ChangeTile()
         {
+            Undo.RecordObject(this, "Tile Generator Change");
+
             if (shouldPaint)
             {
                 // Paint tile
@@ -382,7 +438,6 @@ namespace TileGeneration
 
         void PaintTile()
         {
-            Undo.RecordObject(this, "Tile Generator Change");
             // Cache selected tile
             Tile selectedTile = SelectedTile;
 
@@ -410,13 +465,46 @@ namespace TileGeneration
                 selectedTile.obj.transform.localRotation = selectedTilePrefab.transform.localRotation;
                 selectedTile.SetScale(GetGridScaleRatio());
             }
+
+            foreach (var tile in tilesInRadius)
+            {
+                PaintTile(tile);
+            }
+
+            EditorUtility.SetDirty(this);
+        }
+
+        void PaintTile(Tile tile)
+        {
+            if (tile != null &&
+                selectedRule != null && selectedTilePrefab != null)
+            {
+                if (tile.obj != null)
+                {
+                    // Destroy existing obj
+                    DestroyImmediate(tile.obj);
+                }
+
+                // Create the game object
+                GameObject newObj = (GameObject)PrefabUtility.InstantiatePrefab(selectedTilePrefab, transform);
+
+                Undo.RegisterCreatedObjectUndo(newObj, "New Object Created");
+
+                tile.obj = newObj;
+                tile.rule = selectedRule;
+                tile.prefab = selectedTilePrefab;
+
+                tile.obj.transform.parent = transform;
+
+                tile.obj.transform.position = tile.GetTargetPosition();
+                tile.obj.transform.localRotation = selectedTilePrefab.transform.localRotation;
+                tile.SetScale(GetGridScaleRatio());
+            }
             EditorUtility.SetDirty(this);
         }
 
         void EraseTile()
         {
-            Undo.RecordObject(this, "Tile Generator Change");
-
             // Cache selected tile
             Tile selectedTile = SelectedTile;
             if (selectedTile != null && selectedTile.obj != null)
@@ -426,6 +514,23 @@ namespace TileGeneration
                 selectedTile.obj = null;
                 selectedTile.prefab = null;
                 selectedTile.rule = null;
+            }
+            foreach (var tile in tilesInRadius)
+            {
+                EraseTile(tile);
+            }
+            EditorUtility.SetDirty(this);
+        }
+
+        void EraseTile(Tile tile)
+        {
+            if (tile != null && tile.obj != null)
+            {
+                // Destroy the existing object
+                DestroyImmediate(tile.obj);
+                tile.obj = null;
+                tile.prefab = null;
+                tile.rule = null;
             }
             EditorUtility.SetDirty(this);
         }
@@ -450,6 +555,40 @@ namespace TileGeneration
             {
                 tiles.Add(tileKeys[i], tileValues[i]);
             }
+        }
+
+        List<Tile> GetTilesInRadius(Tile startingTile)
+        {
+            List<Tile> tilesInRadius = new List<Tile>();
+
+            if (startingTile != null)
+            {
+                tilesInRadius = GetTilesInRadiusRecursive(startingTile);
+            }
+
+            return tilesInRadius;
+        }
+
+        List<Tile> GetTilesInRadiusRecursive(Tile currentTile)
+        {
+            List<Tile> tilesInRadius = new List<Tile>();
+
+            int y = currentTile.indexPosition.y;
+
+            for (int x = currentTile.indexPosition.x - adjacentRecursions; x < currentTile.indexPosition.x + adjacentRecursions; x++)
+            {
+                if (x >= 0 && x < gridCount.x)
+                {
+                    for (int z = currentTile.indexPosition.z - adjacentRecursions; z < currentTile.indexPosition.z + adjacentRecursions; z++)
+                    {
+                        if (z >= 0 && z < gridCount.z)
+                        {
+                            tilesInRadius.Add(tiles[new Vector3Int(x, y, z)]);
+                        }
+                    }
+                }
+            }
+            return tilesInRadius;
         }
     }
 }
