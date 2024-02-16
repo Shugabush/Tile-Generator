@@ -53,19 +53,27 @@ namespace TileGeneration
         public GameObject selectedTilePrefab;
         public Vector3Int selectedTileIndex = -Vector3Int.one;
 
-        [SerializeField] int paintSize = 5;
+        public enum PaintMode
+        {
+            Draw,
+            Fill,
+        }
 
-        public int PaintSize
+        [SerializeField] int paintRadius = 5;
+
+        public int PaintRadius
         {
             get
             {
-                return paintSize;
+                return paintRadius;
             }
             set
             {
-                paintSize = Mathf.Clamp(value, 0, 10);
+                paintRadius = Mathf.Clamp(value, 0, 10);
             }
         }
+
+        public PaintMode paintMode = PaintMode.Draw;
 
         public bool shouldPaint = true;
         [SerializeField] bool showAllYLevels = true;
@@ -87,6 +95,9 @@ namespace TileGeneration
                 return null;
             }
         }
+
+        int debugCount;
+        Queue<Tile> pendingTiles;
 
         void OnEnable()
         {
@@ -113,7 +124,7 @@ namespace TileGeneration
 
         void OnValidate()
         {
-            Undo.undoRedoPerformed = new Undo.UndoRedoCallback(ClearUnusedObjects);
+            //Undo.undoRedoPerformed = new Undo.UndoRedoCallback(ClearUnusedObjects);
 
             // Grid count can never go below 1
             gridCount.x = System.Math.Max(gridCount.x, 1);
@@ -298,7 +309,15 @@ namespace TileGeneration
         {
             ValidateTile(selectedTileIndex);
 
-            tilesInRadius = GetTilesInRadius(SelectedTile);
+            switch (paintMode)
+            {
+                case PaintMode.Draw:
+                    tilesInRadius = GetTilesInRadius(SelectedTile);
+                    break;
+                case PaintMode.Fill:
+                    tilesInRadius = GetTilesToFill(SelectedTile);
+                    break;
+            }
 
             Gizmos.color = Color.red;
             for (int x = 0; x < gridCount.x; x++)
@@ -446,7 +465,8 @@ namespace TileGeneration
             Tile selectedTile = SelectedTile;
 
             if (selectedTile != null &&
-                selectedRule != null && selectedTilePrefab != null)
+                selectedRule != selectedTile.rule &&
+                selectedTilePrefab != null)
             {
                 if (selectedTile.obj != null)
                 {
@@ -481,7 +501,8 @@ namespace TileGeneration
         void PaintTile(Tile tile)
         {
             if (tile != null &&
-                selectedRule != null && selectedTilePrefab != null)
+                selectedRule != tile.rule &&
+                selectedTilePrefab != null)
             {
                 if (tile.obj != null)
                 {
@@ -504,7 +525,6 @@ namespace TileGeneration
                 tile.obj.transform.localRotation = selectedTilePrefab.transform.localRotation;
                 tile.SetScale(GetGridScaleRatio());
             }
-            EditorUtility.SetDirty(this);
         }
 
         void EraseTile()
@@ -563,36 +583,78 @@ namespace TileGeneration
 
         List<Tile> GetTilesInRadius(Tile startingTile)
         {
+            debugCount = 0;
+            pendingTiles = new Queue<Tile>();
             List<Tile> tilesInRadius = new List<Tile>();
 
             if (startingTile != null)
             {
-                tilesInRadius = GetTilesInRadiusRecursive(startingTile);
+                pendingTiles.Enqueue(startingTile);
+                while (pendingTiles.Count > 0)
+                {
+                    GetTilesInRadiusRecursive(tilesInRadius, startingTile, pendingTiles.Dequeue());
+                }
             }
 
             return tilesInRadius;
         }
 
-        List<Tile> GetTilesInRadiusRecursive(Tile currentTile)
+        void GetTilesInRadiusRecursive(List<Tile> tilesInRadius, Tile startingTile, Tile currentTile)
         {
-            List<Tile> tilesInRadius = new List<Tile>();
-
-            int y = currentTile.indexPosition.y;
-
-            for (int x = currentTile.indexPosition.x + 1 - paintSize; x < currentTile.indexPosition.x + paintSize; x++)
+            if (startingTile != null && currentTile != null)
             {
-                if (x >= 0 && x < gridCount.x)
+                ManageAdjacentTiles(currentTile);
+                foreach (var pair in currentTile.adjacentTiles)
                 {
-                    for (int z = currentTile.indexPosition.z + 1 - paintSize; z < currentTile.indexPosition.z + paintSize; z++)
+                    Vector3Int key = pair.Key;
+                    Tile value = pair.Value;
+
+                    if (Vector3.Distance(startingTile.indexPosition, value.indexPosition) < paintRadius &&
+                        !tilesInRadius.Contains(value) && key.y == 0)
                     {
-                        if (z >= 0 && z < gridCount.z)
-                        {
-                            tilesInRadius.Add(tiles[new Vector3Int(x, y, z)]);
-                        }
+                        debugCount++;
+                        tilesInRadius.Add(value);
+                        pendingTiles.Enqueue(value);
                     }
                 }
             }
-            return tilesInRadius;
+        }
+
+        List<Tile> GetTilesToFill(Tile startingTile)
+        {
+            debugCount = 0;
+            pendingTiles = new Queue<Tile>();
+            List<Tile> tilesToFill = new List<Tile>();
+
+            if (startingTile != null)
+            {
+                pendingTiles.Enqueue(startingTile);
+                while (pendingTiles.Count > 0)
+                {
+                    GetTilesToFillRecursive(tilesToFill, pendingTiles.Dequeue());
+                }
+            }
+
+            return tilesToFill;
+        }
+
+        void GetTilesToFillRecursive(List<Tile> tilesToFill, Tile currentTile)
+        {
+            if (currentTile != null)
+            {
+                foreach (var pair in currentTile.adjacentTiles)
+                {
+                    Vector3Int key = pair.Key;
+                    Tile value = pair.Value;
+
+                    if (!tilesToFill.Contains(value) && key.y == 0 && value.obj == null)
+                    {
+                        debugCount++;
+                        tilesToFill.Add(value);
+                        pendingTiles.Enqueue(value);
+                    }
+                }
+            }
         }
     }
 }

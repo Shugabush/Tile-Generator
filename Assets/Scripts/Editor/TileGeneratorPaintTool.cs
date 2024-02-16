@@ -33,12 +33,12 @@ namespace TileGeneration
 
                 if (scrollDir == 1)
                 {
-                    tileGenerator.PaintSize--;
+                    tileGenerator.PaintRadius--;
                     Event.current.Use();
                 }
                 else if (scrollDir == -1)
                 {
-                    tileGenerator.PaintSize++;
+                    tileGenerator.PaintRadius++;
                     Event.current.Use();
                 }
             }
@@ -59,7 +59,7 @@ namespace TileGeneration
 
             if (tileGenerator.GetSelectedPoint(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition), out Vector3 point))
             {
-                Handles.DrawWireDisc(point, Selection.activeTransform.up, 0.5f);
+                Handles.DrawWireDisc(point, Selection.activeTransform.up, tileGenerator.GetGridScaleRatio().y * tileGenerator.PaintRadius);
             }
             else
             {

@@ -53,13 +53,6 @@ namespace TileGeneration
 #if UNITY_EDITOR
         public void EnsurePrefabIsInstantiated()
         {
-            if (obj == null)
-            {
-                rule = null;
-                prefab = null;
-                return;
-            }
-
             if (rule == null || prefab == null || obj != null) return;
 
             obj = (GameObject)PrefabUtility.InstantiatePrefab(prefab);

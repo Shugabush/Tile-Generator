@@ -41,20 +41,27 @@ namespace TileGeneration
 
             serializedObject.ApplyModifiedProperties();
 
+            Rect currentRect = GUILayoutUtility.GetLastRect();
+            GUILayout.Space(25);
+            currentRect.y += 25;
+
             foreach (TilePalette palette in tileGenerator.palettes)
             {
                 if (palette != null)
                 {
                     GUI.backgroundColor = tileGenerator.selectedPalette == palette ? Color.blue : oldColor;
 
-                    if (GUILayout.Button(palette.name))
+                    if (GUI.Button(currentRect, palette.name))
                     {
                         tileGenerator.selectedPalette = tileGenerator.selectedPalette == palette ? null : palette;
                     }
+                    GUILayout.Space(25);
+                    currentRect.y += 25;
                 }
             }
 
             GUILayout.Space(25);
+            currentRect.y += 25;
 
             if (tileGenerator.selectedPalette != null)
             {
@@ -71,50 +78,80 @@ namespace TileGeneration
                         GUIContent asset = new GUIContent(AssetPreview.GetAssetPreview(ruleTile.defaultGameObject),
                             "This is the " + ruleTile.defaultGameObject.name + " prefab");
 
-                        if (GUILayout.Button(asset))
+                        if (GUI.Button(new Rect(currentRect.position, Vector2.one * 100), asset))
                         {
                             tileGenerator.selectedRule = ruleTile;
                             tileGenerator.selectedTilePrefab = targetObj;
                         }
                     }
+                    GUILayout.Space(100);
+                    currentRect.y += 100;
                 }
             }
-
             GUILayout.Space(25);
+            currentRect.y += 25;
 
-            GUI.backgroundColor = tileGenerator.shouldPaint ? Color.red : oldColor;
-            if (GUILayout.Button("Draw"))
+            GUI.backgroundColor = tileGenerator.paintMode == TileGenerator.PaintMode.Draw ? Color.red : oldColor;
+
+            // Pencil icon
+            GUIContent draw = new GUIContent(TextureLibrary.GetTexture("Pencil"));
+            if (GUI.Button(new Rect(currentRect.x, currentRect.y, 100, 100), draw))
             {
-                tileGenerator.shouldPaint = true;
+                tileGenerator.paintMode = TileGenerator.PaintMode.Draw;
+            }
+
+            GUI.backgroundColor = tileGenerator.paintMode == TileGenerator.PaintMode.Fill ? Color.red : oldColor;
+
+            // Paint bucket icon
+            GUIContent fill = new GUIContent(TextureLibrary.GetTexture("Bucket"));
+            if (GUI.Button(new Rect(currentRect.x + 100, currentRect.y, 100, 100), fill))
+            {
+                tileGenerator.paintMode = TileGenerator.PaintMode.Fill;
             }
 
             GUI.backgroundColor = !tileGenerator.shouldPaint ? Color.red : oldColor;
-            if (GUILayout.Button("Erase"))
+
+            GUILayout.Space(100);
+            currentRect.y += 100;
+
+            // Eraser icon
+            GUIContent erase = new GUIContent(TextureLibrary.GetTexture("Eraser"));
+            if (GUI.Button(new Rect(currentRect.position, Vector2.one * 100), erase))
             {
-                tileGenerator.shouldPaint = false;
+                tileGenerator.shouldPaint = !tileGenerator.shouldPaint;
             }
 
             GUI.backgroundColor = oldColor;
 
-            GUILayout.Space(25);
+            GUILayout.Space(100);
+            currentRect.y += 100;
 
-            if (GUILayout.Button("Add/Remove Palettes"))
+            if (GUI.Button(currentRect, "Add/Remove Palettes"))
             {
                 AddTilePaletteWindow window = (AddTilePaletteWindow)EditorWindow.GetWindow(typeof(AddTilePaletteWindow), false, "Add Palette");
                 window.tileGenerator = tileGenerator;
             }
 
-            if (GUILayout.Button("Clear Unused Tiles"))
+            GUILayout.Space(25);
+            currentRect.y += 25;
+
+            if (GUI.Button(currentRect, "Clear Unused Tiles"))
             {
                 tileGenerator.ClearUnusedTiles();
             }
 
-            if (GUILayout.Button("Clear Unused Objects"))
+            GUILayout.Space(25);
+            currentRect.y += 25;
+
+            if (GUI.Button(currentRect, "Clear Unused Objects"))
             {
                 tileGenerator.ClearUnusedObjects();
             }
 
-            if (GUILayout.Button("Reset Tiles"))
+            GUILayout.Space(25);
+            currentRect.y += 25;
+
+            if (GUI.Button(currentRect, "Reset Tiles"))
             {
                 tileGenerator.ResetTiles();
             }
