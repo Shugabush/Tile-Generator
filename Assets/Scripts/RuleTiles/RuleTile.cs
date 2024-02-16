@@ -22,8 +22,71 @@ namespace TileGeneration
             return defaultGameObject;
         }
 
-
         public List<Rule> rules = new List<Rule>();
+
+        public bool fixBoundsPosition = true;
+        public bool fixBoundsScale = true;
+
+        public Vector3 positionOffset = Vector3.zero;
+        public Vector3 rotationOffset = Vector3.zero;
+        public Vector3 scaleMultiplier = Vector3.one;
+
+        public void GetFixBounds(Tile tile, out bool fixBoundsPosition, out bool fixBoundsScale)
+        {
+            Rule rule = GetRule(tile);
+            if (rule != null)
+            {
+                fixBoundsPosition = rule.fixBoundsPosition;
+                fixBoundsScale = rule.fixBoundsScale;
+                return;
+            }
+
+            fixBoundsPosition = this.fixBoundsPosition;
+            fixBoundsScale = this.fixBoundsScale;
+        }
+
+        public void GetOffsets(Tile tile, out Vector3 positionOffset, out Quaternion rotationOffset, out Vector3 scaleMultiplier)
+        {
+            Rule rule = GetRule(tile);
+            if (rule != null)
+            {
+                positionOffset = rule.positionOffset;
+                rotationOffset = Quaternion.Euler(rule.rotationOffset);
+                scaleMultiplier = rule.scaleMultiplier;
+                return;
+            }
+
+            positionOffset = this.positionOffset;
+            rotationOffset = Quaternion.Euler(this.rotationOffset);
+            scaleMultiplier = this.scaleMultiplier;
+        }
+
+        Rule GetRule(Tile tile)
+        {
+            foreach (var rule in rules)
+            {
+                GameObject evaluatedObj = rule.Evaluate(tile);
+                if (evaluatedObj != null)
+                {
+                    return rule;
+                }
+            }
+            return null;
+        }
+
+        Rule GetRule(Tile tile, out GameObject evaluatedObj)
+        {
+            evaluatedObj = null;
+            foreach (var rule in rules)
+            {
+                evaluatedObj = rule.Evaluate(tile);
+                if (evaluatedObj != null)
+                {
+                    return rule;
+                }
+            }
+            return null;
+        }
 
         void OnValidate()
         {
@@ -82,6 +145,13 @@ namespace TileGeneration
 
             public Slot[] slots = new Slot[26];
             public GameObject newObj;
+
+            public bool fixBoundsPosition = true;
+            public bool fixBoundsScale = true;
+
+            public Vector3 positionOffset = Vector3.zero;
+            public Vector3 rotationOffset = Vector3.zero;
+            public Vector3 scaleMultiplier = Vector3.one;
 
             public GameObject Evaluate(Tile tile)
             {

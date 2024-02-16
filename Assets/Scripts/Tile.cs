@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor.UI;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -43,6 +44,11 @@ namespace TileGeneration
 
         public Tile GetAdjacentTile(Vector3Int directionIndex)
         {
+            if (adjacentTiles == null)
+            {
+                adjacentTiles = new Dictionary<Vector3Int, Tile>();
+            }
+
             if (adjacentTiles.ContainsKey(directionIndex))
             {
                 return adjacentTiles[directionIndex];
@@ -59,7 +65,7 @@ namespace TileGeneration
             obj.transform.SetParent(parent.transform);
             obj.transform.position = GetTargetPosition();
             obj.transform.localRotation = prefab.transform.localRotation;
-            SetScale(parent.GetGridScaleRatio());
+            SetTransform(GetTargetLocalPosition(), prefab.transform.localRotation, parent.GetGridScaleRatio());
         }
 
         public void FixObject()
@@ -90,7 +96,7 @@ namespace TileGeneration
                 obj.transform.parent = parent.transform;
                 obj.transform.position = GetTargetPosition();
                 obj.transform.localRotation = rulePrefab.transform.localRotation;
-                SetScale(parent.GetGridScaleRatio());
+                SetTransform(GetTargetLocalPosition(), rulePrefab.transform.localRotation, parent.GetGridScaleRatio());
                 prefab = rulePrefab;
             }
         }
@@ -106,27 +112,47 @@ namespace TileGeneration
             return parent.transform.TransformPoint(GetTargetLocalPosition());
         }
 
-        public void SetScale(Vector3 baseScale)
+        public void SetTransform(Vector3 basePosition, Quaternion baseRotation, Vector3 baseScale)
         {
-            if (obj == null) return;
+            if (obj == null || prefab == null || rule == null) return;
 
             Renderer rend = obj.GetComponentInChildren<Renderer>();
 
-            obj.transform.localScale = baseScale;
+            rule.GetOffsets(this, out Vector3 positionOffset, out Quaternion rotationOffset, out Vector3 scaleMultiplier);
 
-            Vector3 size = rend.localBounds.size;
+            rule.GetFixBounds(this, out bool fixBoundsPosition, out bool fixBoundsScale);
 
-            size.x = Mathf.Max(0.025f, size.x);
-            size.y = Mathf.Max(0.025f, size.y);
-            size.z = Mathf.Max(0.025f, size.z);
+            if (fixBoundsPosition)
+            {
+                obj.transform.localPosition = basePosition + positionOffset - rend.localBounds.center;
+            }
+            else
+            {
+                obj.transform.localPosition = basePosition + positionOffset;
+            }
 
-            Vector3 scaledSize = new Vector3(baseScale.x / size.x, baseScale.y / size.y, baseScale.z / size.z);
+            obj.transform.localRotation = baseRotation * rotationOffset;
 
-            scaledSize.x = Mathf.Max(0.025f, scaledSize.x);
-            scaledSize.y = Mathf.Max(0.025f, scaledSize.y);
-            scaledSize.z = Mathf.Max(0.025f, scaledSize.z);
+            if (fixBoundsScale)
+            {
+                Vector3 size = rend.localBounds.size;
 
-            obj.transform.localScale = scaledSize;
+                size.x = Mathf.Max(0.025f, size.x);
+                size.y = Mathf.Max(0.025f, size.y);
+                size.z = Mathf.Max(0.025f, size.z);
+
+                Vector3 scaledSize = new Vector3(baseScale.x / size.x, baseScale.y / size.y, baseScale.z / size.z);
+
+                scaledSize.x = Mathf.Max(0.025f, scaledSize.x);
+                scaledSize.y = Mathf.Max(0.025f, scaledSize.y);
+                scaledSize.z = Mathf.Max(0.025f, scaledSize.z);
+
+                obj.transform.localScale = Vector3.Scale(scaledSize, scaleMultiplier);
+            }
+            else
+            {
+                obj.transform.localScale = Vector3.Scale(baseScale, scaleMultiplier);
+            }
         }
 
         public Tile(TileGenerator parent, Vector3Int indexPosition)

@@ -120,6 +120,10 @@ namespace TileGeneration
             {
                 enabled = false;
             }
+            else
+            {
+                OnValidate();
+            }
         }
 
         void OnValidate()
@@ -228,9 +232,7 @@ namespace TileGeneration
 
             if (tile.obj != null)
             {
-                tile.obj.transform.parent = transform;
-                tile.obj.transform.position = tile.GetTargetPosition();
-                tile.SetScale(GetGridScaleRatio());
+                tile.SetTransform(tile.GetTargetLocalPosition(), tile.prefab.transform.localRotation, GetGridScaleRatio());
 
                 if (showAllYLevels)
                 {
@@ -489,9 +491,7 @@ namespace TileGeneration
 
                 selectedTile.obj.transform.parent = transform;
 
-                selectedTile.obj.transform.position = selectedTile.GetTargetPosition();
-                selectedTile.obj.transform.localRotation = selectedTilePrefab.transform.localRotation;
-                selectedTile.SetScale(GetGridScaleRatio());
+                selectedTile.SetTransform(selectedTile.GetTargetLocalPosition(), selectedTilePrefab.transform.localRotation, GetGridScaleRatio());
             }
 
             foreach (var tile in tilesInRadius)
@@ -533,9 +533,7 @@ namespace TileGeneration
 
                 tile.obj.transform.parent = transform;
 
-                tile.obj.transform.position = tile.GetTargetPosition();
-                tile.obj.transform.localRotation = selectedTilePrefab.transform.localRotation;
-                tile.SetScale(GetGridScaleRatio());
+                tile.SetTransform(tile.GetTargetLocalPosition(), selectedTilePrefab.transform.localRotation, GetGridScaleRatio());
             }
         }
 

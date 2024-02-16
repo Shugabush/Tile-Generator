@@ -1,0 +1,257 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bee137f346016043b54821c0df249e5, type: 3}
+  m_Name: Grass
+  m_EditorClassIdentifier: 
+  defaultGameObject: {fileID: 919132149155446097, guid: 27eb61eea87708e4cb0409f9f72ce331, type: 3}
+  rules:
+  - slots:
+    - direction: {x: -1, y: -1, z: -1}
+      condition: 0
+    - direction: {x: -1, y: -1, z: 0}
+      condition: 0
+    - direction: {x: -1, y: -1, z: 1}
+      condition: 0
+    - direction: {x: -1, y: 0, z: -1}
+      condition: 0
+    - direction: {x: -1, y: 0, z: 0}
+      condition: 0
+    - direction: {x: -1, y: 0, z: 1}
+      condition: 2
+    - direction: {x: -1, y: 1, z: -1}
+      condition: 0
+    - direction: {x: -1, y: 1, z: 0}
+      condition: 0
+    - direction: {x: -1, y: 1, z: 1}
+      condition: 0
+    - direction: {x: 0, y: -1, z: -1}
+      condition: 0
+    - direction: {x: 0, y: -1, z: 0}
+      condition: 0
+    - direction: {x: 0, y: -1, z: 1}
+      condition: 0
+    - direction: {x: 0, y: 0, z: -1}
+      condition: 0
+    - direction: {x: 0, y: 0, z: 1}
+      condition: 0
+    - direction: {x: 0, y: 1, z: -1}
+      condition: 0
+    - direction: {x: 0, y: 1, z: 0}
+      condition: 0
+    - direction: {x: 0, y: 1, z: 1}
+      condition: 0
+    - direction: {x: 1, y: -1, z: -1}
+      condition: 0
+    - direction: {x: 1, y: -1, z: 0}
+      condition: 0
+    - direction: {x: 1, y: -1, z: 1}
+      condition: 0
+    - direction: {x: 1, y: 0, z: -1}
+      condition: 2
+    - direction: {x: 1, y: 0, z: 0}
+      condition: 0
+    - direction: {x: 1, y: 0, z: 1}
+      condition: 2
+    - direction: {x: 1, y: 1, z: -1}
+      condition: 0
+    - direction: {x: 1, y: 1, z: 0}
+      condition: 0
+    - direction: {x: 1, y: 1, z: 1}
+      condition: 0
+    newObj: {fileID: 919132149155446097, guid: 04b3ac0c96681374a94d0b514804a75b, type: 3}
+    fixBoundsPosition: 1
+    fixBoundsScale: 0
+    positionOffset: {x: -0.034159, y: 0, z: -0.034159}
+    rotationOffset: {x: 0, y: 0, z: 0}
+    scaleMultiplier: {x: 1, y: 1, z: 1}
+  - slots:
+    - direction: {x: -1, y: -1, z: -1}
+      condition: 0
+    - direction: {x: -1, y: -1, z: 0}
+      condition: 0
+    - direction: {x: -1, y: -1, z: 1}
+      condition: 0
+    - direction: {x: -1, y: 0, z: -1}
+      condition: 2
+    - direction: {x: -1, y: 0, z: 0}
+      condition: 0
+    - direction: {x: -1, y: 0, z: 1}
+      condition: 2
+    - direction: {x: -1, y: 1, z: -1}
+      condition: 0
+    - direction: {x: -1, y: 1, z: 0}
+      condition: 0
+    - direction: {x: -1, y: 1, z: 1}
+      condition: 0
+    - direction: {x: 0, y: -1, z: -1}
+      condition: 0
+    - direction: {x: 0, y: -1, z: 0}
+      condition: 0
+    - direction: {x: 0, y: -1, z: 1}
+      condition: 0
+    - direction: {x: 0, y: 0, z: -1}
+      condition: 0
+    - direction: {x: 0, y: 0, z: 1}
+      condition: 0
+    - direction: {x: 0, y: 1, z: -1}
+      condition: 0
+    - direction: {x: 0, y: 1, z: 0}
+      condition: 0
+    - direction: {x: 0, y: 1, z: 1}
+      condition: 0
+    - direction: {x: 1, y: -1, z: -1}
+      condition: 0
+    - direction: {x: 1, y: -1, z: 0}
+      condition: 0
+    - direction: {x: 1, y: -1, z: 1}
+      condition: 0
+    - direction: {x: 1, y: 0, z: -1}
+      condition: 0
+    - direction: {x: 1, y: 0, z: 0}
+      condition: 0
+    - direction: {x: 1, y: 0, z: 1}
+      condition: 2
+    - direction: {x: 1, y: 1, z: -1}
+      condition: 0
+    - direction: {x: 1, y: 1, z: 0}
+      condition: 0
+    - direction: {x: 1, y: 1, z: 1}
+      condition: 0
+    newObj: {fileID: 919132149155446097, guid: 04b3ac0c96681374a94d0b514804a75b, type: 3}
+    fixBoundsPosition: 1
+    fixBoundsScale: 0
+    positionOffset: {x: -0.034159, y: 0, z: -0.034159}
+    rotationOffset: {x: 0, y: -90, z: 0}
+    scaleMultiplier: {x: 1, y: 1, z: 1}
+  - slots:
+    - direction: {x: -1, y: -1, z: -1}
+      condition: 0
+    - direction: {x: -1, y: -1, z: 0}
+      condition: 0
+    - direction: {x: -1, y: -1, z: 1}
+      condition: 0
+    - direction: {x: -1, y: 0, z: -1}
+      condition: 2
+    - direction: {x: -1, y: 0, z: 0}
+      condition: 0
+    - direction: {x: -1, y: 0, z: 1}
+      condition: 0
+    - direction: {x: -1, y: 1, z: -1}
+      condition: 0
+    - direction: {x: -1, y: 1, z: 0}
+      condition: 0
+    - direction: {x: -1, y: 1, z: 1}
+      condition: 0
+    - direction: {x: 0, y: -1, z: -1}
+      condition: 0
+    - direction: {x: 0, y: -1, z: 0}
+      condition: 0
+    - direction: {x: 0, y: -1, z: 1}
+      condition: 0
+    - direction: {x: 0, y: 0, z: -1}
+      condition: 0
+    - direction: {x: 0, y: 0, z: 1}
+      condition: 0
+    - direction: {x: 0, y: 1, z: -1}
+      condition: 0
+    - direction: {x: 0, y: 1, z: 0}
+      condition: 0
+    - direction: {x: 0, y: 1, z: 1}
+      condition: 0
+    - direction: {x: 1, y: -1, z: -1}
+      condition: 0
+    - direction: {x: 1, y: -1, z: 0}
+      condition: 0
+    - direction: {x: 1, y: -1, z: 1}
+      condition: 0
+    - direction: {x: 1, y: 0, z: -1}
+      condition: 2
+    - direction: {x: 1, y: 0, z: 0}
+      condition: 0
+    - direction: {x: 1, y: 0, z: 1}
+      condition: 2
+    - direction: {x: 1, y: 1, z: -1}
+      condition: 0
+    - direction: {x: 1, y: 1, z: 0}
+      condition: 0
+    - direction: {x: 1, y: 1, z: 1}
+      condition: 0
+    newObj: {fileID: 919132149155446097, guid: 04b3ac0c96681374a94d0b514804a75b, type: 3}
+    fixBoundsPosition: 1
+    fixBoundsScale: 0
+    positionOffset: {x: -0.034159, y: 0, z: -0.034159}
+    rotationOffset: {x: 0, y: 90, z: 0}
+    scaleMultiplier: {x: 1, y: 1, z: 1}
+  - slots:
+    - direction: {x: -1, y: -1, z: -1}
+      condition: 0
+    - direction: {x: -1, y: -1, z: 0}
+      condition: 0
+    - direction: {x: -1, y: -1, z: 1}
+      condition: 0
+    - direction: {x: -1, y: 0, z: -1}
+      condition: 2
+    - direction: {x: -1, y: 0, z: 0}
+      condition: 0
+    - direction: {x: -1, y: 0, z: 1}
+      condition: 2
+    - direction: {x: -1, y: 1, z: -1}
+      condition: 0
+    - direction: {x: -1, y: 1, z: 0}
+      condition: 0
+    - direction: {x: -1, y: 1, z: 1}
+      condition: 0
+    - direction: {x: 0, y: -1, z: -1}
+      condition: 0
+    - direction: {x: 0, y: -1, z: 0}
+      condition: 0
+    - direction: {x: 0, y: -1, z: 1}
+      condition: 0
+    - direction: {x: 0, y: 0, z: -1}
+      condition: 0
+    - direction: {x: 0, y: 0, z: 1}
+      condition: 0
+    - direction: {x: 0, y: 1, z: -1}
+      condition: 0
+    - direction: {x: 0, y: 1, z: 0}
+      condition: 0
+    - direction: {x: 0, y: 1, z: 1}
+      condition: 0
+    - direction: {x: 1, y: -1, z: -1}
+      condition: 0
+    - direction: {x: 1, y: -1, z: 0}
+      condition: 0
+    - direction: {x: 1, y: -1, z: 1}
+      condition: 0
+    - direction: {x: 1, y: 0, z: -1}
+      condition: 2
+    - direction: {x: 1, y: 0, z: 0}
+      condition: 0
+    - direction: {x: 1, y: 0, z: 1}
+      condition: 0
+    - direction: {x: 1, y: 1, z: -1}
+      condition: 0
+    - direction: {x: 1, y: 1, z: 0}
+      condition: 0
+    - direction: {x: 1, y: 1, z: 1}
+      condition: 0
+    newObj: {fileID: 919132149155446097, guid: 04b3ac0c96681374a94d0b514804a75b, type: 3}
+    fixBoundsPosition: 1
+    fixBoundsScale: 0
+    positionOffset: {x: -0.034159, y: 0, z: -0.034159}
+    rotationOffset: {x: 0, y: 180, z: 0}
+    scaleMultiplier: {x: 1, y: 1, z: 1}
+  fixBoundsPosition: 1
+  fixBoundsScale: 0
+  positionOffset: {x: 0, y: 0, z: 0}
+  rotationOffset: {x: 0, y: 0, z: 0}
+  scaleMultiplier: {x: 1, y: 1, z: 1}
