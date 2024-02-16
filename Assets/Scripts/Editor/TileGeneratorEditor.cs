@@ -135,7 +135,7 @@ namespace TileGeneration
             GUILayout.Space(25);
             currentRect.y += 25;
 
-            if (GUI.Button(currentRect, "Clear Unused Tiles"))
+            if (GUI.Button(currentRect, new GUIContent("Clear Unused Tiles", "Deletes tiles that are out of the current grid bounds")))
             {
                 tileGenerator.ClearUnusedTiles();
             }
@@ -143,7 +143,7 @@ namespace TileGeneration
             GUILayout.Space(25);
             currentRect.y += 25;
 
-            if (GUI.Button(currentRect, "Clear Unused Objects"))
+            if (GUI.Button(currentRect, new GUIContent("Clear Unused Objects", "Deletes children objects that aren't being tracked by a tile")))
             {
                 tileGenerator.ClearUnusedObjects();
             }
@@ -151,7 +151,7 @@ namespace TileGeneration
             GUILayout.Space(25);
             currentRect.y += 25;
 
-            if (GUI.Button(currentRect, "Reset Tiles"))
+            if (GUI.Button(currentRect, new GUIContent("Reset Tiles", "Deletes the data in all tiles")))
             {
                 tileGenerator.ResetTiles();
             }

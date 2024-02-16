@@ -294,7 +294,7 @@ namespace TileGeneration
 #if UNITY_EDITOR
         public void ResetTiles()
         {
-            tiles = new Dictionary<Vector3Int, Tile>();
+            tiles.Clear();
             while (transform.childCount > 0)
             {
                 for (int i = 0; i < transform.childCount; i++)
@@ -349,7 +349,11 @@ namespace TileGeneration
 
             Gizmos.color = Color.red;
 
-            Tile tile = tiles[new Vector3Int(x, y, z)];
+            Vector3Int indexPosition = new Vector3Int(x, y, z);
+
+            tiles.TryAdd(indexPosition, new Tile(this, indexPosition));
+
+            Tile tile = tiles[indexPosition];
 
             if (SelectedTile == tile || tilesInRadius.Contains(tile))
             {
@@ -493,6 +497,14 @@ namespace TileGeneration
             foreach (var tile in tilesInRadius)
             {
                 PaintTile(tile);
+            }
+
+            // Fix objects in a separate loop because
+            // we only want to do that after all tiles in radius
+            // have had their objects created
+            foreach (var tile in tiles.Keys)
+            {
+                ValidateTile(tile);
             }
 
             EditorUtility.SetDirty(this);
