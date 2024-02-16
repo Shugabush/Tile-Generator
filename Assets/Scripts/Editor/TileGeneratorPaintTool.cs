@@ -27,6 +27,22 @@ namespace TileGeneration
                 isClicking = false;
             }
 
+            if (Event.current.type == EventType.ScrollWheel)
+            {
+                int scrollDir = System.Math.Sign(Event.current.delta.y);
+
+                if (scrollDir == 1)
+                {
+                    tileGenerator.PaintSize--;
+                    Event.current.Use();
+                }
+                else if (scrollDir == -1)
+                {
+                    tileGenerator.PaintSize++;
+                    Event.current.Use();
+                }
+            }
+
             if (Event.current.type == EventType.MouseUp && Event.current.button == 0)
             {
                 Event.current.Use();
@@ -41,11 +57,9 @@ namespace TileGeneration
 
             if (Selection.activeGameObject == null || !Selection.activeGameObject.TryGetComponent<TileGenerator>(out _)) return;
 
-            tileGenerator.paintRadius = 0.5f;
-
             if (tileGenerator.GetSelectedPoint(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition), out Vector3 point))
             {
-                Handles.DrawWireDisc(point, Selection.activeTransform.up, tileGenerator.paintRadius);
+                Handles.DrawWireDisc(point, Selection.activeTransform.up, 0.5f);
             }
             else
             {

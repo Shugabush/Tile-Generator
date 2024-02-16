@@ -55,10 +55,19 @@ namespace TileGeneration
         public GameObject selectedTilePrefab;
         public Vector3Int selectedTileIndex = -Vector3Int.one;
 
-        public float paintRadius = 1f;
+        [SerializeField] int paintSize = 5;
 
-        [Range(0, 10)]
-        public int adjacentRecursions = 5;
+        public int PaintSize
+        {
+            get
+            {
+                return paintSize;
+            }
+            set
+            {
+                paintSize = Mathf.Clamp(value, 0, 10);
+            }
+        }
 
         public bool shouldPaint = true;
         [SerializeField] bool showAllYLevels = true;
@@ -572,11 +581,11 @@ namespace TileGeneration
 
             int y = currentTile.indexPosition.y;
 
-            for (int x = currentTile.indexPosition.x - adjacentRecursions; x < currentTile.indexPosition.x + adjacentRecursions; x++)
+            for (int x = currentTile.indexPosition.x + 1 - paintSize; x < currentTile.indexPosition.x + paintSize; x++)
             {
                 if (x >= 0 && x < gridCount.x)
                 {
-                    for (int z = currentTile.indexPosition.z - adjacentRecursions; z < currentTile.indexPosition.z + adjacentRecursions; z++)
+                    for (int z = currentTile.indexPosition.z + 1 - paintSize; z < currentTile.indexPosition.z + paintSize; z++)
                     {
                         if (z >= 0 && z < gridCount.z)
                         {
