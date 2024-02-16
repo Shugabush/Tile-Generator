@@ -56,15 +56,22 @@ namespace TileGeneration
             if (!ToolManager.IsActiveTool(this)) return;
 
             if (Selection.activeGameObject == null || !Selection.activeGameObject.TryGetComponent<TileGenerator>(out _)) return;
-
+            
             if (tileGenerator.GetSelectedPoint(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition), out Vector3 point))
             {
-                Handles.DrawWireDisc(point, Selection.activeTransform.up, tileGenerator.GetGridScaleRatio().y * tileGenerator.PaintRadius);
+                Handles.matrix = Matrix4x4.TRS(point,
+                    tileGenerator.transform.rotation,
+                    Vector3.Scale(tileGenerator.GetGridScaleRatio(), tileGenerator.transform.localScale) * 
+                    tileGenerator.PaintRadius);
+
+                Handles.DrawWireDisc(Vector3.zero, Vector3.up, 1);
             }
             else
             {
                 Handles.DrawWireDisc(GetCurrentMousePositionInScene(), Vector3.up, 0.5f);
             }
+
+            Handles.matrix = Matrix4x4.identity;
 
             if (isClicking)
             {

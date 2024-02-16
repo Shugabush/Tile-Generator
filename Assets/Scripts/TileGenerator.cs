@@ -631,23 +631,26 @@ namespace TileGeneration
                 pendingTiles.Enqueue(startingTile);
                 while (pendingTiles.Count > 0)
                 {
-                    GetTilesToFillRecursive(tilesToFill, pendingTiles.Dequeue());
+                    GetTilesToFillRecursive(startingTile.rule, tilesToFill, pendingTiles.Dequeue());
                 }
             }
 
             return tilesToFill;
         }
 
-        void GetTilesToFillRecursive(List<Tile> tilesToFill, Tile currentTile)
+        void GetTilesToFillRecursive(RuleTile startingRule, List<Tile> tilesToFill, Tile currentTile)
         {
             if (currentTile != null)
             {
+                ManageAdjacentTiles(currentTile);
                 foreach (var pair in currentTile.adjacentTiles)
                 {
                     Vector3Int key = pair.Key;
                     Tile value = pair.Value;
 
-                    if (!tilesToFill.Contains(value) && key.y == 0 && value.obj == null)
+                    if (key.magnitude != 1 || key.y != 0) continue;
+
+                    if (value.rule == startingRule && !tilesToFill.Contains(value))
                     {
                         debugCount++;
                         tilesToFill.Add(value);
