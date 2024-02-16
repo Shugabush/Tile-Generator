@@ -34,8 +34,6 @@ namespace TileGeneration
             new Vector3Int(0, -1, -1),
         };
 
-        int debugCount;
-
         [SerializeField] Vector3Int gridCount = Vector3Int.one;
         [SerializeField] Vector3 gridSize = Vector3.one * 25;
 
