@@ -60,9 +60,6 @@ namespace TileGeneration
         [Range(0, 10)]
         public int adjacentRecursions = 5;
 
-        int adjacentSteps = 0;
-        [SerializeField] int maxSteps = 20;
-
         public bool shouldPaint = true;
         [SerializeField] bool showAllYLevels = true;
 
