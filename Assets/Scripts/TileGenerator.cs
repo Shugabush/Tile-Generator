@@ -116,15 +116,15 @@ namespace TileGeneration
 
         void Update()
         {
-            if (!Application.isPlaying)
+            if (Application.isPlaying)
             {
-                OnValidate();
+                enabled = false;
             }
         }
 
         void OnValidate()
         {
-            //Undo.undoRedoPerformed = new Undo.UndoRedoCallback(ClearUnusedObjects);
+            Undo.undoRedoPerformed = new Undo.UndoRedoCallback(ClearUnusedObjects);
 
             // Grid count can never go below 1
             gridCount.x = System.Math.Max(gridCount.x, 1);
