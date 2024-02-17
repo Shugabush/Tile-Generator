@@ -62,10 +62,17 @@ namespace TileGeneration
 
                 GUIContent foldoutContent = new GUIContent(AssetPreview.GetAssetPreview(rule.newObj));
 
-                popups[i] = EditorGUI.Foldout(currentRect, popups[i], foldoutContent);
+                rule.open = EditorGUI.Foldout(currentRect, rule.open, foldoutContent);
 
-                // If popups[i] is true, display the current rule
-                if (popups[i])
+                if (GUI.Button(new Rect(currentRect.x + 50, currentRect.y, 100, currentRect.height), "Remove Rule"))
+                {
+                    ruleTile.rules.Remove(rule);
+                    i--;
+                    continue;
+                }
+
+                // If the rule should be open, display it
+                if (rule.open)
                 {
                     currentRect.y += 25;
 
@@ -151,24 +158,23 @@ namespace TileGeneration
                         if (slot.direction.y == selectedYLevel)
                         {
                             Rect slotRect = new Rect(currentRect.x + 50 + (slot.direction.x * 50), currentRect.y - (slot.direction.z * 50), 50, 50);
-                            slot.Draw(slotRect);
+
+                            slot.Draw(slotRect, rule.rotationOffset.y);
                         }
                     }
 
                     if (selectedYLevel == 0)
                     {
                         Rect rect = new Rect(currentRect.x + 50, currentRect.y, 50, 50);
+
+                        rule.newObj.transform.rotation *= Quaternion.Euler(rule.rotationOffset);
+
                         GUI.DrawTexture(rect, AssetPreview.GetAssetPreview(rule.newObj));
+
+                        rule.newObj.transform.rotation *= Quaternion.Inverse(Quaternion.Euler(rule.rotationOffset));
                     }
 
-                    currentRect.y += 125;
-
-                    if (GUI.Button(currentRect, "Remove Rule"))
-                    {
-                        ruleTile.rules.Remove(rule);
-                        i--;
-                        continue;
-                    }
+                    currentRect.y += 100;
                 }
             }
 
@@ -176,7 +182,17 @@ namespace TileGeneration
             if (GUI.Button(currentRect, "Add New Rule"))
             {
                 // Add a new rule
-                var newRule = new RuleTile.Rule();
+                RuleTile.Rule newRule;
+
+                if (ruleTile.rules.Count > 0)
+                {
+                    newRule = new RuleTile.Rule(ruleTile.rules[ruleTile.rules.Count - 1]);
+                }
+                else
+                {
+                    newRule = new RuleTile.Rule();
+                }
+
                 ruleTile.rules.Add(newRule);
             }
 

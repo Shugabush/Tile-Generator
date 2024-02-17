@@ -143,8 +143,30 @@ namespace TileGeneration
                 }
             }
 
+            public Rule(Rule existingRule)
+            {
+                slots = new Slot[26];
+
+                for (int i = 0; i < slots.Length; i++)
+                {
+                    slots[i] = new Slot(existingRule.slots[i]);
+                }
+
+                open = existingRule.open;
+
+                newObj = existingRule.newObj;
+                fixBoundsPosition = existingRule.fixBoundsPosition;
+                fixBoundsScale = existingRule.fixBoundsScale;
+
+                positionOffset = existingRule.positionOffset;
+                rotationOffset = existingRule.rotationOffset;
+                scaleMultiplier = existingRule.scaleMultiplier;
+            }
+
             public Slot[] slots = new Slot[26];
             public GameObject newObj;
+
+            public bool open = false;
 
             public bool fixBoundsPosition = true;
             public bool fixBoundsScale = true;
@@ -190,12 +212,23 @@ namespace TileGeneration
             {
                 public Vector3Int direction;
 
-                public Condition condition = Condition.None;
+                public Condition condition;
+
+                public Slot()
+                {
+
+                }
+
+                public Slot(Slot existingSlot)
+                {
+                    direction = existingSlot.direction;
+                    condition = existingSlot.condition;
+                }
 
                 /// <summary>
                 /// Draws a texture based on the condition type
                 /// </summary>
-                public void Draw(Rect position)
+                public void Draw(Rect position, float rotation)
                 {
                     // Cache proper texture
                     Texture properTexture = GetProperTexture();
@@ -204,13 +237,21 @@ namespace TileGeneration
 
                     if (GUI.Button(position, buttonContent))
                     {
-                        NextCondition();
+                        if (Event.current.button == 0)
+                        {
+                            NextCondition();
+                        }
+                        else if (Event.current.button == 1)
+                        {
+                            PreviousCondition();
+                        }
                     }
 
                     Rect textureRect = position;
 
                     textureRect.size *= 0.75f;
                     textureRect.center = position.center;
+
 
                     if (properTexture != null)
                     {
@@ -224,6 +265,15 @@ namespace TileGeneration
                     if (condition > (Condition)2)
                     {
                         condition = 0;
+                    }
+                }
+
+                public void PreviousCondition()
+                {
+                    condition--;
+                    if (condition < 0)
+                    {
+                        condition = (Condition)2;
                     }
                 }
 

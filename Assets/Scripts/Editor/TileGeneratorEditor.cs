@@ -39,6 +39,9 @@ namespace TileGeneration
             SerializedProperty showAllYLevels = serializedObject.FindProperty("showAllYLevels");
             EditorGUILayout.PropertyField(showAllYLevels);
 
+            SerializedProperty debugRuleUsage = serializedObject.FindProperty("debugRuleUsage");
+            EditorGUILayout.PropertyField(debugRuleUsage);
+
             serializedObject.ApplyModifiedProperties();
 
             Rect currentRect = GUILayoutUtility.GetLastRect();

@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -52,6 +51,9 @@ namespace TileGeneration
         [SerializeReference] public RuleTile selectedRule;
         public GameObject selectedTilePrefab;
         public Vector3Int selectedTileIndex = -Vector3Int.one;
+
+        [Tooltip("Show what rule number is being used on each tile? (if any)")]
+        public bool debugRuleUsage = true;
 
         public enum PaintMode
         {
@@ -305,6 +307,29 @@ namespace TileGeneration
                 }
             }
             EditorUtility.SetDirty(this);
+        }
+
+        void OnDrawGizmos()
+        {
+            if (debugRuleUsage)
+            {
+                foreach (var tile in tiles.Values)
+                {
+                    if (tile.rule != null)
+                    {
+                        for (int i = 0; i < tile.rule.rules.Count; i++)
+                        {
+                            var rule = tile.rule.rules[i];
+                            if (rule.Evaluate(tile))
+                            {
+                                // The tile is using this rule
+                                Handles.Label(tile.GetTargetPosition(), new GUIContent("Rule " + (i + 1).ToString()));
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         void OnDrawGizmosSelected()
