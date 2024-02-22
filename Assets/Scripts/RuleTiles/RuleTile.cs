@@ -47,6 +47,14 @@ namespace TileGeneration
 
         public void GetOffsets(Tile tile, out Vector3 positionOffset, out Quaternion rotationOffset, out Vector3 scaleMultiplier)
         {
+            if (tile.ignoreRule)
+            {
+                positionOffset = this.positionOffset;
+                rotationOffset = Quaternion.Euler(this.rotationOffset);
+                scaleMultiplier = this.scaleMultiplier;
+                return;
+            }
+
             Rule rule = GetRule(tile);
             if (rule != null)
             {

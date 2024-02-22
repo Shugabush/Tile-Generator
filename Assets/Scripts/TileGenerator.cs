@@ -33,9 +33,9 @@ namespace TileGeneration
             new Vector3Int(0, -1, -1),
         };
 
-        [SerializeField] Vector3Int tileSize = Vector3Int.one;
+        [SerializeField] Vector3Int tileCount = Vector3Int.one;
 
-        public Vector3Int TileSize => tileSize;
+        public Vector3Int TileCount => tileCount;
 
         [SerializeField] List<Vector3Int> tileKeys = new List<Vector3Int>();
         [SerializeField] List<Tile> tileValues = new List<Tile>();
@@ -139,15 +139,15 @@ namespace TileGeneration
             Undo.undoRedoPerformed = new Undo.UndoRedoCallback(ClearUnusedObjects);
 
             // Grid count can never go below 1
-            tileSize.x = System.Math.Max(tileSize.x, 1);
-            tileSize.y = System.Math.Max(tileSize.y, 1);
-            tileSize.z = System.Math.Max(tileSize.z, 1);
+            tileCount.x = System.Math.Max(tileCount.x, 1);
+            tileCount.y = System.Math.Max(tileCount.y, 1);
+            tileCount.z = System.Math.Max(tileCount.z, 1);
 
-            for (int x = 0; x < tileSize.x; x++)
+            for (int x = 0; x < tileCount.x; x++)
             {
-                for (int y = 0; y < tileSize.y; y++)
+                for (int y = 0; y < tileCount.y; y++)
                 {
-                    for (int z = 0; z < tileSize.z; z++)
+                    for (int z = 0; z < tileCount.z; z++)
                     {
                         ValidateTile(x, y, z);
                     }
@@ -157,9 +157,9 @@ namespace TileGeneration
             // Destroy objects in unused tiles
             foreach (var tileKey in tiles.Keys)
             {
-                if (tileKey.x >= tileSize.x ||
-                    tileKey.y >= tileSize.y ||
-                    tileKey.z >= tileSize.z)
+                if (tileKey.x >= tileCount.x ||
+                    tileKey.y >= tileCount.y ||
+                    tileKey.z >= tileCount.z)
                 {
                     Tile tile = tiles[tileKey];
                     if (tile.obj != null)
@@ -179,9 +179,9 @@ namespace TileGeneration
 
             foreach (var tileKey in tiles.Keys)
             {
-                if (tileKey.x >= tileSize.x ||
-                    tileKey.y >= tileSize.y ||
-                    tileKey.z >= tileSize.z)
+                if (tileKey.x >= tileCount.x ||
+                    tileKey.y >= tileCount.y ||
+                    tileKey.z >= tileCount.z)
                 {
                     keysToRemove.Add(tileKey);
                 }
@@ -322,21 +322,27 @@ namespace TileGeneration
                     style.alignment = TextAnchor.MiddleCenter;
                     if (tile.ignoreRule)
                     {
-                        // The tile is using this rule
+                        // No rules are to be used for this tile
                         content = new GUIContent("Using default object");
-                        //Handles.Label(tile.GetTargetPosition(), new GUIContent("Using default object"));
                     }
                     else if (tile.rule != null)
                     {
+                        bool firstRuleEvaluated = false;
                         for (int i = 0; i < tile.rule.rules.Count; i++)
                         {
                             var rule = tile.rule.rules[i];
                             if (rule.Evaluate(tile))
                             {
-                                // The tile is using this rule
-                                content = new GUIContent("Rule " + (i + 1).ToString());
-                                //Handles.Label(tile.GetTargetPosition(), new GUIContent("Rule " + (i + 1).ToString()));
-                                break;
+                                if (!firstRuleEvaluated)
+                                {
+                                    // The tile is using this rule
+                                    content = new GUIContent("Using Rule " + (i + 1).ToString());
+                                    firstRuleEvaluated = true;
+                                }
+                                else
+                                {
+                                    content.text += "\nRule " + (i + 1).ToString() + " was also successful";
+                                }
                             }
                         }
                     }
@@ -347,6 +353,8 @@ namespace TileGeneration
                 }
             }
         }
+
+        
 
         void OnDrawGizmosSelected()
         {
@@ -363,13 +371,13 @@ namespace TileGeneration
             }
 
             Gizmos.color = Color.red;
-            for (int x = 0; x < tileSize.x; x++)
+            for (int x = 0; x < tileCount.x; x++)
             {
-                for (int z = 0; z < tileSize.z; z++)
+                for (int z = 0; z < tileCount.z; z++)
                 {
                     if (showAllYLevels)
                     {
-                        for (int y = 0; y < tileSize.y; y++)
+                        for (int y = 0; y < tileCount.y; y++)
                         {
                             DrawTile(x, y, z);
                         }
@@ -418,7 +426,7 @@ namespace TileGeneration
             float yPoint = y + (0.5f - gridPivotPoint.y);
             float zPoint = z + (0.5f - gridPivotPoint.z);
 
-            return new Vector3(xPoint, yPoint, zPoint) - Vector3.Scale(tileSize - Vector3.one, gridPivotPoint);
+            return new Vector3(xPoint, yPoint, zPoint) - Vector3.Scale(tileCount - Vector3.one, gridPivotPoint);
         }
 
         public bool GetSelectedPoint(Ray ray, out Vector3 point)
@@ -435,17 +443,15 @@ namespace TileGeneration
                 Vector3 selectedPoint = transform.InverseTransformPoint(ray.GetPoint(distance));
 
                 // Trying to convert xPoint, yPoint, and zPoint into what the indexes will be (excluding decimals)
-                float xPoint = selectedPoint.x + tileSize.x * 0.5f;
-                float yPoint = selectedPoint.y + tileSize.y * 0.5f;
-                float zPoint = selectedPoint.z + tileSize.z * 0.5f;
+                float xPoint = selectedPoint.x + tileCount.x * 0.5f;
+                float yPoint = selectedPoint.y + tileCount.y * 0.5f;
+                float zPoint = selectedPoint.z + tileCount.z * 0.5f;
 
                 int xIndex = (int)xPoint;
                 int yIndex = (int)yPoint;
                 int zIndex = (int)zPoint;
 
-                if (xIndex < tileSize.x && xIndex >= 0
-                    && yIndex < tileSize.y && yIndex >= 0
-                    && zIndex < tileSize.z && zIndex >= 0)
+                if (TileInRange(xIndex, yIndex, zIndex))
                 {
                     selectedTileIndex.x = xIndex;
                     selectedTileIndex.z = zIndex;
@@ -529,9 +535,12 @@ namespace TileGeneration
             // Fix objects in a separate loop because
             // we only want to do that after all tiles in radius
             // have had their objects created
-            foreach (var tile in tiles.Keys)
+            foreach (var tileIndex in tiles.Keys)
             {
-                ValidateTile(tile);
+                if (TileInRange(tileIndex))
+                {
+                    ValidateTile(tileIndex);
+                }
             }
 
             EditorUtility.SetDirty(this);
@@ -699,6 +708,29 @@ namespace TileGeneration
                     }
                 }
             }
+        }
+
+        bool TileInRange(Tile tile)
+        {
+            if (tile == null) return false;
+
+            return tile.indexPosition.x >= 0 && tile.indexPosition.x < tileCount.x &&
+            tile.indexPosition.y >= 0 && tile.indexPosition.y < tileCount.y &&
+            tile.indexPosition.z >= 0 && tile.indexPosition.z < tileCount.z;
+        }
+
+        bool TileInRange(Vector3Int indexPosition)
+        {
+            return indexPosition.x >= 0 && indexPosition.x < tileCount.x &&
+            indexPosition.y >= 0 && indexPosition.y < tileCount.y &&
+            indexPosition.z >= 0 && indexPosition.z < tileCount.z;
+        }
+
+        bool TileInRange(int x, int y, int z)
+        {
+            return x >= 0 && x < tileCount.x &&
+            y >= 0 && y < tileCount.y &&
+            z >= 0 && z < tileCount.z;
         }
     }
 }
