@@ -51,6 +51,8 @@ namespace TileGeneration
         public GameObject selectedTilePrefab;
         public Vector3Int selectedTileIndex = -Vector3Int.one;
 
+        [SerializeField] Vector3 gridPivotPoint = new Vector3(0.5f, 0f, 0.5f);
+
         [Tooltip("Show what rule number is being used on each tile? (if any)")]
         public bool debugRuleUsage = true;
 
@@ -70,7 +72,7 @@ namespace TileGeneration
             }
             set
             {
-                paintRadius = Mathf.Clamp(value, 0, 10);
+                paintRadius = Mathf.Clamp(value, 1, 10);
             }
         }
 
@@ -229,7 +231,7 @@ namespace TileGeneration
 
             if (tile.obj != null)
             {
-                tile.SetTransform(tile.GetTargetLocalPosition(), tile.prefab.transform.localRotation, GetGridScaleRatio());
+                tile.SetTransform(tile.GetTargetLocalPosition(), tile.prefab.transform.localRotation, Vector3.one);
 
                 if (showAllYLevels)
                 {
@@ -310,7 +312,16 @@ namespace TileGeneration
             {
                 foreach (var tile in tiles.Values)
                 {
-                    if (tile.rule != null)
+                    GUIContent content = GUIContent.none;
+                    GUIStyle style = new GUIStyle();
+                    style.alignment = TextAnchor.MiddleCenter;
+                    if (tile.ignoreRule)
+                    {
+                        // The tile is using this rule
+                        content = new GUIContent("Using default object");
+                        //Handles.Label(tile.GetTargetPosition(), new GUIContent("Using default object"));
+                    }
+                    else if (tile.rule != null)
                     {
                         for (int i = 0; i < tile.rule.rules.Count; i++)
                         {
@@ -318,10 +329,15 @@ namespace TileGeneration
                             if (rule.Evaluate(tile))
                             {
                                 // The tile is using this rule
-                                Handles.Label(tile.GetTargetPosition(), new GUIContent("Rule " + (i + 1).ToString()));
+                                content = new GUIContent("Rule " + (i + 1).ToString());
+                                //Handles.Label(tile.GetTargetPosition(), new GUIContent("Rule " + (i + 1).ToString()));
                                 break;
                             }
                         }
+                    }
+                    if (content != GUIContent.none)
+                    {
+                        Handles.Label(tile.GetTargetPosition(), content, style);
                     }
                 }
             }
@@ -365,9 +381,7 @@ namespace TileGeneration
 
         void DrawTile(int x, int y, int z)
         {
-            Gizmos.matrix = Matrix4x4.Translate(transform.TransformPoint(GetGridScalePoint(x, y, z))) *
-                        Matrix4x4.Rotate(transform.rotation) *
-                        Matrix4x4.Scale(Vector3.Scale(GetGridScaleRatio(), transform.localScale));
+            Gizmos.matrix = Matrix4x4.TRS(transform.TransformPoint(GetGridScalePoint(x, y, z)), transform.rotation, transform.localScale);
 
             Gizmos.color = Color.red;
 
@@ -388,41 +402,18 @@ namespace TileGeneration
         }
 #endif
 
-        public Vector3 GetGridScaleRatio()
-        {
-            return new Vector3(tileSize.x / tileSize.x, tileSize.y / tileSize.y, tileSize.z / tileSize.z);
-        }
-
         public Vector3 GetGridScalePoint(Vector3Int index)
         {
-            // Cache grid scale ratio
-            Vector3 gridScaleRatio = GetGridScaleRatio();
-
-            float xPoint = index.x * tileSize.x / tileSize.x;
-            float yPoint = index.y * tileSize.y / tileSize.y;
-            float zPoint = index.z * tileSize.z / tileSize.z;
-
-            xPoint -= (1 - gridScaleRatio.x) * 0.5f;
-            yPoint -= (1 - gridScaleRatio.y) * 0.5f;
-            zPoint -= (1 - gridScaleRatio.z) * 0.5f;
-
-            return new Vector3(xPoint, yPoint, zPoint) - ((tileSize - Vector3.one) * 0.5f);
+            return GetGridScalePoint(index.x, index.y, index.z);
         }
 
         public Vector3 GetGridScalePoint(float x, float y, float z)
         {
-            // Cache grid scale ratio
-            Vector3 gridScaleRatio = GetGridScaleRatio();
+            float xPoint = x + (0.5f - gridPivotPoint.x);
+            float yPoint = y + (0.5f - gridPivotPoint.y);
+            float zPoint = z + (0.5f - gridPivotPoint.z);
 
-            float xPoint = x * tileSize.x / tileSize.x;
-            float yPoint = y * tileSize.y / tileSize.y;
-            float zPoint = z * tileSize.z / tileSize.z;
-
-            xPoint -= (1 - gridScaleRatio.x) * 0.5f;
-            yPoint -= (1 - gridScaleRatio.y) * 0.5f;
-            zPoint -= (1 - gridScaleRatio.z) * 0.5f;
-
-            return new Vector3(xPoint, yPoint, zPoint) - ((tileSize - Vector3.one) * 0.5f);
+            return new Vector3(xPoint, yPoint, zPoint) - Vector3.Scale(tileSize - Vector3.one, gridPivotPoint);
         }
 
         public bool GetSelectedPoint(Ray ray, out Vector3 point)
@@ -434,9 +425,6 @@ namespace TileGeneration
 
             if (hPlane.Raycast(ray, out float distance))
             {
-                // Cache grid scale ratio
-                Vector3 gridScaleRatio = GetGridScaleRatio();
-
                 point = ray.GetPoint(distance);
 
                 Vector3 selectedPoint = transform.InverseTransformPoint(ray.GetPoint(distance));
@@ -445,10 +433,6 @@ namespace TileGeneration
                 float xPoint = selectedPoint.x + tileSize.x * 0.5f;
                 float yPoint = selectedPoint.y + tileSize.y * 0.5f;
                 float zPoint = selectedPoint.z + tileSize.z * 0.5f;
-
-                xPoint /= gridScaleRatio.x;
-                yPoint /= gridScaleRatio.y;
-                zPoint /= gridScaleRatio.z;
 
                 int xIndex = (int)xPoint;
                 int yIndex = (int)yPoint;
@@ -511,7 +495,7 @@ namespace TileGeneration
 
                 selectedTile.obj.transform.parent = transform;
 
-                selectedTile.SetTransform(selectedTile.GetTargetLocalPosition(), selectedTilePrefab.transform.localRotation, GetGridScaleRatio());
+                selectedTile.SetTransform(selectedTile.GetTargetLocalPosition(), selectedTilePrefab.transform.localRotation, Vector3.one);
             }
 
             foreach (var tile in tilesInRadius)
@@ -553,7 +537,7 @@ namespace TileGeneration
 
                 tile.obj.transform.parent = transform;
 
-                tile.SetTransform(tile.GetTargetLocalPosition(), selectedTilePrefab.transform.localRotation, GetGridScaleRatio());
+                tile.SetTransform(tile.GetTargetLocalPosition(), selectedTilePrefab.transform.localRotation, Vector3.one);
             }
         }
 

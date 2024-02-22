@@ -39,6 +39,17 @@ namespace TileGeneration
             SerializedProperty debugRuleUsage = serializedObject.FindProperty("debugRuleUsage");
             EditorGUILayout.PropertyField(debugRuleUsage);
 
+            SerializedProperty gridPivotPoint = serializedObject.FindProperty("gridPivotPoint");
+
+            Vector3 gridPivotValue = gridPivotPoint.vector3Value;
+            gridPivotValue.x = Mathf.Clamp01(gridPivotValue.x);
+            gridPivotValue.y = Mathf.Clamp01(gridPivotValue.y);
+            gridPivotValue.z = Mathf.Clamp01(gridPivotValue.z);
+
+            gridPivotPoint.vector3Value = gridPivotValue;
+
+            EditorGUILayout.PropertyField(gridPivotPoint);
+
             serializedObject.ApplyModifiedProperties();
 
             Rect currentRect = GUILayoutUtility.GetLastRect();

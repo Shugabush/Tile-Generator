@@ -61,8 +61,7 @@ namespace TileGeneration
             {
                 Handles.matrix = Matrix4x4.TRS(point,
                     tileGenerator.transform.rotation,
-                    Vector3.Scale(tileGenerator.GetGridScaleRatio(), tileGenerator.transform.localScale) * 
-                    tileGenerator.PaintRadius);
+                    tileGenerator.transform.localScale * tileGenerator.PaintRadius);
 
                 Handles.DrawWireDisc(Vector3.zero, Vector3.up, 1);
             }
@@ -73,9 +72,29 @@ namespace TileGeneration
 
             Handles.matrix = Matrix4x4.identity;
 
+            // Determine whether we should switch the tile's status of whether it is ignoring the rule or not
+            Event currentEvent = Event.current;
+            bool changeTileRuleIgnoreStatus = false;
+            do
+            {
+                if (currentEvent.shift)
+                {
+                    changeTileRuleIgnoreStatus = true;
+                    break;
+                }
+            }
+            while (Event.PopEvent(currentEvent));
+
             if (isClicking)
             {
-                tileGenerator.ChangeTile();
+                if (changeTileRuleIgnoreStatus)
+                {
+                    tileGenerator.SelectedTile.ignoreRule = !tileGenerator.SelectedTile.ignoreRule;
+                }
+                else
+                {
+                    tileGenerator.ChangeTile();
+                }
             }
 
             base.OnToolGUI(window);

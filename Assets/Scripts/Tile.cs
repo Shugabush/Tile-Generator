@@ -17,6 +17,7 @@ namespace TileGeneration
         public Vector3Int indexPosition;
 
         public RuleTile rule;
+        public bool ignoreRule = false;
 
         // Prefab for this tile (we will be comparing this when deciding if we need to draw a new one or not)
         public GameObject prefab;
@@ -65,7 +66,7 @@ namespace TileGeneration
             obj.transform.SetParent(parent.transform);
             obj.transform.position = GetTargetPosition();
             obj.transform.localRotation = prefab.transform.localRotation;
-            SetTransform(GetTargetLocalPosition(), prefab.transform.localRotation, parent.GetGridScaleRatio());
+            SetTransform(GetTargetLocalPosition(), prefab.transform.localRotation, Vector3.one);
         }
 
         public void FixObject()
@@ -82,7 +83,7 @@ namespace TileGeneration
                 return;
             }
 
-            GameObject rulePrefab = rule.GetObject(this);
+            GameObject rulePrefab = ignoreRule ? rule.defaultGameObject : rule.GetObject(this);
             if (rulePrefab != null && rulePrefab != PrefabUtility.GetCorrespondingObjectFromSource(obj))
             {
                 // Destroy obj and re-instantiate the new prefab
@@ -96,7 +97,7 @@ namespace TileGeneration
                 obj.transform.parent = parent.transform;
                 obj.transform.position = GetTargetPosition();
                 obj.transform.localRotation = rulePrefab.transform.localRotation;
-                SetTransform(GetTargetLocalPosition(), rulePrefab.transform.localRotation, parent.GetGridScaleRatio());
+                SetTransform(GetTargetLocalPosition(), rulePrefab.transform.localRotation, Vector3.one);
                 prefab = rulePrefab;
             }
         }
