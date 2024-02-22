@@ -26,8 +26,18 @@ namespace TileGeneration
             SerializedProperty defaultObjProperty = serializedObject.FindProperty("defaultGameObject");
             EditorGUILayout.PropertyField(defaultObjProperty);
 
+            GUILayout.Space(15);
+
+            EditorGUILayout.LabelField("The bounds of a mesh may not be centered or scaled properly,");
+            EditorGUILayout.LabelField("so checking these fields will fix that.");
+
             ruleTile.fixBoundsPosition = EditorGUILayout.Toggle("Fix Bounds Position", ruleTile.fixBoundsPosition);
             ruleTile.fixBoundsScale = EditorGUILayout.Toggle("Fix Bounds Scale", ruleTile.fixBoundsScale);
+
+            GUILayout.Space(15);
+
+            EditorGUILayout.LabelField("Define offsets (position, rotation, and scale).");
+            EditorGUILayout.LabelField("Will only be used if no rule condition is met for a given tile.");
 
             SerializedProperty rotationOffsetProperty = serializedObject.FindProperty("rotationOffset");
             EditorGUILayout.PropertyField(rotationOffsetProperty);
@@ -36,6 +46,8 @@ namespace TileGeneration
 
             Rect currentRect = GUILayoutUtility.GetLastRect();
             GUILayout.Space(Screen.height * 0.75f);
+
+            currentRect.y += 25;
 
             Rect lastRect = currentRect;
 
@@ -62,11 +74,17 @@ namespace TileGeneration
                 // If the rule should be open, display it
                 if (rule.open)
                 {
-                    AddRectYOffset(ref currentRect, 25);
+                    currentRect.y += 25;
+
+                    // Explain what the new game object property is for
+                    EditorGUI.LabelField(currentRect, "If the rule conditions are met below, this is the game object that");
+                    currentRect.y += 15;
+                    EditorGUI.LabelField(currentRect, "will be drawn.");
+                    currentRect.y += 25;
 
                     rule.newObj = (GameObject)EditorGUI.ObjectField(currentRect, "New Game Object", rule.newObj, typeof(GameObject));
 
-                    AddRectYOffset(ref currentRect, 50);
+                    currentRect.y += 35;
                     currentRect.x += 200;
 
                     GUIStyle yLevelStyle = new GUIStyle();
@@ -77,32 +95,35 @@ namespace TileGeneration
                     // Explain what the fix bounds properties are for
                     EditorGUI.LabelField(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height),
                         "The bounds of a mesh may not be centered or scaled properly,");
-                    AddRectYOffset(ref currentRect, 15);
+                    currentRect.y += 15;
 
                     EditorGUI.LabelField(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height),
                         "so checking these fields will fix that.");
-                    AddRectYOffset(ref currentRect, 25);
+                    currentRect.y += 25;
 
                     rule.fixBoundsPosition = EditorGUI.Toggle(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height),
                         new GUIContent("Fix Bounds Position"), rule.fixBoundsPosition);
-                    AddRectYOffset(ref currentRect, 25);
+                    currentRect.y += 25;
 
                     rule.fixBoundsScale = EditorGUI.Toggle(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height),
                         new GUIContent("Fix Bounds Scale"), rule.fixBoundsScale);
-                    AddRectYOffset(ref currentRect, 25);
+                    currentRect.y += 35;
 
                     // Explain what offsets are for
                     EditorGUI.LabelField(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height), 
-                        "Test");
-                    AddRectYOffset(ref currentRect, 25);
+                        "Define offsets (position, rotation, and scale) for this rule");
+                    currentRect.y += 15;
+                    EditorGUI.LabelField(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height),
+                        "Will only be applied if this rule is being used for a given tile.");
+                    currentRect.y += 25;
 
                     rule.positionOffset = EditorGUI.Vector3Field(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height),
                         new GUIContent("Position Offset"), rule.positionOffset);
-                    AddRectYOffset(ref currentRect, 25);
+                    currentRect.y += 25;
 
                     rule.rotationOffset = EditorGUI.Vector3Field(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height),
                         new GUIContent("Rotation Offset"), rule.rotationOffset);
-                    AddRectYOffset(ref currentRect, 25);
+                    currentRect.y += 25;
 
                     rule.scaleMultiplier = EditorGUI.Vector3Field(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height),
                         new GUIContent("Scale Multiplier"), rule.scaleMultiplier);
@@ -113,7 +134,7 @@ namespace TileGeneration
 
                     if (selectedYLevel == -1) GUI.backgroundColor = Color.gray;
 
-                    AddRectYOffset(ref selectedYLevelRect, 50);
+                    selectedYLevelRect.y += 50;
 
                     if (GUI.Button(selectedYLevelRect, "Lower Level"))
                     {
@@ -123,7 +144,7 @@ namespace TileGeneration
                     GUI.backgroundColor = oldColor;
                     if (selectedYLevel == 0) GUI.backgroundColor = Color.gray;
 
-                    AddRectYOffset(ref selectedYLevelRect, 50);
+                    selectedYLevelRect.y += 50;
 
                     if (GUI.Button(selectedYLevelRect, "Main Level"))
                     {
@@ -133,7 +154,7 @@ namespace TileGeneration
                     GUI.backgroundColor = oldColor;
                     if (selectedYLevel == 1) GUI.backgroundColor = Color.gray;
 
-                    AddRectYOffset(ref selectedYLevelRect, 50);
+                    selectedYLevelRect.y += 50;
 
                     if (GUI.Button(selectedYLevelRect, "Upper Level"))
                     {
@@ -141,10 +162,9 @@ namespace TileGeneration
                     }
 
                     GUI.backgroundColor = oldColor;
-                    currentRect.y = selectedYLevelRect.y;
 
                     currentRect.x -= 200;
-                    AddRectYOffset(ref currentRect, 50);
+                    currentRect.y += 100;
 
                     Vector3Int lastSlotDirection = -Vector3Int.one;
                     lastSlotDirection.y = selectedYLevel;
@@ -156,7 +176,6 @@ namespace TileGeneration
                         if (slot.direction.y == selectedYLevel)
                         {
                             Rect slotRect = new Rect(currentRect.x + 50 + (slot.direction.x * 50), currentRect.y - (slot.direction.z * 50), 50, 50);
-
                             slot.Draw(slotRect);
                         }
                     }
@@ -165,18 +184,14 @@ namespace TileGeneration
                     {
                         Rect rect = new Rect(currentRect.x + 50, currentRect.y, 50, 50);
 
-                        rule.newObj.transform.rotation *= Quaternion.Euler(rule.rotationOffset);
-
                         GUI.DrawTexture(rect, AssetPreview.GetAssetPreview(rule.newObj));
-
-                        rule.newObj.transform.rotation *= Quaternion.Inverse(Quaternion.Euler(rule.rotationOffset));
                     }
 
-                    AddRectYOffset(ref currentRect, 100);
+                    currentRect.y += 100;
                 }
             }
 
-            AddRectYOffset(ref currentRect, 25);
+            currentRect.y += 25;
             if (GUI.Button(currentRect, "Add New Rule"))
             {
                 // Add a new rule
@@ -198,12 +213,6 @@ namespace TileGeneration
             {
                 EditorUtility.SetDirty(ruleTile);
             }
-        }
-
-        void AddRectYOffset(ref Rect rect, float offset)
-        {
-            rect.y += offset;
-            //GUILayout.Space(offset);
         }
     }
 }
