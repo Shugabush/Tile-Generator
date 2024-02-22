@@ -59,7 +59,20 @@ namespace TileGeneration
             if (!ToolManager.IsActiveTool(this)) return;
 
             if (Selection.activeGameObject == null || !Selection.activeGameObject.TryGetComponent<TileGenerator>(out _)) return;
-            
+
+            Camera currentCamera = Camera.current;
+            if (currentCamera != null)
+            {
+                GUIContent labelContent = new GUIContent($"Click to {(tileGenerator.shouldPaint ? "draw" : "erase")} a tile");
+                GUIStyle labelStyle = new GUIStyle();
+                labelStyle.alignment = TextAnchor.UpperCenter;
+                labelStyle.fontSize = 18;
+                Handles.Label(currentCamera.ViewportToWorldPoint(new Vector3(0.5f, 0.975f, 1)), labelContent, labelStyle);
+
+                labelContent.text = "Shift click to toggle whether a tile will evaluate their rule or just use their default game object.";
+                Handles.Label(currentCamera.ViewportToWorldPoint(new Vector3(0.5f, 0.925f, 1)), labelContent, labelStyle);
+            }
+
             if (tileGenerator.GetSelectedPoint(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition), out Vector3 point))
             {
                 Handles.matrix = Matrix4x4.TRS(point,
