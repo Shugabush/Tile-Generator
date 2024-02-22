@@ -12,15 +12,8 @@ namespace TileGeneration
 
         int selectedYLevel = 0;
 
-        List<bool> popups;
-
         public override void OnInspectorGUI()
         {
-            if (popups == null)
-            {
-                popups = new List<bool>();
-            }
-
             if (ruleTile == null)
             {
                 ruleTile = (RuleTile)target;
@@ -42,19 +35,14 @@ namespace TileGeneration
             serializedObject.ApplyModifiedProperties();
 
             Rect currentRect = GUILayoutUtility.GetLastRect();
-            GUILayout.Space(Screen.height * 0.5f);
+            GUILayout.Space(Screen.height * 0.75f);
 
             Rect lastRect = currentRect;
 
             for (int i = 0; i < ruleTile.rules.Count; i++)
             {
                 var rule = ruleTile.rules[i];
-                GUILayout.Space(currentRect.y - lastRect.y + 25);
-
-                if (i >= popups.Count)
-                {
-                    popups.Add(true);
-                }
+                GUILayout.Space(currentRect.y - lastRect.y);
 
                 lastRect = currentRect;
 
@@ -74,11 +62,11 @@ namespace TileGeneration
                 // If the rule should be open, display it
                 if (rule.open)
                 {
-                    currentRect.y += 25;
+                    AddRectYOffset(ref currentRect, 25);
 
                     rule.newObj = (GameObject)EditorGUI.ObjectField(currentRect, "New Game Object", rule.newObj, typeof(GameObject));
 
-                    currentRect.y += 50;
+                    AddRectYOffset(ref currentRect, 50);
                     currentRect.x += 200;
 
                     GUIStyle yLevelStyle = new GUIStyle();
@@ -86,25 +74,35 @@ namespace TileGeneration
 
                     Color oldColor = GUI.backgroundColor;
 
+                    // Explain what the fix bounds properties are for
+                    EditorGUI.LabelField(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height),
+                        "The bounds of a mesh may not be centered or scaled properly,");
+                    AddRectYOffset(ref currentRect, 15);
+
+                    EditorGUI.LabelField(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height),
+                        "so checking these fields will fix that.");
+                    AddRectYOffset(ref currentRect, 25);
+
                     rule.fixBoundsPosition = EditorGUI.Toggle(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height),
                         new GUIContent("Fix Bounds Position"), rule.fixBoundsPosition);
-
-                    currentRect.y += 25;
+                    AddRectYOffset(ref currentRect, 25);
 
                     rule.fixBoundsScale = EditorGUI.Toggle(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height),
                         new GUIContent("Fix Bounds Scale"), rule.fixBoundsScale);
+                    AddRectYOffset(ref currentRect, 25);
 
-                    currentRect.y += 25;
+                    // Explain what offsets are for
+                    EditorGUI.LabelField(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height), 
+                        "Test");
+                    AddRectYOffset(ref currentRect, 25);
 
                     rule.positionOffset = EditorGUI.Vector3Field(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height),
                         new GUIContent("Position Offset"), rule.positionOffset);
-
-                    currentRect.y += 25;
+                    AddRectYOffset(ref currentRect, 25);
 
                     rule.rotationOffset = EditorGUI.Vector3Field(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height),
                         new GUIContent("Rotation Offset"), rule.rotationOffset);
-
-                    currentRect.y += 25;
+                    AddRectYOffset(ref currentRect, 25);
 
                     rule.scaleMultiplier = EditorGUI.Vector3Field(new Rect(lastRect.x, currentRect.y, currentRect.width, currentRect.height),
                         new GUIContent("Scale Multiplier"), rule.scaleMultiplier);
@@ -115,7 +113,7 @@ namespace TileGeneration
 
                     if (selectedYLevel == -1) GUI.backgroundColor = Color.gray;
 
-                    selectedYLevelRect.y += 50;
+                    AddRectYOffset(ref selectedYLevelRect, 50);
 
                     if (GUI.Button(selectedYLevelRect, "Lower Level"))
                     {
@@ -125,7 +123,7 @@ namespace TileGeneration
                     GUI.backgroundColor = oldColor;
                     if (selectedYLevel == 0) GUI.backgroundColor = Color.gray;
 
-                    selectedYLevelRect.y += 50;
+                    AddRectYOffset(ref selectedYLevelRect, 50);
 
                     if (GUI.Button(selectedYLevelRect, "Main Level"))
                     {
@@ -135,7 +133,7 @@ namespace TileGeneration
                     GUI.backgroundColor = oldColor;
                     if (selectedYLevel == 1) GUI.backgroundColor = Color.gray;
 
-                    selectedYLevelRect.y += 50;
+                    AddRectYOffset(ref selectedYLevelRect, 50);
 
                     if (GUI.Button(selectedYLevelRect, "Upper Level"))
                     {
@@ -146,7 +144,7 @@ namespace TileGeneration
                     currentRect.y = selectedYLevelRect.y;
 
                     currentRect.x -= 200;
-                    currentRect.y += 50;
+                    AddRectYOffset(ref currentRect, 50);
 
                     Vector3Int lastSlotDirection = -Vector3Int.one;
                     lastSlotDirection.y = selectedYLevel;
@@ -159,7 +157,7 @@ namespace TileGeneration
                         {
                             Rect slotRect = new Rect(currentRect.x + 50 + (slot.direction.x * 50), currentRect.y - (slot.direction.z * 50), 50, 50);
 
-                            slot.Draw(slotRect, rule.rotationOffset.y);
+                            slot.Draw(slotRect);
                         }
                     }
 
@@ -174,11 +172,11 @@ namespace TileGeneration
                         rule.newObj.transform.rotation *= Quaternion.Inverse(Quaternion.Euler(rule.rotationOffset));
                     }
 
-                    currentRect.y += 100;
+                    AddRectYOffset(ref currentRect, 100);
                 }
             }
 
-            currentRect.y += 25;
+            AddRectYOffset(ref currentRect, 25);
             if (GUI.Button(currentRect, "Add New Rule"))
             {
                 // Add a new rule
@@ -200,6 +198,12 @@ namespace TileGeneration
             {
                 EditorUtility.SetDirty(ruleTile);
             }
+        }
+
+        void AddRectYOffset(ref Rect rect, float offset)
+        {
+            rect.y += offset;
+            //GUILayout.Space(offset);
         }
     }
 }

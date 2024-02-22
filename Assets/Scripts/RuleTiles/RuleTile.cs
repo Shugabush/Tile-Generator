@@ -228,7 +228,7 @@ namespace TileGeneration
                 /// <summary>
                 /// Draws a texture based on the condition type
                 /// </summary>
-                public void Draw(Rect position, float rotation)
+                public void Draw(Rect position)
                 {
                     // Cache proper texture
                     Texture properTexture = GetProperTexture();
@@ -251,7 +251,6 @@ namespace TileGeneration
 
                     textureRect.size *= 0.75f;
                     textureRect.center = position.center;
-
 
                     if (properTexture != null)
                     {

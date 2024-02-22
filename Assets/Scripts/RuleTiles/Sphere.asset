@@ -68,3 +68,14 @@ MonoBehaviour:
     - direction: {x: 1, y: 1, z: 1}
       condition: 0
     newObj: {fileID: 7635457198165937764, guid: 53fea5378289b2948886aa3e0ba7fb17, type: 3}
+    open: 0
+    fixBoundsPosition: 1
+    fixBoundsScale: 1
+    positionOffset: {x: 0, y: 0, z: 0}
+    rotationOffset: {x: 0, y: 0, z: 0}
+    scaleMultiplier: {x: 1, y: 1, z: 1}
+  fixBoundsPosition: 1
+  fixBoundsScale: 1
+  positionOffset: {x: 0, y: 0, z: 0}
+  rotationOffset: {x: 0, y: 0, z: 0}
+  scaleMultiplier: {x: 1, y: 1, z: 1}
