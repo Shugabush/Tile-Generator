@@ -25,7 +25,6 @@ namespace TileGeneration
             SerializedProperty tileSize = serializedObject.FindProperty("tileSize");
             EditorGUILayout.PropertyField(tileSize);
 
-
             SerializedProperty selectedTileIndexProperty = serializedObject.FindProperty("selectedTileIndex");
             Vector3Int selectedTileIndex = selectedTileIndexProperty.vector3IntValue;
             selectedTileIndex.y = EditorGUILayout.IntField("Y Level", selectedTileIndex.y);

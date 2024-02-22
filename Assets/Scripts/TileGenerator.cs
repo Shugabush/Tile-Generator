@@ -60,6 +60,7 @@ namespace TileGeneration
         {
             Draw,
             Fill,
+            ChangeRuleStatus,
         }
 
         [SerializeField] int paintRadius = 5;
@@ -100,7 +101,11 @@ namespace TileGeneration
         }
 
         int debugCount;
-        Queue<Tile> pendingTiles;
+        Queue<Tile> pendingTilesInRadius;
+
+        // When the user holds down the mouse button, all tiles that they select will
+        // be added to this list, and when they release it, this list will reset
+        public List<Tile> tilesBeingEdited = new List<Tile>();
 
         void OnEnable()
         {
@@ -349,11 +354,11 @@ namespace TileGeneration
 
             switch (paintMode)
             {
-                case PaintMode.Draw:
-                    tilesInRadius = GetTilesInRadius(SelectedTile);
-                    break;
                 case PaintMode.Fill:
                     tilesInRadius = GetTilesToFill(SelectedTile);
+                    break;
+                default:
+                    tilesInRadius = GetTilesInRadius(SelectedTile);
                     break;
             }
 
@@ -391,7 +396,7 @@ namespace TileGeneration
 
             Tile tile = tiles[indexPosition];
 
-            if (SelectedTile == tile || tilesInRadius.Contains(tile))
+            if (SelectedTile == tile || tilesInRadius.Contains(tile) || tilesBeingEdited.Contains(tile))
             {
                 Gizmos.DrawCube(Vector3.zero, Vector3.one);
             }
@@ -455,17 +460,31 @@ namespace TileGeneration
 #if UNITY_EDITOR
         public void ChangeTile()
         {
+            Tile selectedTile = SelectedTile;
+
+            if (selectedTile == null) return;
+            if (tilesBeingEdited.Contains(selectedTile)) return;
+
+            tilesBeingEdited.Add(selectedTile);
+
             Undo.RecordObject(this, "Tile Generator Change");
 
-            if (shouldPaint)
+            if (paintMode == PaintMode.ChangeRuleStatus)
             {
-                // Paint tile
-                PaintTile();
+                selectedTile.ignoreRule = !selectedTile.ignoreRule;
             }
             else
             {
-                // Erase tile
-                EraseTile();
+                if (shouldPaint)
+                {
+                    // Paint tile
+                    PaintTile();
+                }
+                else
+                {
+                    // Erase tile
+                    EraseTile();
+                }
             }
         }
 
@@ -500,7 +519,11 @@ namespace TileGeneration
 
             foreach (var tile in tilesInRadius)
             {
-                PaintTile(tile);
+                if (!tilesBeingEdited.Contains(tile))
+                {
+                    PaintTile(tile);
+                    tilesBeingEdited.Add(tile);
+                }
             }
 
             // Fix objects in a separate loop because
@@ -555,7 +578,11 @@ namespace TileGeneration
             }
             foreach (var tile in tilesInRadius)
             {
-                EraseTile(tile);
+                if (!tilesBeingEdited.Contains(tile))
+                {
+                    EraseTile(tile);
+                    tilesBeingEdited.Add(tile);
+                }
             }
             EditorUtility.SetDirty(this);
         }
@@ -598,15 +625,15 @@ namespace TileGeneration
         List<Tile> GetTilesInRadius(Tile startingTile)
         {
             debugCount = 0;
-            pendingTiles = new Queue<Tile>();
+            pendingTilesInRadius = new Queue<Tile>();
             List<Tile> tilesInRadius = new List<Tile>();
 
             if (startingTile != null)
             {
-                pendingTiles.Enqueue(startingTile);
-                while (pendingTiles.Count > 0)
+                pendingTilesInRadius.Enqueue(startingTile);
+                while (pendingTilesInRadius.Count > 0)
                 {
-                    GetTilesInRadiusRecursive(tilesInRadius, startingTile, pendingTiles.Dequeue());
+                    GetTilesInRadiusRecursive(tilesInRadius, startingTile, pendingTilesInRadius.Dequeue());
                 }
             }
 
@@ -628,7 +655,7 @@ namespace TileGeneration
                     {
                         debugCount++;
                         tilesInRadius.Add(value);
-                        pendingTiles.Enqueue(value);
+                        pendingTilesInRadius.Enqueue(value);
                     }
                 }
             }
@@ -637,15 +664,15 @@ namespace TileGeneration
         List<Tile> GetTilesToFill(Tile startingTile)
         {
             debugCount = 0;
-            pendingTiles = new Queue<Tile>();
+            pendingTilesInRadius = new Queue<Tile>();
             List<Tile> tilesToFill = new List<Tile>();
 
             if (startingTile != null)
             {
-                pendingTiles.Enqueue(startingTile);
-                while (pendingTiles.Count > 0)
+                pendingTilesInRadius.Enqueue(startingTile);
+                while (pendingTilesInRadius.Count > 0)
                 {
-                    GetTilesToFillRecursive(startingTile.rule, tilesToFill, pendingTiles.Dequeue());
+                    GetTilesToFillRecursive(startingTile.rule, tilesToFill, pendingTilesInRadius.Dequeue());
                 }
             }
 
@@ -668,7 +695,7 @@ namespace TileGeneration
                     {
                         debugCount++;
                         tilesToFill.Add(value);
-                        pendingTiles.Enqueue(value);
+                        pendingTilesInRadius.Enqueue(value);
                     }
                 }
             }

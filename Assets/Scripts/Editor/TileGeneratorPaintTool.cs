@@ -8,23 +8,25 @@ namespace TileGeneration
     [EditorTool("Paint Tool", typeof(TileGenerator))]
     public class TileGeneratorPaintTool : EditorTool
     {
-        bool isClicking = false;
+        bool isHoldingMouseButton = false;
+        bool mouseUp = false;
 
         TileGenerator tileGenerator;
 
         void BeforeSceneGUI(SceneView sceneView)
         {
             if (!ToolManager.IsActiveTool(this)) return;
+            mouseUp = false;
             if (Selection.activeGameObject == null || !Selection.activeGameObject.TryGetComponent<TileGenerator>(out _)) return;
 
             if ((Event.current.type == EventType.MouseDrag || Event.current.type == EventType.MouseDown) && Event.current.button == 0)
             {
-                isClicking = true;
+                isHoldingMouseButton = true;
                 Event.current.Use();
             }
             else
             {
-                isClicking = false;
+                isHoldingMouseButton = false;
             }
 
             if (Event.current.type == EventType.ScrollWheel)
@@ -45,6 +47,7 @@ namespace TileGeneration
 
             if (Event.current.type == EventType.MouseUp && Event.current.button == 0)
             {
+                mouseUp = true;
                 Event.current.Use();
             }
         }
@@ -72,30 +75,31 @@ namespace TileGeneration
 
             Handles.matrix = Matrix4x4.identity;
 
+            TileGenerator.PaintMode paintMode = tileGenerator.paintMode;
+
             // Determine whether we should switch the tile's status of whether it is ignoring the rule or not
             Event currentEvent = Event.current;
-            bool changeTileRuleIgnoreStatus = false;
             do
             {
                 if (currentEvent.shift)
                 {
-                    changeTileRuleIgnoreStatus = true;
+                    tileGenerator.paintMode = TileGenerator.PaintMode.ChangeRuleStatus;
                     break;
                 }
             }
             while (Event.PopEvent(currentEvent));
 
-            if (isClicking)
+            if (isHoldingMouseButton)
             {
-                if (changeTileRuleIgnoreStatus)
-                {
-                    tileGenerator.SelectedTile.ignoreRule = !tileGenerator.SelectedTile.ignoreRule;
-                }
-                else
-                {
-                    tileGenerator.ChangeTile();
-                }
+                tileGenerator.ChangeTile();
             }
+
+            if (mouseUp)
+            {
+                tileGenerator.tilesBeingEdited.Clear();
+            }
+
+            tileGenerator.paintMode = paintMode;
 
             base.OnToolGUI(window);
 
