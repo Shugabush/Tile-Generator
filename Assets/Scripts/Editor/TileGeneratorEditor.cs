@@ -22,17 +22,14 @@ namespace TileGeneration
 
             EditorGUI.BeginChangeCheck();
 
-            SerializedProperty gridSize = serializedObject.FindProperty("gridSize");
-            EditorGUILayout.PropertyField(gridSize);
-
-            SerializedProperty gridCount = serializedObject.FindProperty("gridCount");
-            EditorGUILayout.PropertyField(gridCount);
+            SerializedProperty tileSize = serializedObject.FindProperty("tileSize");
+            EditorGUILayout.PropertyField(tileSize);
 
 
             SerializedProperty selectedTileIndexProperty = serializedObject.FindProperty("selectedTileIndex");
             Vector3Int selectedTileIndex = selectedTileIndexProperty.vector3IntValue;
             selectedTileIndex.y = EditorGUILayout.IntField("Y Level", selectedTileIndex.y);
-            selectedTileIndex.y = Mathf.Clamp(selectedTileIndex.y, 0, tileGenerator.GridCount.y - 1);
+            selectedTileIndex.y = Mathf.Clamp(selectedTileIndex.y, 0, tileGenerator.TileSize.y - 1);
 
             selectedTileIndexProperty.vector3IntValue = selectedTileIndex;
 

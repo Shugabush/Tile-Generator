@@ -33,10 +33,9 @@ namespace TileGeneration
             new Vector3Int(0, -1, -1),
         };
 
-        [SerializeField] Vector3Int gridCount = Vector3Int.one;
-        [SerializeField] Vector3 gridSize = Vector3.one * 25;
+        [SerializeField] Vector3Int tileSize = Vector3Int.one;
 
-        public Vector3Int GridCount => gridCount;
+        public Vector3Int TileSize => tileSize;
 
         [SerializeField] List<Vector3Int> tileKeys = new List<Vector3Int>();
         [SerializeField] List<Tile> tileValues = new List<Tile>();
@@ -133,19 +132,15 @@ namespace TileGeneration
             Undo.undoRedoPerformed = new Undo.UndoRedoCallback(ClearUnusedObjects);
 
             // Grid count can never go below 1
-            gridCount.x = System.Math.Max(gridCount.x, 1);
-            gridCount.y = System.Math.Max(gridCount.y, 1);
-            gridCount.z = System.Math.Max(gridCount.z, 1);
+            tileSize.x = System.Math.Max(tileSize.x, 1);
+            tileSize.y = System.Math.Max(tileSize.y, 1);
+            tileSize.z = System.Math.Max(tileSize.z, 1);
 
-            gridSize.x = Mathf.Max(gridSize.x, 0.01f);
-            gridSize.y = Mathf.Max(gridSize.y, 0.01f);
-            gridSize.z = Mathf.Max(gridSize.z, 0.01f);
-
-            for (int x = 0; x < gridCount.x; x++)
+            for (int x = 0; x < tileSize.x; x++)
             {
-                for (int y = 0; y < gridCount.y; y++)
+                for (int y = 0; y < tileSize.y; y++)
                 {
-                    for (int z = 0; z < gridCount.z; z++)
+                    for (int z = 0; z < tileSize.z; z++)
                     {
                         ValidateTile(x, y, z);
                     }
@@ -155,9 +150,9 @@ namespace TileGeneration
             // Destroy objects in unused tiles
             foreach (var tileKey in tiles.Keys)
             {
-                if (tileKey.x >= gridCount.x ||
-                    tileKey.y >= gridCount.y ||
-                    tileKey.z >= gridCount.z)
+                if (tileKey.x >= tileSize.x ||
+                    tileKey.y >= tileSize.y ||
+                    tileKey.z >= tileSize.z)
                 {
                     Tile tile = tiles[tileKey];
                     if (tile.obj != null)
@@ -177,9 +172,9 @@ namespace TileGeneration
 
             foreach (var tileKey in tiles.Keys)
             {
-                if (tileKey.x >= gridCount.x ||
-                    tileKey.y >= gridCount.y ||
-                    tileKey.z >= gridCount.z)
+                if (tileKey.x >= tileSize.x ||
+                    tileKey.y >= tileSize.y ||
+                    tileKey.z >= tileSize.z)
                 {
                     keysToRemove.Add(tileKey);
                 }
@@ -347,13 +342,13 @@ namespace TileGeneration
             }
 
             Gizmos.color = Color.red;
-            for (int x = 0; x < gridCount.x; x++)
+            for (int x = 0; x < tileSize.x; x++)
             {
-                for (int z = 0; z < gridCount.z; z++)
+                for (int z = 0; z < tileSize.z; z++)
                 {
                     if (showAllYLevels)
                     {
-                        for (int y = 0; y < gridCount.y; y++)
+                        for (int y = 0; y < tileSize.y; y++)
                         {
                             DrawTile(x, y, z);
                         }
@@ -395,7 +390,7 @@ namespace TileGeneration
 
         public Vector3 GetGridScaleRatio()
         {
-            return new Vector3(gridSize.x / gridCount.x, gridSize.y / gridCount.y, gridSize.z / gridCount.z);
+            return new Vector3(tileSize.x / tileSize.x, tileSize.y / tileSize.y, tileSize.z / tileSize.z);
         }
 
         public Vector3 GetGridScalePoint(Vector3Int index)
@@ -403,15 +398,15 @@ namespace TileGeneration
             // Cache grid scale ratio
             Vector3 gridScaleRatio = GetGridScaleRatio();
 
-            float xPoint = index.x * gridSize.x / gridCount.x;
-            float yPoint = index.y * gridSize.y / gridCount.y;
-            float zPoint = index.z * gridSize.z / gridCount.z;
+            float xPoint = index.x * tileSize.x / tileSize.x;
+            float yPoint = index.y * tileSize.y / tileSize.y;
+            float zPoint = index.z * tileSize.z / tileSize.z;
 
             xPoint -= (1 - gridScaleRatio.x) * 0.5f;
             yPoint -= (1 - gridScaleRatio.y) * 0.5f;
             zPoint -= (1 - gridScaleRatio.z) * 0.5f;
 
-            return new Vector3(xPoint, yPoint, zPoint) - ((gridSize - Vector3.one) * 0.5f);
+            return new Vector3(xPoint, yPoint, zPoint) - ((tileSize - Vector3.one) * 0.5f);
         }
 
         public Vector3 GetGridScalePoint(float x, float y, float z)
@@ -419,15 +414,15 @@ namespace TileGeneration
             // Cache grid scale ratio
             Vector3 gridScaleRatio = GetGridScaleRatio();
 
-            float xPoint = x * gridSize.x / gridCount.x;
-            float yPoint = y * gridSize.y / gridCount.y;
-            float zPoint = z * gridSize.z / gridCount.z;
+            float xPoint = x * tileSize.x / tileSize.x;
+            float yPoint = y * tileSize.y / tileSize.y;
+            float zPoint = z * tileSize.z / tileSize.z;
 
             xPoint -= (1 - gridScaleRatio.x) * 0.5f;
             yPoint -= (1 - gridScaleRatio.y) * 0.5f;
             zPoint -= (1 - gridScaleRatio.z) * 0.5f;
 
-            return new Vector3(xPoint, yPoint, zPoint) - ((gridSize - Vector3.one) * 0.5f);
+            return new Vector3(xPoint, yPoint, zPoint) - ((tileSize - Vector3.one) * 0.5f);
         }
 
         public bool GetSelectedPoint(Ray ray, out Vector3 point)
@@ -447,9 +442,9 @@ namespace TileGeneration
                 Vector3 selectedPoint = transform.InverseTransformPoint(ray.GetPoint(distance));
 
                 // Trying to convert xPoint, yPoint, and zPoint into what the indexes will be (excluding decimals)
-                float xPoint = selectedPoint.x + gridSize.x * 0.5f;
-                float yPoint = selectedPoint.y + gridSize.y * 0.5f;
-                float zPoint = selectedPoint.z + gridSize.z * 0.5f;
+                float xPoint = selectedPoint.x + tileSize.x * 0.5f;
+                float yPoint = selectedPoint.y + tileSize.y * 0.5f;
+                float zPoint = selectedPoint.z + tileSize.z * 0.5f;
 
                 xPoint /= gridScaleRatio.x;
                 yPoint /= gridScaleRatio.y;
@@ -459,9 +454,9 @@ namespace TileGeneration
                 int yIndex = (int)yPoint;
                 int zIndex = (int)zPoint;
 
-                if (xIndex < gridCount.x && xIndex >= 0
-                    && yIndex < gridCount.y && yIndex >= 0
-                    && zIndex < gridCount.z && zIndex >= 0)
+                if (xIndex < tileSize.x && xIndex >= 0
+                    && yIndex < tileSize.y && yIndex >= 0
+                    && zIndex < tileSize.z && zIndex >= 0)
                 {
                     selectedTileIndex.x = xIndex;
                     selectedTileIndex.z = zIndex;
