@@ -38,6 +38,9 @@ namespace TileGeneration
             SerializedProperty debugRuleUsage = serializedObject.FindProperty("debugRuleUsage");
             EditorGUILayout.PropertyField(debugRuleUsage);
 
+            SerializedProperty showMeshes = serializedObject.FindProperty("showMeshes");
+            EditorGUILayout.PropertyField(showMeshes);
+
             SerializedProperty gridPivotPoint = serializedObject.FindProperty("gridPivotPoint");
 
             Vector3 gridPivotValue = gridPivotPoint.vector3Value;
@@ -91,7 +94,6 @@ namespace TileGeneration
                         if (GUI.Button(new Rect(currentRect.position, Vector2.one * 100), asset))
                         {
                             tileGenerator.selectedRule = ruleTile;
-                            tileGenerator.selectedTilePrefab = targetObj;
                         }
                     }
                     GUILayout.Space(100);
@@ -143,6 +145,22 @@ namespace TileGeneration
 
             GUILayout.Space(100);
             currentRect.y += 100;
+
+            if (GUI.Button(currentRect, "Generate Tiles"))
+            {
+                tileGenerator.GenerateTiles();
+            }
+
+            GUILayout.Space(25);
+            currentRect.y += 25;
+
+            if (GUI.Button(currentRect, "Clear Tiles"))
+            {
+                tileGenerator.ClearTiles();
+            }
+
+            GUILayout.Space(25);
+            currentRect.y += 25;
 
             if (GUI.Button(currentRect, "Add/Remove Palettes"))
             {

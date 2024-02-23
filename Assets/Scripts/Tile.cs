@@ -16,15 +16,99 @@ namespace TileGeneration
 
         public Vector3Int indexPosition;
 
-        public RuleTile rule;
-        public bool ignoreRule = false;
+        RuleTile rule;
+        public RuleTile Rule
+        {
+            get
+            {
+                return rule;
+            }
+            set
+            {
+                if (rule != value)
+                {
+                    if (value != null)
+                    {
+                        Prefab = value.GetObject(this);
+                    }
+                    else
+                    {
+                        Prefab = null;
+                    }
+                }
+
+                rule = value;
+            }
+        }
+
+        bool ignoreRule;
+        public bool IgnoreRule
+        {
+            get
+            {
+                return ignoreRule;
+            }
+            set
+            {
+                if (ignoreRule != value && rule != null)
+                {
+                    if (value)
+                    {
+                        Prefab = rule.defaultGameObject;
+                    }
+                    else
+                    {
+                        Prefab = rule.GetObject(this);
+                    }
+                }
+
+                ignoreRule = value;
+            }
+        }
+
+        GameObject prefab;
+        MeshFilter[] meshFilters;
 
         // Prefab for this tile (we will be comparing this when deciding if we need to draw a new one or not)
-        public GameObject prefab;
+        public GameObject Prefab
+        {
+            get
+            {
+                return prefab;
+            }
+            private set
+            {
+                if (prefab != value)
+                {
+                    if (value != null)
+                    {
+                        meshFilters = value.GetComponentsInChildren<MeshFilter>();
+                    }
+                    else
+                    {
+                        meshFilters = null;
+                    }
+                }
+
+                prefab = value;
+            }
+        }
 
         // Game Object that is occupying this tile slot (if any)
         public GameObject obj;
         public Dictionary<Vector3Int, Tile> adjacentTiles = new Dictionary<Vector3Int, Tile>();
+
+        public void UpdatePrefab()
+        {
+            if (rule != null)
+            {
+                Prefab = rule.GetObject(this);
+            }
+            else
+            {
+                Prefab = null;
+            }
+        }
 
         public void SetAdjacentTile(Vector3Int directionIndex, Tile newTile)
         {
@@ -58,22 +142,27 @@ namespace TileGeneration
         }
 
 #if UNITY_EDITOR
-        public void EnsurePrefabIsInstantiated()
+        public void SpawnObject()
         {
-            if (rule == null || prefab == null || obj != null) return;
+            if (Rule == null || Prefab == null || obj != null) return;
 
-            obj = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-            obj.transform.SetParent(parent.transform);
-            obj.transform.position = GetTargetPosition();
-            obj.transform.localRotation = prefab.transform.localRotation;
-            SetTransform(GetTargetLocalPosition(), prefab.transform.localRotation, Vector3.one);
+            obj = (GameObject)PrefabUtility.InstantiatePrefab(Prefab);
+            SetTransform();
+        }
+
+        public void DestroyObject()
+        {
+            if (obj != null)
+            {
+                Object.DestroyImmediate(obj);
+                obj = null;
+            }
         }
 
         public void FixObject()
         {
-            if (rule == null || prefab == null || obj == null)
+            if (Rule == null || Prefab == null || obj == null)
             {
-                prefab = null;
                 if (obj != null)
                 {
                     EditorApplication.delayCall += () => Object.DestroyImmediate(obj);
@@ -83,7 +172,7 @@ namespace TileGeneration
                 return;
             }
 
-            GameObject rulePrefab = ignoreRule ? rule.defaultGameObject : rule.GetObject(this);
+            GameObject rulePrefab = ignoreRule ? Rule.defaultGameObject : Rule.GetObject(this);
             if (rulePrefab != null && rulePrefab != PrefabUtility.GetCorrespondingObjectFromSource(obj))
             {
                 // Destroy obj and re-instantiate the new prefab
@@ -97,14 +186,47 @@ namespace TileGeneration
                 obj.transform.parent = parent.transform;
                 obj.transform.position = GetTargetPosition();
                 obj.transform.localRotation = rulePrefab.transform.localRotation;
-                SetTransform(GetTargetLocalPosition(), rulePrefab.transform.localRotation, Vector3.one);
-                prefab = rulePrefab;
+                SetTransform();
             }
         }
 #endif
 
+        public void DrawMesh()
+        {
+            if (meshFilters != null)
+            {
+                foreach (var filter in meshFilters)
+                {
+                    Mesh mesh = filter.sharedMesh;
+
+                    Gizmos.matrix = Matrix4x4.TRS(GetTargetPosition(), GetTargetRotation(), GetTargetScale());
+
+                    Gizmos.DrawWireMesh(mesh);
+                }
+                Gizmos.matrix = Matrix4x4.identity;
+            }
+        }
+
         public Vector3 GetTargetLocalPosition()
         {
+            if (Rule != null)
+            {
+                Rule.GetOffsets(this, out Vector3 positionOffset, out _, out _);
+                Rule.GetFixBounds(this, out bool fixBoundsPosition, out _);
+                if (fixBoundsPosition)
+                {
+                    Bounds bounds = new Bounds();
+
+                    foreach (var filter in meshFilters)
+                    {
+                        bounds.Encapsulate(filter.sharedMesh.bounds);
+                    }
+
+                    return parent.GetGridScalePoint(indexPosition) + positionOffset - bounds.center;
+                }
+
+                return parent.GetGridScalePoint(indexPosition) + positionOffset;
+            }
             return parent.GetGridScalePoint(indexPosition);
         }
 
@@ -113,47 +235,59 @@ namespace TileGeneration
             return parent.transform.TransformPoint(GetTargetLocalPosition());
         }
 
-        public void SetTransform(Vector3 basePosition, Quaternion baseRotation, Vector3 baseScale)
+        public Quaternion GetTargetLocalRotation()
         {
-            if (obj == null || prefab == null || rule == null) return;
-
-            Renderer rend = obj.GetComponentInChildren<Renderer>();
-
-            rule.GetOffsets(this, out Vector3 positionOffset, out Quaternion rotationOffset, out Vector3 scaleMultiplier);
-
-            rule.GetFixBounds(this, out bool fixBoundsPosition, out bool fixBoundsScale);
-
-            if (fixBoundsPosition)
+            if (Rule != null)
             {
-                obj.transform.localPosition = basePosition + positionOffset - rend.localBounds.center;
+                Rule.GetOffsets(this, out _, out Quaternion rotationOffset, out _);
+                return (prefab == null ? Quaternion.identity : prefab.transform.rotation) * rotationOffset;
             }
-            else
+            return prefab == null ? Quaternion.identity : prefab.transform.rotation;
+        }
+        public Quaternion GetTargetRotation()
+        {
+            return parent.transform.rotation * GetTargetLocalRotation();
+        }
+
+        public Vector3 GetTargetLocalScale()
+        {
+            Vector3 returnValue = prefab == null ? Vector3.one : prefab.transform.localScale;
+            if (Rule != null)
             {
-                obj.transform.localPosition = basePosition + positionOffset;
+                Rule.GetOffsets(this, out _, out _, out Vector3 scaleMultiplier);
+                Rule.GetFixBounds(this, out _, out bool fixBoundsScale);
+
+                returnValue = Vector3.Scale(returnValue, scaleMultiplier);
+
+                if (fixBoundsScale)
+                {
+                    Bounds bounds = new Bounds();
+
+                    foreach (var filter in meshFilters)
+                    {
+                        bounds.Encapsulate(filter.sharedMesh.bounds);
+                    }
+
+                    returnValue = new Vector3(returnValue.x / bounds.size.x, returnValue.y / bounds.size.y, returnValue.z / bounds.size.z);
+                }
             }
 
-            obj.transform.localRotation = baseRotation * rotationOffset;
+            return returnValue;
+        }
 
-            if (fixBoundsScale)
-            {
-                Vector3 size = rend.localBounds.size;
+        public Vector3 GetTargetScale()
+        {
+            return Vector3.Scale(parent.transform.localScale, GetTargetLocalScale());
+        }
 
-                size.x = Mathf.Max(0.025f, size.x);
-                size.y = Mathf.Max(0.025f, size.y);
-                size.z = Mathf.Max(0.025f, size.z);
+        public void SetTransform()
+        {
+            if (obj == null || Prefab == null || Rule == null) return;
 
-                Vector3 scaledSize = new Vector3(baseScale.x / size.x, baseScale.y / size.y, baseScale.z / size.z);
-
-                scaledSize.x = Mathf.Max(0.025f, scaledSize.x);
-                scaledSize.y = Mathf.Max(0.025f, scaledSize.y);
-                scaledSize.z = Mathf.Max(0.025f, scaledSize.z);
-
-                obj.transform.localScale = Vector3.Scale(scaledSize, scaleMultiplier);
-            }
-            else
-            {
-                obj.transform.localScale = Vector3.Scale(baseScale, scaleMultiplier);
-            }
+            obj.transform.parent = parent.transform;
+            obj.transform.localPosition = GetTargetPosition();
+            obj.transform.localRotation = GetTargetRotation();
+            obj.transform.localScale = GetTargetScale();
         }
 
         public Tile(TileGenerator parent, Vector3Int indexPosition)

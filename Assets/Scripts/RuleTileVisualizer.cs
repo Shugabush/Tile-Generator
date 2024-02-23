@@ -8,12 +8,12 @@ namespace TileGeneration
     {
         public static void Display(Tile tile, int targetRuleIndex = 0)
         {
-            if (tile == null || tile.rule == null || targetRuleIndex < 0 ||
-                tile.rule.rules == null || tile.rule.rules.Count <= targetRuleIndex) return;
+            if (tile == null || tile.Rule == null || targetRuleIndex < 0 ||
+                tile.Rule.rules == null || tile.Rule.rules.Count <= targetRuleIndex) return;
 
             Gizmos.color = Color.white;
 
-            RuleTile.Rule rule = tile.rule.rules[targetRuleIndex];
+            RuleTile.Rule rule = tile.Rule.rules[targetRuleIndex];
             foreach (var kvp in tile.adjacentTiles)
             {
                 RuleTile.Rule.Slot slot = rule.GetSlot(kvp.Key);

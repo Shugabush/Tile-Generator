@@ -11,12 +11,15 @@ namespace TileGeneration
 
         public GameObject GetObject(Tile tile)
         {
-            foreach (var rule in rules)
+            if (tile != null && !tile.IgnoreRule)
             {
-                GameObject evaluatedObj = rule.Evaluate(tile);
-                if (evaluatedObj != null)
+                foreach (var rule in rules)
                 {
-                    return evaluatedObj;
+                    GameObject evaluatedObj = rule.Evaluate(tile);
+                    if (evaluatedObj != null)
+                    {
+                        return evaluatedObj;
+                    }
                 }
             }
             return defaultGameObject;
@@ -47,26 +50,20 @@ namespace TileGeneration
 
         public void GetOffsets(Tile tile, out Vector3 positionOffset, out Quaternion rotationOffset, out Vector3 scaleMultiplier)
         {
-            if (tile.ignoreRule)
-            {
-                positionOffset = this.positionOffset;
-                rotationOffset = Quaternion.Euler(this.rotationOffset);
-                scaleMultiplier = this.scaleMultiplier;
-                return;
-            }
-
-            Rule rule = GetRule(tile);
-            if (rule != null)
-            {
-                positionOffset = rule.positionOffset;
-                rotationOffset = Quaternion.Euler(rule.rotationOffset);
-                scaleMultiplier = rule.scaleMultiplier;
-                return;
-            }
-
             positionOffset = this.positionOffset;
             rotationOffset = Quaternion.Euler(this.rotationOffset);
             scaleMultiplier = this.scaleMultiplier;
+
+            if (!tile.IgnoreRule)
+            {
+                Rule rule = GetRule(tile);
+                if (rule != null)
+                {
+                    positionOffset = rule.positionOffset;
+                    rotationOffset = Quaternion.Euler(rule.rotationOffset);
+                    scaleMultiplier = rule.scaleMultiplier;
+                }
+            }
         }
 
         Rule GetRule(Tile tile)
@@ -350,9 +347,9 @@ namespace TileGeneration
                     switch (condition)
                     {
                         case Condition.ExistingTile:
-                            return adjacentTile != null && adjacentTile.obj != null;
+                            return adjacentTile != null && adjacentTile.Prefab != null;
                         case Condition.NoTile:
-                            return adjacentTile == null || adjacentTile.obj == null;
+                            return adjacentTile == null || adjacentTile.Prefab == null;
                         default:
                             return true;
                     }
