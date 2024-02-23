@@ -297,6 +297,34 @@ namespace TileGeneration
                     }
                 }
 
+                public Mesh GetProperMesh(out Vector3 scale)
+                {
+                    scale = Vector3.one;
+                    switch (condition)
+                    {
+                        case Condition.ExistingTile:
+                            scale = Vector3.one * 0.125f;
+                            return TextureLibrary.GetMesh("CheckMark");
+                        case Condition.NoTile:
+                            return TextureLibrary.GetMesh("XMark");
+                        default:
+                            return null;
+                    }
+                }
+
+                public Color GetProperColor()
+                {
+                    switch (condition)
+                    {
+                        case Condition.ExistingTile:
+                            return Color.green;
+                        case Condition.NoTile:
+                            return Color.red;
+                        default:
+                            return Color.gray;
+                    }
+                }
+
                 string GetToolTip()
                 {
                     switch (condition)

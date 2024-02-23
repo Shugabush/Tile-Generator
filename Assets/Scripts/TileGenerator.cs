@@ -358,8 +358,6 @@ namespace TileGeneration
                             }
                         }
                     }
-
-                    Handles.matrix = Matrix4x4.identity;
                 }
             }
         }

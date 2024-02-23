@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace TileGeneration
@@ -19,14 +20,13 @@ namespace TileGeneration
                     RuleTile.Rule.Slot slot = rule.GetSlot(kvp.Key);
                     if (slot != null)
                     {
-                        Texture properTexture = slot.GetProperTexture();
+                        // Using mesh instead of texture because I can't figure out how to draw a texture in the scene view properly
+                        Mesh properMesh = slot.GetProperMesh(out Vector3 scale);
+                        Gizmos.color = slot.GetProperColor();
 
-                        //Gizmos.DrawCube(kvp.Value.GetTargetPosition(), kvp.Value.parent.transform.localScale);
-                        if (properTexture != null)
+                        if (properMesh != null)
                         {
-                            Gizmos.matrix = Matrix4x4.Translate(kvp.Value.GetTargetPosition());
-                            Gizmos.DrawGUITexture(new Rect(Vector2.zero, Vector2.one), properTexture);
-                            //GUI.DrawTexture(new Rect(Camera.current.WorldToScreenPoint(kvp.Value.GetTargetPosition()), Vector2.one), properTexture);
+                            Gizmos.DrawMesh(properMesh, kvp.Value.GetTargetPosition(), kvp.Value.parent.transform.rotation, scale);
                         }
                     }
                 }
