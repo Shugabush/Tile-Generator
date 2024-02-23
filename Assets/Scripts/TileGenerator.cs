@@ -317,39 +317,43 @@ namespace TileGeneration
             {
                 foreach (var tile in tiles.Values)
                 {
-                    GUIContent content = GUIContent.none;
                     GUIStyle style = new GUIStyle();
                     style.alignment = TextAnchor.MiddleCenter;
+
+                    Vector3 tileRelativeToCameraPos = Camera.current.transform.InverseTransformPoint(tile.GetTargetPosition());
+
+                    style.fontSize = (int)(32f / tileRelativeToCameraPos.z);
+
                     if (tile.ignoreRule)
                     {
                         // No rules are to be used for this tile
-                        content = new GUIContent("Using default object");
+                        Handles.Label(tile.GetTargetPosition(), "Using default object", style);
                     }
                     else if (tile.rule != null)
                     {
-                        bool firstRuleEvaluated = false;
-                        for (int i = 0; i < tile.rule.rules.Count; i++)
+                        int ruleCount = tile.rule.rules.Count;
+
+                        for (int i = 0; i < ruleCount; i++)
                         {
                             var rule = tile.rule.rules[i];
+
+                            float yOffset = (i - (ruleCount * 0.5f)) * 10f * style.fontSize / ruleCount;
+                            style.contentOffset = Vector2.up * yOffset;
+
                             if (rule.Evaluate(tile))
                             {
-                                if (!firstRuleEvaluated)
-                                {
-                                    // The tile is using this rule
-                                    content = new GUIContent("Using Rule " + (i + 1).ToString());
-                                    firstRuleEvaluated = true;
-                                }
-                                else
-                                {
-                                    content.text += "\nRule " + (i + 1).ToString() + " was also successful";
-                                }
+                                style.normal.textColor = Color.green;
+                                Handles.Label(tile.GetTargetPosition(), "Rule " + (i + 1).ToString() + " was successful", style);
+                            }
+                            else
+                            {
+                                style.normal.textColor = Color.red;
+                                Handles.Label(tile.GetTargetPosition(), "Rule " + (i + 1).ToString() + " was unsuccessful", style);
                             }
                         }
                     }
-                    if (content != GUIContent.none)
-                    {
-                        Handles.Label(tile.GetTargetPosition(), content, style);
-                    }
+
+                    Handles.matrix = Matrix4x4.identity;
                 }
             }
         }
