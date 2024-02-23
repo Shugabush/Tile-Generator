@@ -306,6 +306,7 @@ namespace TileGeneration
                             scale = Vector3.one * 0.125f;
                             return TextureLibrary.GetMesh("CheckMark");
                         case Condition.NoTile:
+                            scale = Vector3.one * 0.125f;
                             return TextureLibrary.GetMesh("XMark");
                         default:
                             return null;

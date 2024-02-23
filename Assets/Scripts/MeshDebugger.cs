@@ -130,27 +130,9 @@ public class MeshDebugger : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
-        if (filters == null) return;
-
-        List<Vector3> usedPositions = new List<Vector3>();
-
         if (targetRenderer != null)
         {
             Gizmos.DrawWireCube(targetRenderer.bounds.center, targetRenderer.bounds.size);
-        }
-
-        foreach (var filter in filters)
-        {
-            Mesh mesh = filter.sharedMesh;
-
-            for (int i = 0; i < mesh.vertexCount; i++)
-            {
-                if (!usedPositions.Contains(filter.transform.TransformPoint(mesh.vertices[i])))
-                {
-                    Handles.Label(filter.transform.TransformPoint(mesh.vertices[i]), i.ToString() + ": " + mesh.vertices[i].ToString(), new GUIStyle());
-                    usedPositions.Add(filter.transform.TransformPoint(mesh.vertices[i]));
-                }
-            }
         }
     }
 }
