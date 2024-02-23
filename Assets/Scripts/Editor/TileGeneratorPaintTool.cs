@@ -17,6 +17,7 @@ namespace TileGeneration
         {
             if (!ToolManager.IsActiveTool(this)) return;
 
+            isHoldingMouseButton = false;
             mouseUp = false;
 
             if (tileGenerator != null && Event.current != null)
