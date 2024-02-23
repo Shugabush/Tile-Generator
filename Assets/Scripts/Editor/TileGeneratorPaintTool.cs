@@ -94,9 +94,9 @@ namespace TileGeneration
             Event currentEvent = Event.current;
             do
             {
-                if (currentEvent.shift)
+                if (currentEvent.shift && tileGenerator.paintMode != TileGenerator.PaintMode.ViewRules)
                 {
-                    tileGenerator.paintMode = TileGenerator.PaintMode.ChangeRuleStatus;
+                    tileGenerator.paintMode = TileGenerator.PaintMode.ToggleRuleUsage;
                     break;
                 }
             }
@@ -135,8 +135,11 @@ namespace TileGeneration
             base.OnWillBeDeactivated();
 
             SceneView.beforeSceneGui -= BeforeSceneGUI;
-            tileGenerator.selectedTileIndex.x = -1;
-            tileGenerator.selectedTileIndex.z = -1;
+            if (tileGenerator.paintMode != TileGenerator.PaintMode.ViewRules)
+            {
+                tileGenerator.selectedTileIndex.x = -1;
+                tileGenerator.selectedTileIndex.z = -1;
+            }
         }
 
         Vector3 GetCurrentMousePositionInScene()

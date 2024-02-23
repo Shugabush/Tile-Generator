@@ -119,6 +119,14 @@ namespace TileGeneration
                 tileGenerator.paintMode = TileGenerator.PaintMode.Fill;
             }
 
+            GUI.backgroundColor = tileGenerator.paintMode == TileGenerator.PaintMode.ViewRules ? Color.red : oldColor;
+
+            // Button to view rules
+            if (GUI.Button(new Rect(currentRect.x + 200, currentRect.y, 100, 100), "View Rules"))
+            {
+                tileGenerator.paintMode = TileGenerator.PaintMode.ViewRules;
+            }
+
             GUI.backgroundColor = !tileGenerator.shouldPaint ? Color.red : oldColor;
 
             GUILayout.Space(100);

@@ -39,6 +39,7 @@ namespace TileGeneration
 
         [SerializeField] List<Vector3Int> tileKeys = new List<Vector3Int>();
         [SerializeField] List<Tile> tileValues = new List<Tile>();
+        [SerializeField] bool setSelectedTile = true;
 
         Dictionary<Vector3Int, Tile> tiles = new Dictionary<Vector3Int, Tile>();
 
@@ -60,7 +61,8 @@ namespace TileGeneration
         {
             Draw,
             Fill,
-            ChangeRuleStatus,
+            ViewRules,
+            ToggleRuleUsage,
         }
 
         [SerializeField] int paintRadius = 5;
@@ -315,6 +317,7 @@ namespace TileGeneration
         {
             if (debugRuleUsage)
             {
+                // Display the status of each rule next to each tile
                 foreach (var tile in tiles.Values)
                 {
                     GUIStyle style = new GUIStyle();
@@ -397,6 +400,19 @@ namespace TileGeneration
             }
 
             Gizmos.matrix = Matrix4x4.identity;
+
+            Tile selectedTile = SelectedTile;
+            if (paintMode == PaintMode.ViewRules)
+            {
+                if (selectedTile != null)
+                {
+                    RuleTileVisualizer.Display(selectedTile);
+                }
+            }
+            else
+            {
+                setSelectedTile = true;
+            }
         }
 
         void DrawTile(int x, int y, int z)
@@ -460,13 +476,19 @@ namespace TileGeneration
 
                 if (TileInRange(xIndex, yIndex, zIndex))
                 {
-                    selectedTileIndex.x = xIndex;
-                    selectedTileIndex.z = zIndex;
+                    if (setSelectedTile)
+                    {
+                        selectedTileIndex.x = xIndex;
+                        selectedTileIndex.z = zIndex;
+                    }
                     return true;
                 }
             }
-            selectedTileIndex.x = -1;
-            selectedTileIndex.z = -1;
+            if (setSelectedTile)
+            {
+                selectedTileIndex.x = -1;
+                selectedTileIndex.z = -1;
+            }
             return false;
         }
 
@@ -482,22 +504,30 @@ namespace TileGeneration
 
             Undo.RecordObject(this, "Tile Generator Change");
 
-            if (paintMode == PaintMode.ChangeRuleStatus)
+            switch (paintMode)
             {
-                selectedTile.ignoreRule = !selectedTile.ignoreRule;
-            }
-            else
-            {
-                if (shouldPaint)
-                {
-                    // Paint tile
-                    PaintTile();
-                }
-                else
-                {
-                    // Erase tile
-                    EraseTile();
-                }
+                case PaintMode.ViewRules:
+                    setSelectedTile = !setSelectedTile;
+                    break;
+                case PaintMode.ToggleRuleUsage:
+                    selectedTile.ignoreRule = !selectedTile.ignoreRule;
+                    foreach (var tile in tilesInRadius)
+                    {
+                        tile.ignoreRule = !tile.ignoreRule;
+                    }
+                    break;
+                default:
+                    if (shouldPaint)
+                    {
+                        // Paint tile
+                        PaintTile();
+                    }
+                    else
+                    {
+                        // Erase tile
+                        EraseTile();
+                    }
+                    break;
             }
         }
 

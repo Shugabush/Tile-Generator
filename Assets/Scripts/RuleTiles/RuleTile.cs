@@ -284,7 +284,7 @@ namespace TileGeneration
                     }
                 }
 
-                Texture GetProperTexture()
+                public Texture GetProperTexture()
                 {
                     switch (condition)
                     {
