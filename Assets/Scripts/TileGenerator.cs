@@ -324,6 +324,9 @@ namespace TileGeneration
 
                     style.fontSize = (int)(32f / tileRelativeToCameraPos.z);
 
+                    // Drawing text too far away from the camera won't look good
+                    if (style.fontSize == 0) return;
+
                     if (tile.ignoreRule)
                     {
                         // No rules are to be used for this tile
