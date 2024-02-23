@@ -16,7 +16,15 @@ namespace TileGeneration
         void BeforeSceneGUI(SceneView sceneView)
         {
             if (!ToolManager.IsActiveTool(this)) return;
+
             mouseUp = false;
+
+            if (tileGenerator != null && Event.current != null)
+            {
+                tileGenerator.mousePosition = Event.current.mousePosition;
+                tileGenerator.mousePosition.y = Screen.height - tileGenerator.mousePosition.y - 50;
+            }
+
             if (Selection.activeGameObject == null || !Selection.activeGameObject.TryGetComponent<TileGenerator>(out _)) return;
 
             if ((Event.current.type == EventType.MouseDrag || Event.current.type == EventType.MouseDown) && Event.current.button == 0)
@@ -31,18 +39,20 @@ namespace TileGeneration
 
             if (Event.current.type == EventType.ScrollWheel)
             {
-                int scrollDir = System.Math.Sign(Event.current.delta.y);
+                if (tileGenerator.paintMode != TileGenerator.PaintMode.ViewRules)
+                {
+                    int scrollDir = System.Math.Sign(Event.current.delta.y);
+                    if (scrollDir == 1)
+                    {
+                        tileGenerator.PaintRadius--;
+                    }
+                    else if (scrollDir == -1)
+                    {
+                        tileGenerator.PaintRadius++;
+                    }
+                }
 
-                if (scrollDir == 1)
-                {
-                    tileGenerator.PaintRadius--;
-                    Event.current.Use();
-                }
-                else if (scrollDir == -1)
-                {
-                    tileGenerator.PaintRadius++;
-                    Event.current.Use();
-                }
+                Event.current.Use();
             }
 
             if (Event.current.type == EventType.MouseUp && Event.current.button == 0)
@@ -63,26 +73,39 @@ namespace TileGeneration
             Camera currentCamera = Camera.current;
             if (currentCamera != null)
             {
-                GUIContent labelContent = new GUIContent($"Click to {(tileGenerator.shouldPaint ? "draw" : "erase")} a tile");
+                GUIContent labelContent = new GUIContent(tileGenerator.GetLabelDescription());
                 GUIStyle labelStyle = new GUIStyle();
                 labelStyle.alignment = TextAnchor.UpperCenter;
                 labelStyle.fontSize = 18;
                 Handles.Label(currentCamera.ViewportToWorldPoint(new Vector3(0.5f, 0.975f, 1)), labelContent, labelStyle);
-
-                labelContent.text = "Shift click to toggle whether a tile will evaluate their rule or just use their default game object.";
-                Handles.Label(currentCamera.ViewportToWorldPoint(new Vector3(0.5f, 0.925f, 1)), labelContent, labelStyle);
             }
 
-            if (tileGenerator.GetSelectedPoint(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition), out Vector3 point))
+            if (tileGenerator.GetSelectedPoint(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition), out Vector3 point, out Tile tile))
             {
                 Handles.matrix = Matrix4x4.TRS(point,
                     tileGenerator.transform.rotation,
-                    tileGenerator.transform.localScale * tileGenerator.PaintRadius);
+                    tileGenerator.transform.localScale * (tileGenerator.paintMode == TileGenerator.PaintMode.ViewRules ? 1 : tileGenerator.PaintRadius));
+
+                if (tileGenerator.setSelectedTile || mouseUp)
+                {
+                    tileGenerator.SelectedTile = tile;
+                }
+                else
+                {
+                    // just add the tile to the extra tiles being edited
+                    tileGenerator.tilesInRadius.Clear();
+                    tileGenerator.tilesInRadius.Add(tile);
+                }
 
                 Handles.DrawWireDisc(Vector3.zero, Vector3.up, 1);
             }
             else
             {
+                if (tileGenerator.setSelectedTile || mouseUp)
+                {
+                    tileGenerator.SelectedTile = null;
+                }
+
                 Handles.DrawWireDisc(GetCurrentMousePositionInScene(), Vector3.up, 0.5f);
             }
 
@@ -127,6 +150,8 @@ namespace TileGeneration
                 tileGenerator = (TileGenerator)target;
             }
 
+            RuleTileVisualizer.checkForHover = true;
+
             SceneView.beforeSceneGui += BeforeSceneGUI;
         }
 
@@ -134,12 +159,16 @@ namespace TileGeneration
         {
             base.OnWillBeDeactivated();
 
-            SceneView.beforeSceneGui -= BeforeSceneGUI;
             if (tileGenerator.paintMode != TileGenerator.PaintMode.ViewRules)
             {
                 tileGenerator.selectedTileIndex.x = -1;
                 tileGenerator.selectedTileIndex.z = -1;
             }
+            tileGenerator.tilesInRadius.Clear();
+
+            RuleTileVisualizer.checkForHover = false;
+
+            SceneView.beforeSceneGui -= BeforeSceneGUI;
         }
 
         Vector3 GetCurrentMousePositionInScene()

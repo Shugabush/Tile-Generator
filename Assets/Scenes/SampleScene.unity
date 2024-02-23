@@ -648,18 +648,24 @@ MonoBehaviour:
   - parent: {fileID: 1939783120}
     indexPosition: {x: 4, y: 2, z: 4}
     obj: {fileID: 0}
+  setSelectedTile: 0
+  tilesInRadius:
+  - parent: {fileID: 1939783120}
+    indexPosition: {x: 4, y: 0, z: 2}
+    obj: {fileID: 0}
   palettes:
   - {fileID: 11400000, guid: fb940e17ea9a91d40b84ea2f6ac5b19a, type: 2}
   - {fileID: 11400000, guid: ae921e1bc9d1ca145a53e12d23a14480, type: 2}
   - {fileID: 11400000, guid: 1312bb12be48cff4599405e7466303dd, type: 2}
   selectedPalette: {fileID: 11400000, guid: 1312bb12be48cff4599405e7466303dd, type: 2}
   selectedRule: {fileID: 11400000, guid: 09db26eddad4f624c8af842b324abe85, type: 2}
-  selectedTileIndex: {x: 3, y: 0, z: 2}
-  gridPivotPoint: {x: 0.5, y: 0.5, z: 0.5}
+  selectedTileIndex: {x: 2, y: 0, z: 2}
+  gridPivotPoint: {x: 0.5, y: 0, z: 0.5}
   debugRuleUsage: 0
-  showMeshes: 0
+  showMeshes: 1
   paintRadius: 1
   paintMode: 2
   shouldPaint: 1
   showAllYLevels: 0
+  mousePosition: {x: 675, y: 226}
   tilesBeingEdited: []

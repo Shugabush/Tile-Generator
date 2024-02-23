@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor.UI;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -207,9 +206,9 @@ namespace TileGeneration
             }
         }
 
-        public Vector3 GetTargetLocalPosition()
+        public Vector3 GetTargetLocalPosition(bool useOffset = true)
         {
-            if (Rule != null)
+            if (useOffset && Rule != null)
             {
                 Rule.GetOffsets(this, out Vector3 positionOffset, out _, out _);
                 Rule.GetFixBounds(this, out bool fixBoundsPosition, out _);
@@ -230,29 +229,29 @@ namespace TileGeneration
             return parent.GetGridScalePoint(indexPosition);
         }
 
-        public Vector3 GetTargetPosition()
+        public Vector3 GetTargetPosition(bool useOffset = true)
         {
-            return parent.transform.TransformPoint(GetTargetLocalPosition());
+            return parent.transform.TransformPoint(GetTargetLocalPosition(useOffset));
         }
 
-        public Quaternion GetTargetLocalRotation()
+        public Quaternion GetTargetLocalRotation(bool useOffset = true)
         {
-            if (Rule != null)
+            if (useOffset && Rule != null)
             {
                 Rule.GetOffsets(this, out _, out Quaternion rotationOffset, out _);
                 return (prefab == null ? Quaternion.identity : prefab.transform.rotation) * rotationOffset;
             }
             return prefab == null ? Quaternion.identity : prefab.transform.rotation;
         }
-        public Quaternion GetTargetRotation()
+        public Quaternion GetTargetRotation(bool useOffset = true)
         {
-            return parent.transform.rotation * GetTargetLocalRotation();
+            return parent.transform.rotation * GetTargetLocalRotation(useOffset);
         }
 
-        public Vector3 GetTargetLocalScale()
+        public Vector3 GetTargetLocalScale(bool useOffset = true)
         {
             Vector3 returnValue = prefab == null ? Vector3.one : prefab.transform.localScale;
-            if (Rule != null)
+            if (useOffset && Rule != null)
             {
                 Rule.GetOffsets(this, out _, out _, out Vector3 scaleMultiplier);
                 Rule.GetFixBounds(this, out _, out bool fixBoundsScale);
@@ -275,9 +274,9 @@ namespace TileGeneration
             return returnValue;
         }
 
-        public Vector3 GetTargetScale()
+        public Vector3 GetTargetScale(bool useOffset = true)
         {
-            return Vector3.Scale(parent.transform.localScale, GetTargetLocalScale());
+            return Vector3.Scale(parent.transform.localScale, GetTargetLocalScale(useOffset));
         }
 
         public void SetTransform()

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Reflection.Emit;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -39,11 +40,11 @@ namespace TileGeneration
 
         [SerializeField] List<Vector3Int> tileKeys = new List<Vector3Int>();
         [SerializeField] List<Tile> tileValues = new List<Tile>();
-        bool setSelectedTile = true;
+        public bool setSelectedTile = true;
 
         Dictionary<Vector3Int, Tile> tiles = new Dictionary<Vector3Int, Tile>();
 
-        List<Tile> tilesInRadius = new List<Tile>();
+        public List<Tile> tilesInRadius = new List<Tile>();
 
         public List<TilePalette> palettes = new List<TilePalette>();
 
@@ -86,6 +87,8 @@ namespace TileGeneration
         public bool shouldPaint = true;
         [SerializeField] bool showAllYLevels = true;
 
+        public Vector2 mousePosition;
+
         public Tile SelectedTile
         {
             get
@@ -101,6 +104,10 @@ namespace TileGeneration
                     return tile;
                 }
                 return null;
+            }
+            set
+            {
+                selectedTileIndex = value == null ? new Vector3Int(-1, selectedTileIndex.y, -1) : value.indexPosition;
             }
         }
 
@@ -339,19 +346,18 @@ namespace TileGeneration
                     }
                 }
             }
-        }
 
-        void OnDrawGizmosSelected()
-        {
             ValidateTile(selectedTileIndex);
 
             switch (paintMode)
             {
+                case PaintMode.Draw:
+                    tilesInRadius = GetTilesInRadius(SelectedTile);
+                    break;
                 case PaintMode.Fill:
                     tilesInRadius = GetTilesToFill(SelectedTile);
                     break;
                 default:
-                    tilesInRadius = GetTilesInRadius(SelectedTile);
                     break;
             }
 
@@ -381,7 +387,7 @@ namespace TileGeneration
             {
                 if (selectedTile != null)
                 {
-                    RuleTileVisualizer.Display(selectedTile);
+                    RuleTileVisualizer.Display(mousePosition, selectedTile);
                 }
             }
             else
@@ -469,6 +475,37 @@ namespace TileGeneration
             return false;
         }
 
+        public bool GetSelectedPoint(Ray ray, out Vector3 point, out Tile tile)
+        {
+            point = Vector3.zero;
+            tile = null;
+
+            Plane hPlane = new Plane(transform.up, transform.TransformPoint(GetGridScalePoint(0, selectedTileIndex.y, 0)));
+            hPlane.distance -= transform.position.y;
+
+            if (hPlane.Raycast(ray, out float distance))
+            {
+                point = ray.GetPoint(distance);
+
+                Vector3 selectedPoint = transform.InverseTransformPoint(ray.GetPoint(distance));
+
+                // Trying to convert xPoint and zPoint into what the indexes will be (excluding decimals)
+                float xPoint = selectedPoint.x + tileCount.x * 0.5f;
+                float zPoint = selectedPoint.z + tileCount.z * 0.5f;
+
+                int xIndex = (int)xPoint;
+                int yIndex = selectedTileIndex.y;
+                int zIndex = (int)zPoint;
+
+                if (TileInRange(xIndex, yIndex, zIndex))
+                {
+                    tile = tiles[new Vector3Int(xIndex, selectedTileIndex.y, zIndex)];
+                    return true;
+                }
+            }
+            return false;
+        }
+
 #if UNITY_EDITOR
         public void ChangeTile()
         {
@@ -484,7 +521,10 @@ namespace TileGeneration
             switch (paintMode)
             {
                 case PaintMode.ViewRules:
-                    setSelectedTile = !setSelectedTile;
+                    if (!RuleTileVisualizer.hoveringOverLabel)
+                    {
+                        setSelectedTile = false;
+                    }
                     break;
                 case PaintMode.ToggleRuleUsage:
                     selectedTile.IgnoreRule = !selectedTile.IgnoreRule;
@@ -513,25 +553,9 @@ namespace TileGeneration
             // Cache selected tile
             Tile selectedTile = SelectedTile;
 
-            if (selectedTile != null && selectedRule != selectedTile.Rule)
+            if (selectedTile != null)
             {
-                /*if (selectedTile.obj != null)
-                {
-                    // Destroy existing obj
-                    DestroyImmediate(selectedTile.obj);
-                }*/
-
-                // Create the game object
-                //GameObject newObj = (GameObject)PrefabUtility.InstantiatePrefab(selectedTilePrefab, transform);
-
-                //Undo.RegisterCreatedObjectUndo(newObj, "New Object Created");
-
-                //selectedTile.obj = newObj;
                 selectedTile.Rule = selectedRule;
-
-                //selectedTile.obj.transform.parent = transform;
-
-                //selectedTile.SetTransform(selectedTile.GetTargetLocalPosition(), selectedTilePrefab.transform.localRotation, Vector3.one);
             }
 
             foreach (var tile in tilesInRadius)
@@ -734,6 +758,32 @@ namespace TileGeneration
             return x >= 0 && x < tileCount.x &&
             y >= 0 && y < tileCount.y &&
             z >= 0 && z < tileCount.z;
+        }
+
+        public string GetLabelDescription()
+        {
+            switch (paintMode)
+            {
+                case PaintMode.Draw:
+                    break;
+                case PaintMode.Fill:
+                    return $"Click to fill a tile \n " +
+                $"Shift click to toggle whether a tile will evaluate their rule or just use their default game object.";
+                case PaintMode.ViewRules:
+                    if (setSelectedTile)
+                    {
+                        return $"Click to select a tile.";
+                    }
+                    return $"Hover over the labeled squares and scroll to change their requirements.";
+                case PaintMode.ToggleRuleUsage:
+                    break;
+                default:
+                    return $"Click to {(shouldPaint ? "draw" : "erase")} a tile\n " +
+                $"Shift click to toggle whether a tile will evaluate their rule or just use their default game object.";
+            }
+
+            return $"Click to {(shouldPaint ? "draw" : "erase")} a tile\n " +
+                $"Shift click to toggle whether a tile will evaluate their rule or just use their default game object.";
         }
     }
 }
