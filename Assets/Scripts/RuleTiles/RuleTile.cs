@@ -296,7 +296,7 @@ namespace TileGeneration
 
                 public Mesh GetProperMesh(out Vector3 scale)
                 {
-                    scale = Vector3.one;
+                    scale = Vector3.one * 0.125f;
                     switch (condition)
                     {
                         case Condition.ExistingTile:

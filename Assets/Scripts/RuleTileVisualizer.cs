@@ -9,7 +9,7 @@ namespace TileGeneration
     public static class RuleTileVisualizer
     {
         public static bool checkForHover = false;
-        public static bool hoveringOverLabel = false;
+        public static RuleTile.Rule.Slot hoverSlot = null;
 
         public static void Display(Vector2 mousePosition, Tile tile, int targetRuleIndex = 0)
         {
@@ -18,7 +18,7 @@ namespace TileGeneration
 
             Gizmos.color = Color.white;
 
-            hoveringOverLabel = false;
+            hoverSlot = null;
 
             RuleTile.Rule rule = tile.Rule.rules[targetRuleIndex];
 
@@ -44,36 +44,33 @@ namespace TileGeneration
                 {
                     // Using mesh instead of texture because I can't figure out how to draw a texture in the scene view properly
                     Mesh properMesh = slot.GetProperMesh(out Vector3 scale);
-                    Gizmos.color = slot.GetProperColor();
+                    Gizmos.color = Color.blue;
 
                     Camera currentCamera = Camera.current;
                     Vector3 position = adjTile.GetTargetPosition(false);
 
-                    if (checkForHover && !hoveringOverLabel)
+                    if (checkForHover && hoverSlot == null)
                     {
                         Vector2 screenPosition = currentCamera.WorldToScreenPoint(position);
                         if (Vector3.Distance(screenPosition, mousePosition) < 25)
                         {
                             Gizmos.color = Color.magenta;
-                            hoveringOverLabel = true;
+                            hoverSlot = slot;
                         }
                     }
 
                     Quaternion rotation = Quaternion.LookRotation(currentCamera.transform.position - position, currentCamera.transform.up);
 
+                    Gizmos.matrix = Matrix4x4.TRS(position, rotation, scale);
+                    Gizmos.DrawCube(Vector3.zero, Vector3.one * 2.5f);
+
                     if (properMesh != null)
                     {
-                        Gizmos.matrix = Matrix4x4.TRS(position, rotation, scale);
-
-                        Color meshColor = Gizmos.color;
-
-                        Gizmos.color = Color.blue;
-                        Gizmos.DrawCube(Vector3.zero, Vector3.one * 2.5f);
-
-                        Gizmos.color = meshColor;
+                        Gizmos.color = slot.GetProperColor();
 
                         Gizmos.DrawMesh(properMesh);
                     }
+                    Gizmos.matrix = Matrix4x4.identity;
                 }
             }
         }

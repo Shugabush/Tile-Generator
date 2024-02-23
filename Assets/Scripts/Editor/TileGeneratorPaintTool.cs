@@ -27,30 +27,42 @@ namespace TileGeneration
 
             if (Selection.activeGameObject == null || !Selection.activeGameObject.TryGetComponent<TileGenerator>(out _)) return;
 
-            if ((Event.current.type == EventType.MouseDrag || Event.current.type == EventType.MouseDown) && Event.current.button == 0)
+            if (Event.current.type == EventType.MouseDrag || Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
-                isHoldingMouseButton = true;
+                if (Event.current.button == 0)
+                {
+                    isHoldingMouseButton = true;
+                }
                 Event.current.Use();
-            }
-            else
-            {
-                isHoldingMouseButton = false;
             }
 
             if (Event.current.type == EventType.ScrollWheel)
             {
-                if (tileGenerator.paintMode != TileGenerator.PaintMode.ViewRules)
+                int scrollDir = System.Math.Sign(Event.current.delta.y);
+                if (scrollDir == 1)
                 {
-                    int scrollDir = System.Math.Sign(Event.current.delta.y);
-                    if (scrollDir == 1)
+                    if (tileGenerator.paintMode != TileGenerator.PaintMode.ViewRules)
                     {
                         tileGenerator.PaintRadius--;
                     }
-                    else if (scrollDir == -1)
+                    else
+                    {
+                        RuleTileVisualizer.hoverSlot?.PreviousCondition();
+                    }
+                }
+                else if (scrollDir == -1)
+                {
+                    if (tileGenerator.paintMode != TileGenerator.PaintMode.ViewRules)
                     {
                         tileGenerator.PaintRadius++;
                     }
+                    else
+                    {
+                        RuleTileVisualizer.hoverSlot?.NextCondition();
+                    }
                 }
+
+
 
                 Event.current.Use();
             }
@@ -86,15 +98,22 @@ namespace TileGeneration
                     tileGenerator.transform.rotation,
                     tileGenerator.transform.localScale * (tileGenerator.paintMode == TileGenerator.PaintMode.ViewRules ? 1 : tileGenerator.PaintRadius));
 
-                if (tileGenerator.setSelectedTile || mouseUp)
+                if (RuleTileVisualizer.hoverSlot == null)
                 {
-                    tileGenerator.SelectedTile = tile;
+                    if (tileGenerator.setSelectedTile || mouseUp)
+                    {
+                        tileGenerator.SelectedTile = tile;
+                    }
+                    else
+                    {
+                        // just add the tile to the extra tiles being edited
+                        tileGenerator.tilesInRadius.Clear();
+                        tileGenerator.tilesInRadius.Add(tile);
+                    }
                 }
                 else
                 {
-                    // just add the tile to the extra tiles being edited
                     tileGenerator.tilesInRadius.Clear();
-                    tileGenerator.tilesInRadius.Add(tile);
                 }
 
                 Handles.DrawWireDisc(Vector3.zero, Vector3.up, 1);

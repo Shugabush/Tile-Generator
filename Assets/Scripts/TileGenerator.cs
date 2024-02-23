@@ -514,14 +514,12 @@ namespace TileGeneration
             if (selectedTile == null) return;
             if (tilesBeingEdited.Contains(selectedTile)) return;
 
-            tilesBeingEdited.Add(selectedTile);
-
             Undo.RecordObject(this, "Tile Generator Change");
 
             switch (paintMode)
             {
                 case PaintMode.ViewRules:
-                    if (!RuleTileVisualizer.hoveringOverLabel)
+                    if (RuleTileVisualizer.hoverSlot == null)
                     {
                         setSelectedTile = false;
                     }
@@ -546,6 +544,8 @@ namespace TileGeneration
                     }
                     break;
             }
+
+            tilesBeingEdited.Add(selectedTile);
         }
 
         void PaintTile()
