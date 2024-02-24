@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -37,7 +36,7 @@ public class MeshDebugger : MonoBehaviour
         targetFilter = GetComponent<MeshFilter>();
         if (targetFilter == null)
         {
-            targetFilter = transform.AddComponent<MeshFilter>();
+            targetFilter = gameObject.AddComponent<MeshFilter>();
         }
         targetFilter.sharedMesh = newMesh;
         SaveMesh();
