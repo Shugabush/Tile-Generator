@@ -42,7 +42,7 @@ namespace TileGeneration
                 if (slot != null)
                 {
                     // Using mesh instead of texture because I can't figure out how to draw a texture in the scene view properly
-                    Mesh properMesh = slot.GetProperMesh(out Vector3 scale);
+                    Mesh properMesh = slot.GetProperMesh();
                     Gizmos.color = Color.blue;
 
                     Camera currentCamera = Camera.current;
@@ -58,10 +58,10 @@ namespace TileGeneration
                         }
                     }
 
-                    Quaternion rotation = Quaternion.LookRotation(currentCamera.transform.position - position, currentCamera.transform.up);
+                    Quaternion rotation = Quaternion.LookRotation(currentCamera.transform.forward, Vector3.up);
 
-                    Gizmos.matrix = Matrix4x4.TRS(position, rotation, scale);
-                    Gizmos.DrawCube(Vector3.zero, Vector3.one * 2.5f);
+                    Gizmos.matrix = Matrix4x4.TRS(position, rotation, new Vector3(0.125f, 0.125f, 0.01f));
+                    Gizmos.DrawCube(Vector3.zero, new Vector3(2.5f, 2.5f, 1f));
 
                     if (properMesh != null)
                     {

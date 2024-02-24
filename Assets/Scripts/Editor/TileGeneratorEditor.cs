@@ -107,7 +107,7 @@ namespace TileGeneration
             GUI.backgroundColor = tileGenerator.paintMode == TileGenerator.PaintMode.Draw ? Color.red : oldColor;
 
             // Pencil icon
-            GUIContent draw = new GUIContent(TextureLibrary.GetTexture("Pencil"));
+            GUIContent draw = new GUIContent(Library.GetTexture("Pencil"));
             if (GUI.Button(new Rect(currentRect.x, currentRect.y, 100, 100), draw))
             {
                 tileGenerator.paintMode = TileGenerator.PaintMode.Draw;
@@ -116,7 +116,7 @@ namespace TileGeneration
             GUI.backgroundColor = tileGenerator.paintMode == TileGenerator.PaintMode.Fill ? Color.red : oldColor;
 
             // Paint bucket icon
-            GUIContent fill = new GUIContent(TextureLibrary.GetTexture("Bucket"));
+            GUIContent fill = new GUIContent(Library.GetTexture("Bucket"));
             if (GUI.Button(new Rect(currentRect.x + 100, currentRect.y, 100, 100), fill))
             {
                 tileGenerator.paintMode = TileGenerator.PaintMode.Fill;
@@ -136,7 +136,7 @@ namespace TileGeneration
             currentRect.y += 100;
 
             // Eraser icon
-            GUIContent erase = new GUIContent(TextureLibrary.GetTexture("Eraser"));
+            GUIContent erase = new GUIContent(Library.GetTexture("Eraser"));
             if (GUI.Button(new Rect(currentRect.position, Vector2.one * 100), erase))
             {
                 tileGenerator.shouldPaint = !tileGenerator.shouldPaint;

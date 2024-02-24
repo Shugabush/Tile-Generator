@@ -286,25 +286,22 @@ namespace TileGeneration
                     switch (condition)
                     {
                         case Condition.ExistingTile:
-                            return TextureLibrary.GetTexture("CheckMark");
+                            return Library.GetTexture("CheckMark");
                         case Condition.NoTile:
-                            return TextureLibrary.GetTexture("XMark");
+                            return Library.GetTexture("XMark");
                         default:
                             return null;
                     }
                 }
 
-                public Mesh GetProperMesh(out Vector3 scale)
+                public Mesh GetProperMesh()
                 {
-                    scale = Vector3.one * 0.125f;
                     switch (condition)
                     {
                         case Condition.ExistingTile:
-                            scale = Vector3.one * 0.125f;
-                            return TextureLibrary.GetMesh("CheckMark");
+                            return Library.GetMesh("CheckMark");
                         case Condition.NoTile:
-                            scale = Vector3.one * 0.125f;
-                            return TextureLibrary.GetMesh("XMark");
+                            return Library.GetMesh("XMark");
                         default:
                             return null;
                     }
