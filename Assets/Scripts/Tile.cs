@@ -210,6 +210,11 @@ namespace TileGeneration
         {
             if (useOffset && Rule != null)
             {
+                if (meshFilters == null)
+                {
+                    meshFilters = prefab.GetComponentsInChildren<MeshFilter>();
+                }
+
                 Rule.GetOffsets(this, out Vector3 positionOffset, out _, out _);
                 Rule.GetFixBounds(this, out bool fixBoundsPosition, out _);
                 if (fixBoundsPosition)
