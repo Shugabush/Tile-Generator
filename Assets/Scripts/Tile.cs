@@ -15,7 +15,7 @@ namespace TileGeneration
 
         public Vector3Int indexPosition;
 
-        RuleTile rule;
+        [SerializeField] RuleTile rule;
         public RuleTile Rule
         {
             get
@@ -40,7 +40,7 @@ namespace TileGeneration
             }
         }
 
-        bool ignoreRule;
+        [SerializeField] bool ignoreRule;
         public bool IgnoreRule
         {
             get
@@ -65,8 +65,8 @@ namespace TileGeneration
             }
         }
 
-        GameObject prefab;
-        MeshFilter[] meshFilters;
+        [SerializeField] GameObject prefab;
+        [SerializeField] MeshFilter[] meshFilters;
 
         // Prefab for this tile (we will be comparing this when deciding if we need to draw a new one or not)
         public GameObject Prefab
