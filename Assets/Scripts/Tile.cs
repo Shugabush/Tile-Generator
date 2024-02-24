@@ -272,7 +272,9 @@ namespace TileGeneration
                         bounds.Encapsulate(filter.sharedMesh.bounds);
                     }
 
-                    returnValue = new Vector3(returnValue.x / bounds.size.x, returnValue.y / bounds.size.y, returnValue.z / bounds.size.z);
+                    float divisor = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
+
+                    returnValue = new Vector3(returnValue.x / divisor, returnValue.y / divisor, returnValue.z / divisor);
                 }
             }
 
@@ -289,9 +291,9 @@ namespace TileGeneration
             if (obj == null || Prefab == null || Rule == null) return;
 
             obj.transform.parent = parent.transform;
-            obj.transform.localPosition = GetTargetPosition();
-            obj.transform.localRotation = GetTargetRotation();
-            obj.transform.localScale = GetTargetScale();
+            obj.transform.localPosition = GetTargetLocalPosition();
+            obj.transform.localRotation = GetTargetLocalRotation();
+            obj.transform.localScale = GetTargetLocalScale();
         }
 
         public Tile(TileGenerator parent, Vector3Int indexPosition)

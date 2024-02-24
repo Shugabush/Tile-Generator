@@ -325,9 +325,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1939783118}
-  m_LocalRotation: {x: -0, y: 0.00000004470348, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.92458, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -982,11 +982,11 @@ MonoBehaviour:
   selectedRule: {fileID: 11400000, guid: 51cccf3e53296554580f28c341246305, type: 2}
   selectedTileIndex: {x: -1, y: 0, z: -1}
   gridPivotPoint: {x: 0.5, y: 0, z: 0.5}
-  debugRuleUsage: 1
-  showMeshes: 0
+  debugRuleUsage: 0
+  showMeshes: 1
   paintRadius: 1
   paintMode: 0
   shouldPaint: 1
   showAllYLevels: 0
-  mousePosition: {x: 328, y: 230}
+  mousePosition: {x: 654, y: 228}
   tilesBeingEdited: []
