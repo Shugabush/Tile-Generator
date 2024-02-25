@@ -46,6 +46,10 @@ namespace TileGeneration
                     {
                         tileGenerator.PaintRadius--;
                     }
+                    else if (RuleTileVisualizer.overRuleButton)
+                    {
+                        tileGenerator.TargetRuleIndex--;
+                    }
                     else
                     {
                         RuleTileVisualizer.hoverSlot?.PreviousCondition();
@@ -57,13 +61,15 @@ namespace TileGeneration
                     {
                         tileGenerator.PaintRadius++;
                     }
+                    else if (RuleTileVisualizer.overRuleButton)
+                    {
+                        tileGenerator.TargetRuleIndex++;
+                    }
                     else
                     {
                         RuleTileVisualizer.hoverSlot?.NextCondition();
                     }
                 }
-
-
 
                 Event.current.Use();
             }

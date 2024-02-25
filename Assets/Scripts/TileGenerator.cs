@@ -107,7 +107,14 @@ namespace TileGeneration
             }
             set
             {
-                selectedTileIndex = value == null ? new Vector3Int(-1, selectedTileIndex.y, -1) : value.indexPosition;
+                if (value == null)
+                {
+                    selectedTileIndex = new Vector3Int(-1, selectedTileIndex.y, -1);
+                }
+                else
+                {
+                    selectedTileIndex = value.indexPosition;
+                }
             }
         }
 
@@ -117,6 +124,35 @@ namespace TileGeneration
         // When the user holds down the mouse button, all tiles that they select will
         // be added to this list, and when they release it, this list will reset
         public List<Tile> tilesBeingEdited = new List<Tile>();
+
+        int targetRuleIndex = 0;
+
+        public int TargetRuleIndex
+        {
+            get
+            {
+                return targetRuleIndex;
+            }
+            set
+            {
+                try
+                {
+                    if (value >= SelectedTile.Rule.rules.Count)
+                    {
+                        value = 0;
+                    }
+                    else if (value < 0)
+                    {
+                        value = SelectedTile.Rule.rules.Count - 1;
+                    }
+                    targetRuleIndex = value;
+                }
+                catch
+                {
+
+                }
+            }
+        }
 
         void OnEnable()
         {
@@ -387,7 +423,7 @@ namespace TileGeneration
             {
                 if (selectedTile != null)
                 {
-                    RuleTileVisualizer.Display(mousePosition, selectedTile);
+                    RuleTileVisualizer.Draw(mousePosition, selectedTile, TargetRuleIndex);
                 }
             }
             else
@@ -767,23 +803,37 @@ namespace TileGeneration
                 case PaintMode.Draw:
                     break;
                 case PaintMode.Fill:
-                    return $"Click to fill a tile \n " +
-                $"Shift click to toggle whether a tile will evaluate their rule or just use their default game object.";
+                    return "Click to fill a tile \n " +
+                "Shift click to toggle whether a tile will evaluate their rule or just use their default game object.";
                 case PaintMode.ViewRules:
+
+                    try
+                    {
+                        if (RuleTileVisualizer.overRuleButton)
+                        {
+                            // Label the rule we're looking at out of how many there are on the selected tile
+                            return $"Viewing rule {targetRuleIndex + 1} of {SelectedTile.Rule.rules.Count} rules";
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+
                     if (setSelectedTile)
                     {
-                        return $"Click to select a tile.";
+                        return "Click to select a tile.";
                     }
-                    return $"Hover over the labeled squares and scroll to change their requirements.";
+                    return "Hover over the labeled squares and scroll to change their requirements.";
                 case PaintMode.ToggleRuleUsage:
                     break;
                 default:
                     return $"Click to {(shouldPaint ? "draw" : "erase")} a tile\n " +
-                $"Shift click to toggle whether a tile will evaluate their rule or just use their default game object.";
+                "Shift click to toggle whether a tile will evaluate their rule or just use their default game object.";
             }
 
             return $"Click to {(shouldPaint ? "draw" : "erase")} a tile\n " +
-                $"Shift click to toggle whether a tile will evaluate their rule or just use their default game object.";
+                "Shift click to toggle whether a tile will evaluate their rule or just use their default game object.";
         }
     }
 }

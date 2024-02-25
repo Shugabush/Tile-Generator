@@ -74,6 +74,66 @@ MonoBehaviour:
     positionOffset: {x: 0, y: 0, z: 0}
     rotationOffset: {x: 0, y: 0, z: 0}
     scaleMultiplier: {x: 1, y: 1, z: 1}
+  - slots:
+    - direction: {x: -1, y: -1, z: -1}
+      condition: 1
+    - direction: {x: -1, y: -1, z: 0}
+      condition: 1
+    - direction: {x: -1, y: -1, z: 1}
+      condition: 1
+    - direction: {x: -1, y: 0, z: -1}
+      condition: 0
+    - direction: {x: -1, y: 0, z: 0}
+      condition: 1
+    - direction: {x: -1, y: 0, z: 1}
+      condition: 0
+    - direction: {x: -1, y: 1, z: -1}
+      condition: 2
+    - direction: {x: -1, y: 1, z: 0}
+      condition: 2
+    - direction: {x: -1, y: 1, z: 1}
+      condition: 2
+    - direction: {x: 0, y: -1, z: -1}
+      condition: 1
+    - direction: {x: 0, y: -1, z: 0}
+      condition: 1
+    - direction: {x: 0, y: -1, z: 1}
+      condition: 1
+    - direction: {x: 0, y: 0, z: -1}
+      condition: 1
+    - direction: {x: 0, y: 0, z: 1}
+      condition: 1
+    - direction: {x: 0, y: 1, z: -1}
+      condition: 2
+    - direction: {x: 0, y: 1, z: 0}
+      condition: 2
+    - direction: {x: 0, y: 1, z: 1}
+      condition: 2
+    - direction: {x: 1, y: -1, z: -1}
+      condition: 1
+    - direction: {x: 1, y: -1, z: 0}
+      condition: 1
+    - direction: {x: 1, y: -1, z: 1}
+      condition: 1
+    - direction: {x: 1, y: 0, z: -1}
+      condition: 0
+    - direction: {x: 1, y: 0, z: 0}
+      condition: 2
+    - direction: {x: 1, y: 0, z: 1}
+      condition: 0
+    - direction: {x: 1, y: 1, z: -1}
+      condition: 2
+    - direction: {x: 1, y: 1, z: 0}
+      condition: 2
+    - direction: {x: 1, y: 1, z: 1}
+      condition: 2
+    newObj: {fileID: 919132149155446097, guid: 05618ba2de9130646983e6a60cb88c3c, type: 3}
+    open: 1
+    fixBoundsPosition: 1
+    fixBoundsScale: 1
+    positionOffset: {x: 0, y: 0, z: 0}
+    rotationOffset: {x: 0, y: 0, z: 0}
+    scaleMultiplier: {x: 1, y: 1, z: 1}
   fixBoundsPosition: 1
   fixBoundsScale: 1
   positionOffset: {x: 0, y: 0, z: 0}
